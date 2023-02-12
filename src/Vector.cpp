@@ -60,7 +60,7 @@ Vector Vector::operator*( const float& n ) const
 
 std::ostream& operator<<( std::ostream& o, const Vector& v )
 {
-    return o << "X : " << v._x << "\nY : " << v._y << "\nZ : " << v._z ;
+    return o << "X : " << v._x << "\tY : " << v._y << "\tZ : " << v._z<<"\n" ;
 }
 
 
