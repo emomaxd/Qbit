@@ -47,6 +47,17 @@ Vector Vector::operator-( const float& n ) const
     return Vector(_x - n, _y - n, _z - n );
 }
 
+Vector Vector::operator/( const float& n ) const
+{
+    return Vector( _x / n, _y / n, _z / n );
+}
+
+Vector Vector::operator*( const float& n ) const
+{
+    return Vector( _x * n, _y * n, _z * n );
+}
+
+
 std::ostream& operator<<( std::ostream& o, const Vector& v )
 {
     return o << "X : " << v._x << "\nY : " << v._y << "\nZ : " << v._z ;

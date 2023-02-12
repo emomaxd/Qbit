@@ -29,6 +29,9 @@
             Vector operator-( const Vector& other ) const ;
             Vector operator-( const float& n ) const ;
 
+            Vector operator/( const float& n ) const ;
+            Vector operator*( const float& n ) const ; 
+
             friend std::ostream& operator<<( std::ostream& o, const Vector& v );
 
             friend float dotProduct( const Vector& a, const Vector& b );

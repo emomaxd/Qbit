@@ -1,4 +1,5 @@
+@echo off
 cd src
-g++ Application.cpp ..\include\lib\Vector.o Box.cpp -o ..\build\a.exe
+g++ Application.cpp Vector.cpp Box.cpp -o ..\build\a.exe
 cd ..
 build\a.exe
