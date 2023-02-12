@@ -20,3 +20,7 @@ Makefile
 /x64
 /Physics.dir
 /.vs
+
+# ! SUS !
+token.txt
+github_url.txt

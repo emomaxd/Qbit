@@ -16,6 +16,7 @@
                           *If you are *not* seeing the "make.exe" you are probably seeing a file like "mingw32-make.exe" -> Rename that as "make.exe"
                         
    #IF (UNIX)
-   
-      Just run the "cmake ." and then "make"
+
+      OPTION 1 - Just run the "cmake ." and then "make" in your terminal
+      OPTION 2 - Open your terminal and type "chmod +x build.sh" then type "./build.sh"
 <pre/>
