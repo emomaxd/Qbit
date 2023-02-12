@@ -7,9 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add the source files
 file(GLOB SOURCES "src/*.cpp")
-add_executable(Physics.o ${SOURCES})
+add_executable(Physics ${SOURCES})
 
 # Set the output directory for the build files
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+

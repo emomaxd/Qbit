@@ -1,8 +1,22 @@
+# OUTPUT FILES
 *.exe
 *.o
 *.out
+
+# CMAKE BUILD FILES
 /CMakeFiles
 CMakeCache.txt
 *.cmake
+/build
+
+# LINUX SPECIFIED BUILD FILES
 Makefile
-/include/lib
+
+# WINDOWS SPECIFIED BUILD FILES
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+/x64
+/Physics.dir
+/.vs
