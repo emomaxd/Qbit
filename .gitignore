@@ -24,3 +24,6 @@ Makefile
 # ! SUS !
 token.txt
 github_url.txt
+
+# VSCODE
+/.vscode
