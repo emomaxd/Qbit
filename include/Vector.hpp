@@ -36,6 +36,6 @@
 
             friend float dotProduct( const Vector& a, const Vector& b );
             friend Vector crossProduct( const Vector& a, const Vector& b );
-            Vector GET_UNIT_VECTOR();
+            Vector normalized();
     };
 

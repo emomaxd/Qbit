@@ -17,17 +17,19 @@ int main(){
 
 
     // OBJECT PROPERTIES
-    const     float     MASS = 5;
+    const     float     MASS = 3;
 
 
     // OBJECTS INSTANTIATION
-    Box b( Vector(0,0,0), Vector(0,0,0), Vector(0, -9.8f * MASS, 0), MASS, 4, 4, 4 );
-    
+    Box b( Vector(0,5000,0), Vector(0,0,0), Vector(0, -9.8f * MASS, 0), MASS, 4, 4, 4 );
+    Box b1( Vector(0,5,0), Vector(0,0,0), Vector(0, 0 * MASS, 0), MASS, 4, 4, 4 );
 
     // SCENE 
     Scene* scene = Scene::getInstance();
     b.ID = scene->addBox( &b );
+    b1.ID = scene->addBox( &b1 );
 
+    
 
     // PROGRAM LOOP
     auto LAST_TIME = std::chrono::high_resolution_clock::now();
@@ -59,7 +61,7 @@ int main(){
     } 
 
     
-    std::cin.get();
+    //std::cin.get();
     return 0;
 
 

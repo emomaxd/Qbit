@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <vector>
 #include <cstdint>
 
 #include "Box.hpp"
@@ -8,7 +8,7 @@
 class Scene {
 private:
     static Scene* _instance;
-    std::unordered_map< uint64_t, Box* > _boxes; // USE SHARED POINTER HERE
+    std::vector< Box* > _boxes;
     uint64_t nextID = 0 ;
     Scene() {}
 
@@ -17,9 +17,13 @@ public:
 
     uint64_t addBox( Box* box );
 
-    void removeBox( uint64_t ID );
+    void removeBox( const Box& box );
 
+    void removeBox( const uint64_t& ID );
+    
     void update( const float &dt );
+
+    void listAllBoxes();
 
     void checkCollisions();
 };

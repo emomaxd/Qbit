@@ -9,7 +9,7 @@ private:
     
     float _mass;
     
-    Vector _pos, _force, _velocity, _a, _momentum;
+    Vector _pos, _initial_pos, _force, _velocity, _initial_velocity,_a, _momentum;
     
     float _width, _height, _depth;
 
@@ -25,13 +25,12 @@ public:
 
     void update( const float& dt );
     
-    bool isColliding( const Box& other );
+    bool isColliding( Box* other );
 
     void print();
 
-
     void applyForce( const Vector& F );
 
-    void handleCollision( const Box& other );     
+    void handleCollision( Box* other );     
 
 };

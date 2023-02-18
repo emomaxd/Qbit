@@ -79,5 +79,5 @@ Vector crossProduct( const Vector& a, const Vector& b )
     ,                   a._x * b._y - a._y * b._x                   );
 }
 
-Vector Vector::GET_UNIT_VECTOR(){ return Vector( _x/getMagnitude(), _y/getMagnitude(), _z/getMagnitude() ); }
+Vector Vector::normalized(){ return Vector( _x/getMagnitude(), _y/getMagnitude(), _z/getMagnitude() ); }
         
