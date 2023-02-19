@@ -13,42 +13,34 @@ Scene* Scene::getInstance()
     return _instance;
 }
 
-uint64_t Scene::addBox( Box* box ) 
+uint64_t Scene::addBox( std::unique_ptr<Box> box ) 
 {
     uint64_t id = nextID;
     
-    _boxes.push_back(box);
+    _boxes.push_back(std::move(box));
     
     nextID++;
 
     return id;
 }
-/*
-void Scene::removeBox( const Box& box )
+
+bool Scene::removeBox( const uint64_t& ID )
 {
-    auto it = std::find_if(_boxes.begin(), _boxes.end(), [](const Box* b,const Box& box){ return b->ID == box.ID; });
+    auto it = std::find_if(_boxes.begin(), _boxes.end(), [&](const std::unique_ptr<Box>& b){ return b->ID == ID; });
 
     if( it != _boxes.end() ){
+        std::cout << "DELETED\n";
         _boxes.erase( it );
-        return;
+        return true;
     }
     std::cout<<"Couldn't remove the box, NOT FOUND!\n";
+    return false;
 }
 
-void Scene::removeBox( const uint64_t& ID )
-{
-    auto it = std::find_if(_boxes.begin(), _boxes.end(), [](const Box* b,const uint64_t& ID){ return b->ID == ID; });
-
-    if( it != _boxes.end() ){
-        _boxes.erase( it );
-        return;
-    }
-    std::cout<<"Couldn't remove the box, NOT FOUND!\n";
-}
-*/
 void Scene::update( const float &dt ) 
 {
-    for ( auto box : _boxes ) 
+    // NEED 2 SEPERATE THREADS , PARALLEL 
+    for ( const std::unique_ptr<Box>& box : _boxes ) 
     {
         box->update( dt );
     }
@@ -64,16 +56,18 @@ void Scene::checkCollisions()
             
             if (_boxes[i]->isColliding(_boxes[j])) {
                 _boxes[i]->handleCollision(_boxes[j]);
+                exit(0);
             }
 
         }
 
     }
 }
-/*
+
 void Scene::listAllBoxes(){
-    for( auto b : _boxes ){
-        std::cout << "Box " << b->ID << " " << b->_pos;
+    std::cout << "TOTAL BOXES : " << _boxes.size() << "\n";
+    for( const std::unique_ptr<Box>& b : _boxes ){
+        std::cout << "Box " << b->ID << " " << b->getPos();
     }
 }
-*/
+

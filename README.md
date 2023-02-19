@@ -19,4 +19,13 @@
 
       OPTION 1 - Just run the "cmake ." and then "make" in your terminal
       OPTION 2 - Open your terminal and type "chmod +x build.sh" then type "./build.sh"
-<pre/>
+</pre>
+
+# TO-DO
+- [X] Memory handling with unique_ptr
+- [ ] Better collision check algorithm
+- [ ] Collision Handling
+- [ ] Add Rotation stuff ( Moment of Inertia, Rotation Vector )
+- [ ] Super Class-Interface named as Object
+- [ ] Sphere class
+- [ ] Rendering

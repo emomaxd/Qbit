@@ -21,34 +21,42 @@ int main(){
 
 
     // OBJECTS INSTANTIATION
-    Box b( Vector(0,5000,0), Vector(0,0,0), Vector(0, -9.8f * MASS, 0), MASS, 4, 4, 4 );
-    Box b1( Vector(0,5,0), Vector(0,0,0), Vector(0, 0 * MASS, 0), MASS, 4, 4, 4 );
+    std::unique_ptr<Box> b  = std::make_unique<Box>(  Vector(0,200,0), Vector(0,0,0), Vector(0, -9.8f * MASS, 0), MASS, 4, 4, 4 );
+    std::unique_ptr<Box> b1 = std::make_unique<Box>( Vector(0,5,0), Vector(0,0,0), Vector(0, 0 * MASS, 0), MASS, 4, 4, 4        );
+    std::unique_ptr<Box> b2 = std::make_unique<Box>( Vector(0,50,0), Vector(0,0,0), Vector(0, 0 * MASS, 0), MASS, 4, 4, 4       );
+    
 
     // SCENE 
     Scene* scene = Scene::getInstance();
-    b.ID = scene->addBox( &b );
-    b1.ID = scene->addBox( &b1 );
 
+    Box* raw_b = b.get();
+
+    scene->addBox( std::move(b) );
+    scene->addBox( std::move(b1) );
+    scene->addBox( std::move(b2) );
+
+    //scene->removeBox( raw_b->ID ); // WORKS CORRECTLY!
     
+    scene->listAllBoxes();
+ 
 
     // PROGRAM LOOP
-    auto LAST_TIME = std::chrono::high_resolution_clock::now();
+    float TOTAL_TIME = 0 ;
 
-    float i = 0 ;
+    float dt = TARGET_DT;
+    auto LAST_TIME = std::chrono::high_resolution_clock::now();
+    
     while ( true )
     {
-
-
-        //
-        auto CURRENT_TIME = std::chrono::high_resolution_clock::now();
-        float dt = std::chrono::duration_cast<std::chrono::duration<float>>(CURRENT_TIME - LAST_TIME).count();
-        //
-
-
+        std::cout << "Total time : " << TOTAL_TIME << "\n";
         scene->update( dt );
-        b.print();
+        raw_b->print();
+        TOTAL_TIME += dt ;
 
-        i += dt ;
+        // ---
+        auto CURRENT_TIME = std::chrono::high_resolution_clock::now();
+        dt = std::chrono::duration_cast< std::chrono::duration< float > >(CURRENT_TIME - LAST_TIME).count();
+        // ---
 
         // SYNCHRONIZATION WITH REAL-TIME
         LAST_TIME = CURRENT_TIME;
@@ -57,12 +65,8 @@ int main(){
 
         if( REMAINING_TIME > 0.0f )
             std::this_thread::sleep_for( std::chrono::duration< float > ( REMAINING_TIME ) );
-        //
+        // ---
     } 
-
     
-    //std::cin.get();
     return 0;
-
-
 }

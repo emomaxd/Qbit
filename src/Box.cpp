@@ -3,41 +3,34 @@
 
 Box::Box() 
         : _force(Vector()), _pos(Vector()), _velocity(Vector()),
-          _mass(0), _momentum(0,0,0), _width(0), _height(0), _depth(0), _a(0, 0, 0), _initial_pos(0,0,0), _initial_velocity(0,0,0) {}
+          _mass(0), _momentum(0,0,0), _width(0), _height(0), _depth(0), _a(0, 0, 0) {}
 
 Box::Box( Vector pos, Vector velocity, Vector F,
           float mass, float w, float h, float d ) 
           : _pos(pos), _velocity(velocity), _force(F),
-            _mass(mass), _width(w), _height(h), _depth(d) , _a(0,0,0), _momentum(0,0,0), _initial_pos(pos), _initial_velocity(0,0,0) {}
+            _mass(mass), _width(w), _height(h), _depth(d) , _a(0,0,0), _momentum(0,0,0) {}
 
+Box::~Box()
+{
+    std::cout << "Destructor called, Object " << ID << " deleted\n";
+}
 
-
-static float totalTimePassed = 0 ;
 void Box::update( const float& dt )
 {
     
     computeAcc();
 
     if( _a.getMagnitude() != 0){
-        //_pos = _pos + _velocity * dt + _a * dt * dt / 2;
-        _pos = _initial_pos + _a * totalTimePassed * totalTimePassed / 2;
-        _velocity = _initial_velocity + _a * totalTimePassed ; // FIX ??
+        _pos = _pos + _velocity * dt + _a * dt * dt * 0.5f;
+        _velocity = _velocity + _a * dt;
     }
 
     if( _velocity.getMagnitude() != 0)
         computeMomentum();
     
-    
-
-
-    std::cout<< "Total time passed : " << totalTimePassed << "\n";
-
-
-    totalTimePassed += dt;
-    
 }
 
-bool Box::isColliding( Box* other ) 
+bool Box::isColliding( const std::unique_ptr<Box>& other ) 
 {
 
     Vector thisMinCorner = _pos - Vector( _width / 2.0f, _height / 2.0f, _depth / 2.0f );
@@ -61,10 +54,10 @@ bool Box::isColliding( Box* other )
     return true;
 }
 
-// 3D - GENERALIZED MOMENTUM CALCULATION FOR BOXES THEIR CENTER IS NOT ALIGNED
-void Box::handleCollision( Box* other )
+// 3D - GENERALIZED MOMENTUM CALCULATION FOR BOXES THEIR CENTER IS NOT ALIGNED , CALCULATE TORQUE ALSO
+void Box::handleCollision( const std::unique_ptr<Box>& other )
 {
-    //std::cout << "Collision handled!\n";
+    std::cout << "Collision handled!\n";
     Vector distance = other->_pos - _pos;
 
     Vector unit_normal = distance.normalized();
@@ -73,9 +66,14 @@ void Box::handleCollision( Box* other )
 
 }
 
-void Box::applyForce( const Vector& F )
+void Box::addForce( const Vector& F )
 {
     _force = _force + F;
+}
+
+void Box::removeForce( const Vector& F )
+{
+    _force = _force - F;
 }
 
 void Box::computeAcc()
@@ -90,10 +88,15 @@ void Box::computeMomentum()
 
 void Box::print()
 {
-    std::cout << "Position     : " << _pos << 
+    std::cout << "Position     : "   << _pos << 
                  "\nVelocity     : " << _velocity << 
                  "\nAcceleration : " << _a << 
                  "\nMomentum     : " << _momentum << 
                  "\nForce        : " << _force << 
     "\n";
 }
+
+
+// GETTER SETTER
+
+Vector Box::getPos(){ return _pos; }

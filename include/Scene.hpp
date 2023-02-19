@@ -2,24 +2,25 @@
 
 #include <vector>
 #include <cstdint>
+#include <memory>
 
 #include "Box.hpp"
 
 class Scene {
 private:
+
     static Scene* _instance;
-    std::vector< Box* > _boxes;
+    std::vector< std::unique_ptr<Box> > _boxes;
     uint64_t nextID = 0 ;
     Scene() {}
 
 public:
+
     static Scene* getInstance();
 
-    uint64_t addBox( Box* box );
+    uint64_t addBox( std::unique_ptr<Box> box );
 
-    void removeBox( const Box& box );
-
-    void removeBox( const uint64_t& ID );
+    bool removeBox( const uint64_t& ID );
     
     void update( const float &dt );
 
