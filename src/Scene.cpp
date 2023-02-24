@@ -13,24 +13,24 @@ Scene* Scene::getInstance()
     return _instance;
 }
 
-uint64_t Scene::addBox( std::unique_ptr<Box> box ) 
+uint64_t Scene::add( std::unique_ptr<Object> o ) 
 {
     uint64_t id = nextID;
     
-    _boxes.push_back(std::move(box));
+    _objects.push_back(std::move(o));
     
     nextID++;
 
     return id;
 }
 
-bool Scene::removeBox( const uint64_t& ID )
+bool Scene::remove( const uint64_t& ID )
 {
-    auto it = std::find_if(_boxes.begin(), _boxes.end(), [&](const std::unique_ptr<Box>& b){ return b->ID == ID; });
+    auto it = std::find_if(_objects.begin(), _objects.end(), [&](const std::unique_ptr<Object>& o){ return o->getID() == ID; });
 
-    if( it != _boxes.end() ){
+    if( it != _objects.end() ){
         std::cout << "DELETED\n";
-        _boxes.erase( it );
+        _objects.erase( it );
         return true;
     }
     std::cout<<"Couldn't remove the box, NOT FOUND!\n";
@@ -39,10 +39,9 @@ bool Scene::removeBox( const uint64_t& ID )
 
 void Scene::update( const float &dt ) 
 {
-    // NEED 2 SEPERATE THREADS , PARALLEL 
-    for ( const std::unique_ptr<Box>& box : _boxes ) 
+    for ( const std::unique_ptr<Object>& o : _objects ) 
     {
-        box->update( dt );
+        o->update( dt );
     }
     checkCollisions();
 }
@@ -50,12 +49,12 @@ void Scene::update( const float &dt )
 void Scene::checkCollisions() 
 {
    
-    for (int i = 0; i < _boxes.size(); i++) {
+    for (int i = 0; i < _objects.size(); i++) {
         
-        for (int j = i + 1; j < _boxes.size(); j++) {
+        for (int j = i + 1; j < _objects.size(); j++) {
             
-            if (_boxes[i]->isColliding(_boxes[j])) {
-                _boxes[i]->handleCollision(_boxes[j]);
+            if (_objects[i]->isColliding(_objects[j])) {
+                _objects[i]->handleCollision(_objects[j]);
                 exit(0);
             }
 
@@ -64,10 +63,10 @@ void Scene::checkCollisions()
     }
 }
 
-void Scene::listAllBoxes(){
-    std::cout << "TOTAL BOXES : " << _boxes.size() << "\n";
-    for( const std::unique_ptr<Box>& b : _boxes ){
-        std::cout << "Box " << b->ID << " " << b->getPos();
+void Scene::listAll(){
+    std::cout << "TOTAL OBJECTS : " << _objects.size() << "\n";
+    for( const std::unique_ptr<Object>& o : _objects ){
+        std::cout << "Object " << o->getID() << " " << o->getPosition();
     }
 }
 

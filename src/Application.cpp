@@ -3,10 +3,10 @@
 #include <chrono>
 #include <thread>
 
-#include "../include/Vector.hpp"
-#include "../include/Box.hpp"
 #include "../include/Scene.hpp"
+#include "../include/Sphere.hpp"
 
+// FOCUSED TO SPHERE ! FIRST ! 
 
 int main(){
 
@@ -16,28 +16,27 @@ int main(){
     constexpr float     TARGET_DT  = 1.0f / TARGET_FPS ;
 
 
-    // OBJECT PROPERTIES
-    const     float     MASS = 3;
-
-
     // OBJECTS INSTANTIATION
-    std::unique_ptr<Box> b  = std::make_unique<Box>(  Vector(0,200,0), Vector(0,0,0), Vector(0, -9.8f * MASS, 0), MASS, 4, 4, 4 );
-    std::unique_ptr<Box> b1 = std::make_unique<Box>( Vector(0,5,0), Vector(0,0,0), Vector(0, 0 * MASS, 0), MASS, 4, 4, 4        );
-    std::unique_ptr<Box> b2 = std::make_unique<Box>( Vector(0,50,0), Vector(0,0,0), Vector(0, 0 * MASS, 0), MASS, 4, 4, 4       );
+    std::unique_ptr<Object> o  = std::make_unique<Sphere>( 3, 5, Vector(0,200,0), Vector(0,0,0) );
+    std::unique_ptr<Object> o1 = std::make_unique<Sphere>( 3, 5, Vector(0,50,0), Vector(0,0,0) );
+    std::unique_ptr<Object> o2 = std::make_unique<Sphere>( 3, 5, Vector(0,5,0), Vector(0,0,0));
     
 
     // SCENE 
     Scene* scene = Scene::getInstance();
 
-    Box* raw_b = b.get();
+    Object* raw_o = o.get();
 
-    scene->addBox( std::move(b) );
-    scene->addBox( std::move(b1) );
-    scene->addBox( std::move(b2) );
+    o->addForce(Vector(0, o->getMass() * -9.8f , 0));
 
-    //scene->removeBox( raw_b->ID ); // WORKS CORRECTLY!
+    o->setID(scene->add( std::move(o)));
+    o1->setID(scene->add( std::move(o1)));
+    o2->setID(scene->add( std::move(o2)));
+
+
+    scene->remove( 1 );
     
-    scene->listAllBoxes();
+    scene->listAll();
  
 
     // PROGRAM LOOP
@@ -50,7 +49,7 @@ int main(){
     {
         std::cout << "Total time : " << TOTAL_TIME << "\n";
         scene->update( dt );
-        raw_b->print();
+        raw_o->print();
         TOTAL_TIME += dt ;
 
         // ---

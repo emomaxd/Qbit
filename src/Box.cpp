@@ -18,7 +18,7 @@ Box::~Box()
 void Box::update( const float& dt )
 {
     
-    computeAcc();
+    _a = _force * _mass;
 
     if( _a.getMagnitude() != 0){
         _pos = _pos + _velocity * dt + _a * dt * dt * 0.5f;
@@ -26,7 +26,7 @@ void Box::update( const float& dt )
     }
 
     if( _velocity.getMagnitude() != 0)
-        computeMomentum();
+        _momentum = _velocity * _mass;
     
 }
 
@@ -54,16 +54,16 @@ bool Box::isColliding( const std::unique_ptr<Box>& other )
     return true;
 }
 
-// 3D - GENERALIZED MOMENTUM CALCULATION FOR BOXES THEIR CENTER IS NOT ALIGNED , CALCULATE TORQUE ALSO
 void Box::handleCollision( const std::unique_ptr<Box>& other )
 {
-    std::cout << "Collision handled!\n";
-    Vector distance = other->_pos - _pos;
+    Box* otherP = other.get();
 
-    Vector unit_normal = distance.normalized();
-    //Vector unit_tangent = Vector(-unit_normal.getY(), -unit_normal.getX());
+    float k1 = 0.5f * _mass * pow(_velocity.getMagnitude(), 2);
+    float k2 = 0.5f * otherP->_mass * pow(otherP->_velocity.getMagnitude(), 2); 
+    float E = k1 + k2;
 
-
+    Vector v1f = _velocity - (otherP->_mass / (otherP->_mass + _mass) ) * (_velocity - otherP->_velocity) + (2 * otherP->_mass / (otherP->_mass + _mass) ) * (otherP->_velocity - _velocity);
+    _velocity = v1f;
 }
 
 void Box::addForce( const Vector& F )
@@ -74,16 +74,6 @@ void Box::addForce( const Vector& F )
 void Box::removeForce( const Vector& F )
 {
     _force = _force - F;
-}
-
-void Box::computeAcc()
-{
-    _a = _force / _mass ; 
-}
-
-void Box::computeMomentum()
-{
-    _momentum = _velocity * _mass;
 }
 
 void Box::print()

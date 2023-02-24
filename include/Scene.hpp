@@ -4,27 +4,28 @@
 #include <cstdint>
 #include <memory>
 
-#include "Box.hpp"
+#include "Object.hpp"
 
 class Scene {
-private:
-
-    static Scene* _instance;
-    std::vector< std::unique_ptr<Box> > _boxes;
-    uint64_t nextID = 0 ;
-    Scene() {}
-
 public:
 
     static Scene* getInstance();
 
-    uint64_t addBox( std::unique_ptr<Box> box );
+    uint64_t add( std::unique_ptr<Object> o );
 
-    bool removeBox( const uint64_t& ID );
+    bool remove( const uint64_t& ID );
     
     void update( const float &dt );
 
-    void listAllBoxes();
+    void listAll();
 
     void checkCollisions();
+
+private:
+
+    static Scene* _instance;
+    std::vector< std::unique_ptr<Object> > _objects;
+    uint64_t nextID = 0 ;
+    Scene() {}
+
 };

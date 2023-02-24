@@ -5,17 +5,25 @@
 
 #include "Vector.hpp"
 
+
+/*
+
+    // IS GONNA BE MODIFED
+    // 25 FEB 2023 , 00.10
+
+*/
+
+
+
 class Box{
 private:
     
     float _mass;
     
-    Vector _pos, _force, _velocity, _a, _momentum;
+    Vector _pos, _force, _forcePos, _velocity, _a, _momentum;
     
     float _width, _height, _depth;
 
-    void computeAcc();
-    void computeMomentum();
     
 public:
     // (~) -> CTRL+SHIFT+U+7E 

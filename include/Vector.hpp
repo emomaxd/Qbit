@@ -26,11 +26,18 @@
             Vector operator+( const Vector& other ) const ;
             Vector operator+( const float& n ) const ;
 
+            Vector& operator+=( const Vector& other ) ;
+            Vector& operator+=( const float& n ) ;
+
             Vector operator-( const Vector& other ) const ;
             Vector operator-( const float& n ) const ;
 
+            Vector& operator-=( const Vector& other ) ;
+            Vector& operator-=( const float& n ) ;
+
             Vector operator/( const float& n ) const ;
             Vector operator*( const float& n ) const ; 
+            friend Vector operator*( const float& n, const Vector& v);
 
             friend std::ostream& operator<<( std::ostream& o, const Vector& v );
 
