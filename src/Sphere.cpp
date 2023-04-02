@@ -3,18 +3,19 @@
 
 #include "../include/Sphere.hpp"
 
-Sphere::Sphere(const float& radius, const float& mass, const Vector& position, const Vector& velocity)
+Sphere::Sphere(const float& radius, const float& mass, const Vector& position, const Vector& rotation, const Vector& velocity)
     : _radius(radius)
 {
     _mass = mass;
     _position = position;
     _velocity = velocity;
-    TYPE = 0;
+    _rotation = rotation;
+    ID = count++;
 }
 
 Sphere::~Sphere()
 {
-    std::cout << "Destructor called, SPHERE " << ID << " deleted\n";
+    //std::cout << "Destructor called, SPHERE " << ID << " deleted\n";
 }
 
 bool Sphere::isColliding(const std::unique_ptr<Object>& other)
@@ -30,15 +31,14 @@ bool Sphere::isColliding(const std::unique_ptr<Object>& other)
         // If the distance between the centers is less than the sum of the radii,
         // the two spheres are colliding
         if (distance < sumRadii) {
-            std::cout << "Collided with another sphere" << std::endl;
-            exit(0);
+            //std::cout << "\nCollided with another sphere";
             return true;
         }
     }
 
     // NON-SPHERE COLLISION CHECK
     /*
-        // IMPLEMENTATION
+    *  IMPLEMENTATION
     */
 
     return false;
@@ -51,19 +51,29 @@ void Sphere::handleCollision(const std::unique_ptr<Object>& other)
         // handle collision with non-Sphere object
         return;
     }
+    Vector v1i = _velocity;
+    Vector v2i = otherP->_velocity;
 
-    Vector v1f = _velocity - (otherP->_mass / (otherP->_mass + _mass) ) * (_velocity - otherP->_velocity) + (2 * otherP->_mass / (otherP->_mass + _mass) ) * (otherP->_velocity - _velocity);
-    _velocity = v1f;
+    // v1 final
+    _velocity = ((v1i * (_mass - otherP->_mass )) + 2.0f * otherP->_mass * v2i) / (_mass + otherP->_mass);
+    
+    // v2 final
+    otherP->_velocity = ((v2i * (otherP->_mass - _mass )) + 2.0f * _mass * v1i) / (_mass + otherP->_mass);
+    
 }
 
-void Sphere::update(const float& dt)
+void Sphere::update(const float& dt) 
 {
     Vector acceleration = calcAcceleration(_netForce, _mass);
-    _velocity = _velocity + acceleration * dt;
-    _position = _position + _velocity * dt;
+    
+    if(acceleration.getMagnitude() != 0)
+        _velocity += acceleration * dt;
+
+        _position += _velocity * dt;
 }
 
 void Sphere::print()
 {
-    std::cout << "Sphere: radius = " << _radius << ", mass = " << _mass << ", position = (" << _position.getX() << ", " << _position.getY() << ", " << _position.getZ() << ")" << std::endl;
+    std::cout << "\rSphere: radius = " << _radius << ", mass = " << _mass << ", position = (" << _position.getX() << ", " << _position.getY() << ", " << _position.getZ() << ")"
+    << "Sphere: velocity = " << _velocity << "\n";
 }

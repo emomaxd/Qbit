@@ -9,23 +9,6 @@ Vector::Vector( const float& x, const float& y, const float& z ) : _x(x), _y(y),
 
 
 
-// GETTER SETTER
-float Vector::getX() const { return _x; }
-
-float Vector::getY() const { return _y; }
-
-float Vector::getZ() const { return _z; }
-
-void Vector::setX( const float& n ){ _x = n; }
-
-void Vector::setY( const float& n ){ _y = n; }
-
-void Vector::setZ( const float& n ){ _z = n; }
-
-float Vector::getMagnitude() const { return sqrt( _x*_x + _y*_y + _z*_z ); }
-
-
-
 // OPERATOR OVERLOADS
 Vector Vector::operator+( const Vector& other ) const
 {
@@ -56,7 +39,7 @@ Vector& Vector::operator-=( const float& n ) { _x -= n; _y -= n; _z -= n; return
 
 Vector Vector::operator/( const float& n ) const
 {
-    return Vector( _x / n, _y / n, _z / n );
+    return Vector( (float)_x / n, (float)_y / n, (float)_z / n );
 }
 
 Vector Vector::operator*( const float& n ) const
@@ -73,7 +56,7 @@ Vector operator*( const float& n, const Vector& v)
 
 std::ostream& operator<<( std::ostream& o, const Vector& v )
 {
-    return o << "X : " << v._x << "\tY : " << v._y << "\tZ : " << v._z<<"\n" ;
+    return o << "X : " << v._x << "\tY : " << v._y << "\tZ : " << v._z;
 }
 
 

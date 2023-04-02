@@ -4,6 +4,7 @@
 #include "../include/Scene.hpp"
 
 Scene* Scene::_instance = 0;
+float Scene::TOTAL_TIME = 0;
 
 Scene* Scene::getInstance() 
 {
@@ -29,7 +30,7 @@ bool Scene::remove( const uint64_t& ID )
     auto it = std::find_if(_objects.begin(), _objects.end(), [&](const std::unique_ptr<Object>& o){ return o->getID() == ID; });
 
     if( it != _objects.end() ){
-        std::cout << "DELETED\n";
+        //std::cout << "DELETED\n";
         _objects.erase( it );
         return true;
     }
@@ -44,6 +45,13 @@ void Scene::update( const float &dt )
         o->update( dt );
     }
     checkCollisions();
+    TOTAL_TIME += dt;
+}
+
+Object* Scene::getObject( uint64_t ID )
+{
+    auto it = std::find_if(_objects.begin(), _objects.end(), [&](const std::unique_ptr<Object>& o){ return o->getID() == ID; });
+    return it.base()->get();
 }
 
 void Scene::checkCollisions() 
@@ -55,7 +63,7 @@ void Scene::checkCollisions()
             
             if (_objects[i]->isColliding(_objects[j])) {
                 _objects[i]->handleCollision(_objects[j]);
-                exit(0);
+                
             }
 
         }
@@ -64,9 +72,22 @@ void Scene::checkCollisions()
 }
 
 void Scene::listAll(){
-    std::cout << "TOTAL OBJECTS : " << _objects.size() << "\n";
+    std::cout << "\nTOTAL OBJECTS : " << _objects.size() << "\n";
     for( const std::unique_ptr<Object>& o : _objects ){
-        std::cout << "Object " << o->getID() << " " << o->getPosition();
+        std::cout << "Object " << o->getID() << " Position : " << o->getPosition() << " Velocity : " << o->getVelocity() << "\n";
     }
+}
+
+void Scene::printObject(Object* o, float dt){
+    std::cout << "\33[2K\rObject ID : " << o->getID() << " Position = (" << o->getPosition() << ") Mass = " << o->getMass()
+              << " Velocity = (" << o->getVelocity() << ") -[ " << "Total time = " << TOTAL_TIME << "  Current DT = " << dt << "  FPS = " << 1/dt << " ]-" << std::flush ;
+}
+
+void Scene::printObject(uint64_t ID, float dt){
+    Object* o = getObject(ID);
+    std::cout << "\33[2K\rObject ID : " << o->getID() << " Position = (" << o->getPosition() << ") Mass = " << o->getMass()
+              << " Velocity = (" << o->getVelocity() << ") -[ " << "Total time = " << TOTAL_TIME << "  Current DT = " << dt << "  FPS = " << 1/dt << " ]-" << std::flush ;
+
+
 }
 

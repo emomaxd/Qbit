@@ -3,6 +3,8 @@
 #include "../include/Object.hpp"
 
 
+uint64_t Object::count = 0;
+
 Object::~Object() {}
 
 void Object::addForce(const Vector& F) {
@@ -23,12 +25,4 @@ Vector Object::calcAcceleration(const Vector& F, const float& mass) const {
 
 Vector Object::calcMomentum(const Vector& V, const float& mass) const {
     return V * mass;
-}
-
-void Object::print() {
-    std::cout << "Object ID: " << ID << std::endl;
-    std::cout << "Mass: " << _mass << std::endl;
-    std::cout << "Position: (" << _position.getX() << ", " << _position.getY() << ", " << _position.getZ() << ")" << std::endl;
-    std::cout << "Velocity: (" << _velocity.getX() << ", " << _velocity.getY() << ", " << _velocity.getZ() << ")" << std::endl;
-    std::cout << "Net force: (" << _netForce.getX() << ", " << _netForce.getY() << ", " << _netForce.getZ() << ")" << std::endl;
 }

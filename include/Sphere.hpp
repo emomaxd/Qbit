@@ -9,7 +9,7 @@
 class Sphere : public Object
 {
 public:
-    Sphere(const float& radius, const float& mass, const Vector& position, const Vector& velocity);
+    Sphere(const float& radius, const float& mass, const Vector& position, const Vector& rotation, const Vector& velocity);
     ~Sphere();
 
     bool isColliding(const std::unique_ptr<Object>& other) override;

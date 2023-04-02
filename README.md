@@ -31,5 +31,7 @@
 - [ ] Modify Box class
 - [ ] Sphere to Box Collision Handling
 - [ ] Object Factory
+- [ ] Rotation
+- [ ] Separation of nested spawned objects
 - [ ] Rendering
 - [ ] Better collision check algorithm

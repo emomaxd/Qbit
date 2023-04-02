@@ -4,15 +4,13 @@
 
 #include "Vector.hpp"
 
-#define BOX 0
-#define SPHERE 1
 
 class Object
 {
 public:
     
     Object() {}
-    Object(float  _mass, Vector _position, Vector _velocity, Vector _netForce);
+    Object(float  mass, Vector position,Vector rotation, Vector velocity, Vector netForce);
     virtual ~Object();
 
     void addForce( const Vector& F );
@@ -28,37 +26,43 @@ public:
 
     virtual void update( const float& dt ) = 0;
 
-    virtual void print();
+    virtual void print() = 0;
 
 
 
     // GETTER SETTER
 
-    uint64_t getID() const { return ID; }
-    void setID(uint64_t id) { ID = id; }
+    inline uint64_t getID() const { return ID; }
+    inline void setID(uint64_t id) { ID = id; }
     
     
-    float getMass() const { return _mass; }
-    void setMass(float mass) { _mass = mass; }
+    inline float getMass() const { return _mass; }
+    inline void setMass(float mass) { _mass = mass; }
     
     
-    Vector getPosition() const { return _position; }
-    void setPosition(const Vector& position) { _position = position; }
+    inline Vector getPosition() const { return _position; }
+    inline void setPosition(const Vector& position) { _position = position; }
     
     
-    Vector getVelocity() const { return _velocity; }
-    void setVelocity(const Vector& velocity) { _velocity = velocity; }
+    inline Vector getVelocity() const { return _velocity; }
+    inline void setVelocity(const Vector& velocity) { _velocity = velocity; }
     
    
-    Vector getNetForce() const { return _netForce; }
-    void setNetForce(const Vector& netForce) { _netForce = netForce; }
+    inline Vector getNetForce() const { return _netForce; }
+    //inline void setNetForce(const Vector& netForce) { _netForce = netForce; }
+
+    inline Vector getNetForcePosition() const { return _netForcePosition; }
 
 protected:
-    uint8_t TYPE;
-    uint64_t ID;
-    float  _mass;
-    Vector _position;
-    Vector _velocity;
-    Vector _netForce;
-    
+
+    uint64_t ID{};
+    static uint64_t count;
+    float  _mass{};
+    Vector _position{};
+    Vector _velocity{};
+    Vector _netForce{};
+    Vector _netForcePosition{};
+    Vector _rotation{};
+
 };
+
