@@ -6,11 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #add_compile_options(-O2)
+add_compile_options(-L Dependencies/Raylib/lib/)
+add_compile_options(-lraylib -lopengl32 -lgdi32 -lwinmm)
 
 # Add the source files
 file(GLOB SOURCES "src/*.cpp")
+#target_link_libraries(Physics raylib)
 add_executable(Physics ${SOURCES})
-target_link_libraries(Physics raylib)
+
 
 # Set the output directory for the build files
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)

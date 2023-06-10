@@ -13,9 +13,29 @@ Sphere::Sphere(const float& radius, const float& mass, const Vector& position, c
     ID = count++;
 }
 
+Sphere::Sphere(const float& radius, const float& mass, const Vector& position)
+    : _radius(radius)
+{
+    _mass = mass;
+    _position = position;
+    ID = count++;
+}
+
+Sphere::Sphere(const Sphere& sp){
+    _mass = sp._mass;
+    _position = sp._position;
+    _radius = sp._radius;
+    _velocity = sp._velocity;
+    ID = count++;
+}
+
+Sphere::Sphere(const Sphere&& sp){
+    std::cout << "R - VALUE CONSTR. SPHERE";
+}
+
 Sphere::~Sphere()
 {
-    //std::cout << "Destructor called, SPHERE " << ID << " deleted\n";
+    std::cout << "Destructor called, SPHERE " << ID << " deleted\n";
 }
 
 bool Sphere::isColliding(const std::unique_ptr<Object>& other)
@@ -77,3 +97,4 @@ void Sphere::print()
     std::cout << "\rSphere: radius = " << _radius << ", mass = " << _mass << ", position = (" << _position.getX() << ", " << _position.getY() << ", " << _position.getZ() << ")"
     << "Sphere: velocity = " << _velocity << "\n";
 }
+

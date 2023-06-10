@@ -1,6 +1,6 @@
 @echo off
-mkdir build
+
 cd src
-g++ Application.cpp Vector.cpp Box.cpp Scene.cpp Sphere.cpp -o ..\build\O.exe
+g++ Application.cpp Object.cpp Vector.cpp Box.cpp Scene.cpp Sphere.cpp InputHandler.cpp ObjectFactory.cpp -L ../Dependencies/Raylib/lib/ -lraylib -lopengl32 -lgdi32 -lwinmm -o ../build/game.exe
 cd ..
-build\O.exe
+.\build\game.exe

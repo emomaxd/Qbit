@@ -8,11 +8,16 @@ float Scene::TOTAL_TIME = 0;
 
 Scene* Scene::getInstance() 
 {
-    if (!_instance) {
+    if (!_instance) 
         _instance = new Scene();
-    }
+    
     return _instance;
 }
+
+const std::vector<std::unique_ptr<Object>>& Scene::getObjects() const {
+    return _objects;
+}
+
 
 uint64_t Scene::add( std::unique_ptr<Object> o ) 
 {
@@ -51,7 +56,8 @@ void Scene::update( const float &dt )
 Object* Scene::getObject( uint64_t ID )
 {
     auto it = std::find_if(_objects.begin(), _objects.end(), [&](const std::unique_ptr<Object>& o){ return o->getID() == ID; });
-    return it.base()->get();
+    //return it.base->get();
+    return it->get();
 }
 
 void Scene::checkCollisions() 
@@ -86,8 +92,12 @@ void Scene::printObject(Object* o, float dt){
 void Scene::printObject(uint64_t ID, float dt){
     Object* o = getObject(ID);
     std::cout << "\33[2K\rObject ID : " << o->getID() << " Position = (" << o->getPosition() << ") Mass = " << o->getMass()
-              << " Velocity = (" << o->getVelocity() << ") -[ " << "Total time = " << TOTAL_TIME << "  Current DT = " << dt << "  FPS = " << 1/dt << " ]-" << std::flush ;
+              << " Velocity = (" << o->getVelocity() << ") - [ " << "Total time = " << TOTAL_TIME << "  Current DT = " << dt << "  FPS = " << 1/dt << " ]-" << std::flush ;
 
 
+}
+
+int Scene::objectCount(){
+    return _objects.size();
 }
 

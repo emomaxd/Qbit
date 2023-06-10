@@ -23,15 +23,19 @@
 </pre>
 
 # TO-DO
+- [ ] CMAKE compilation(there are some issues)
 - [X] Memory handling with unique_ptr
 - [X] Sphere to Sphere Collision Handling
 - [X] Base Class -> "Object"
 - [X] Sphere class
-- [ ] TEST Sphere to Sphere collision
+- [X] TEST Sphere to Sphere collision
+- [x] User Input
+- [ ] Add WALLS
+- [ ] Fix wrong collision calculations(need more depth, currently 1D)
 - [ ] Modify Box class
 - [ ] Sphere to Box Collision Handling
-- [ ] Object Factory
+- [X] Object Factory
 - [ ] Rotation
 - [ ] Separation of nested spawned objects
-- [ ] Rendering
+- [X] Rendering
 - [ ] Better collision check algorithm

@@ -28,6 +28,11 @@ public:
 
     void printObject(uint64_t ID, float dt);
 
+    int objectCount();
+
+    const std::vector<std::unique_ptr<Object>>& getObjects() const;
+ 
+
 private:
 
     static float TOTAL_TIME;
