@@ -23,6 +23,7 @@
 </pre>
 
 # TO-DO
+- [ ] REFACTOR(delete virtual functions, use glm)
 - [ ] CMAKE compilation(there are some issues)
 - [X] Memory handling with unique_ptr
 - [X] Sphere to Sphere Collision Handling
@@ -30,12 +31,13 @@
 - [X] Sphere class
 - [X] TEST Sphere to Sphere collision
 - [x] User Input
-- [ ] Add WALLS
-- [ ] Fix wrong collision calculations(need more depth, currently 1D)
+- [X] Add WALLS
+- [X] Sphere to sphere collision handling
 - [ ] Modify Box class
 - [ ] Sphere to Box Collision Handling
 - [X] Object Factory
 - [ ] Rotation
+- [ ] Friction
 - [ ] Separation of nested spawned objects
 - [X] Rendering
 - [ ] Better collision check algorithm

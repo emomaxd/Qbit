@@ -1,17 +1,11 @@
-#include <cmath>
-#include <iostream>
-
 #include "../include/Sphere.hpp"
 
-Sphere::Sphere(const float& radius, const float& mass, const Vector& position, const Vector& rotation, const Vector& velocity)
-    : _radius(radius)
-{
-    _mass = mass;
-    _position = position;
-    _velocity = velocity;
-    _rotation = rotation;
-    ID = count++;
-}
+#include "../Dependencies/glm/gtx/projection.hpp"
+//#include <../Dependencies/glm/gtx/perpendicular.hpp>
+
+#include "../Dependencies/glm/vec3.hpp"
+
+
 
 Sphere::Sphere(const float& radius, const float& mass, const Vector& position)
     : _radius(radius)
@@ -29,14 +23,12 @@ Sphere::Sphere(const Sphere& sp){
     ID = count++;
 }
 
-Sphere::Sphere(const Sphere&& sp){
-    std::cout << "R - VALUE CONSTR. SPHERE";
-}
-
 Sphere::~Sphere()
 {
     std::cout << "Destructor called, SPHERE " << ID << " deleted\n";
+    count--;
 }
+
 
 bool Sphere::isColliding(const std::unique_ptr<Object>& other)
 {
@@ -66,20 +58,48 @@ bool Sphere::isColliding(const std::unique_ptr<Object>& other)
 
 void Sphere::handleCollision(const std::unique_ptr<Object>& other)
 {
-    Sphere* otherP = dynamic_cast<Sphere*>(other.get());
-    if (otherP == nullptr) {
-        // handle collision with non-Sphere object
-        return;
-    }
-    Vector v1i = _velocity;
-    Vector v2i = otherP->_velocity;
+        Sphere* otherP = dynamic_cast<Sphere*>(other.get());
+        if (otherP == nullptr) {
+            // handle collision with non-Sphere object
+            return;
+        }
+        
 
-    // v1 final
-    _velocity = ((v1i * (_mass - otherP->_mass )) + 2.0f * otherP->_mass * v2i) / (_mass + otherP->_mass);
+
+        glm::vec3 v1i = glm::vec3(this->_velocity.getX(), this->_velocity.getY(), this->_velocity.getZ());
+
+        glm::vec3 v2i = glm::vec3(otherP->_velocity.getX(), otherP->_velocity.getY(), otherP->_velocity.getZ());
+
     
-    // v2 final
-    otherP->_velocity = ((v2i * (otherP->_mass - _mass )) + 2.0f * _mass * v1i) / (_mass + otherP->_mass);
-    
+        // Calculate centersVector
+        glm::vec3 centersVector = glm::vec3(
+            this->_position.getX() - otherP->_position.getX(),
+            this->_position.getY() - otherP->_position.getY(),
+            this->_position.getZ() - otherP->_position.getZ()
+        );
+
+        centersVector = glm::normalize(centersVector);
+
+        // Calculate projections
+        glm::vec3 v1proj = glm::dot(v1i, centersVector) * centersVector;
+        glm::vec3 v2proj = glm::dot(v2i, centersVector) * centersVector;
+
+        // Calculate normal velocities
+        float v1n = -1.0f * glm::length(v1proj);
+        float v2n = glm::length(v2proj);
+
+        // Calculate final normal velocities after collision
+        float v1n_final = (v1n * (this->_mass - otherP->_mass) + 2 * otherP->_mass * v2n) / (this->_mass + otherP->_mass);
+        float v2n_final = (v2n * (otherP->_mass - this->_mass) + 2 * this->_mass * v1n) / (this->_mass + otherP->_mass);
+
+        // Calculate final velocities
+        glm::vec3 v1f = (v1i - v1proj) + (v1n_final * centersVector);
+        glm::vec3 v2f = (v2i - v2proj) + (v2n_final * centersVector);
+
+        // Update velocities
+        this->_velocity = Vector(v1f.x, v1f.y, v1f.z);
+        otherP->_velocity = Vector(v2f.x, v2f.y, v2f.z);
+
 }
 
 void Sphere::update(const float& dt) 
@@ -89,7 +109,13 @@ void Sphere::update(const float& dt)
     if(acceleration.getMagnitude() != 0)
         _velocity += acceleration * dt;
 
-        _position += _velocity * dt;
+    if(_position.getX() - _radius <= 0 || _position.getX() + _radius >= WIDTH)
+        _velocity.setX(-1*_velocity.getX());
+
+    if(_position.getY() - _radius <= 0 || _position.getY() + _radius >= HEIGHT)
+        _velocity.setY(-1*_velocity.getY());
+
+    _position += _velocity * dt;
 }
 
 void Sphere::print()

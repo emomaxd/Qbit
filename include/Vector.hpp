@@ -37,6 +37,7 @@ public:
     Vector& operator-=( const float& n ) ;
     Vector  operator/( const float& n ) const ;
     Vector  operator*( const float& n ) const ; 
+    Vector operator*( const Vector& v) const ;
     friend Vector operator*( const float& n, const Vector& v) ;
     friend std::ostream& operator<<( std::ostream& o, const Vector& v ) ;
     friend float dotProduct( const Vector& a, const Vector& b );

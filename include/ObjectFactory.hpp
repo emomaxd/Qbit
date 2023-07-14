@@ -10,14 +10,12 @@ public:
 
     static ObjectFactory* getInstance();
 
-    ~ObjectFactory(){
-        delete this;
-    }
        
 private:
     static ObjectFactory* _instance;
     Scene* scene;
     ObjectFactory(){scene = Scene::getInstance();}
+    ~ObjectFactory() = default;
 
 };
 

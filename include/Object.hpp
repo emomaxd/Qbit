@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <iostream>
 
 #include "Vector.hpp"
 
@@ -10,11 +11,10 @@ class Object
 public:
     
     Object() {}
-    Object(float  mass, Vector position,Vector rotation, Vector velocity, Vector netForce);
+    Object(float  mass, Vector position);
     virtual ~Object();
 
     void addForce( const Vector& F );
-    void addForce( const Vector& F, const Vector& applyPosition );
 
     void removeForce( const Vector& F );
 
@@ -49,9 +49,8 @@ public:
     
    
     inline Vector getNetForce() const { return _netForce; }
-    //inline void setNetForce(const Vector& netForce) { _netForce = netForce; }
+    inline void setNetForce(const Vector& netForce) { _netForce = netForce; }
 
-    inline Vector getNetForcePosition() const { return _netForcePosition; }
 
 protected:
 
@@ -61,8 +60,6 @@ protected:
     Vector _position{};
     Vector _velocity{};
     Vector _netForce{};
-    Vector _netForcePosition{};
     Vector _rotation{};
-
 };
 

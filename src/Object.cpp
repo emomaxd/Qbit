@@ -1,18 +1,17 @@
-#include <iostream>
 
 #include "../include/Object.hpp"
 
 
 uint64_t Object::count = 0;
 
+Object::Object(float  mass, Vector position){
+    
+}
+
 Object::~Object() {}
 
 void Object::addForce(const Vector& F) {
     _netForce += F;
-}
-
-void Object::addForce(const Vector& F, const Vector& applyPosition) {
-    // TO-DO
 }
 
 void Object::removeForce(const Vector& F) {

@@ -3,7 +3,7 @@
 
 #include "../include/Scene.hpp"
 
-Scene* Scene::_instance = 0;
+Scene* Scene::_instance = nullptr;
 float Scene::TOTAL_TIME = 0;
 
 Scene* Scene::getInstance() 
@@ -19,15 +19,9 @@ const std::vector<std::unique_ptr<Object>>& Scene::getObjects() const {
 }
 
 
-uint64_t Scene::add( std::unique_ptr<Object> o ) 
-{
-    uint64_t id = nextID;
-    
+void Scene::add( std::unique_ptr<Object> o ) 
+{  
     _objects.push_back(std::move(o));
-    
-    nextID++;
-
-    return id;
 }
 
 bool Scene::remove( const uint64_t& ID )
