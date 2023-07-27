@@ -22,22 +22,5 @@
       OPTION 2 - Open your terminal and type "chmod +x build.sh" then type "./build.sh"
 </pre>
 
-# TO-DO
-- [ ] REFACTOR(delete virtual functions, use glm)
-- [ ] CMAKE compilation(there are some issues)
-- [X] Memory handling with unique_ptr
-- [X] Sphere to Sphere Collision Handling
-- [X] Base Class -> "Object"
-- [X] Sphere class
-- [X] TEST Sphere to Sphere collision
-- [x] User Input
-- [X] Add WALLS
-- [X] Sphere to sphere collision handling
-- [ ] Modify Box class
-- [ ] Sphere to Box Collision Handling
-- [X] Object Factory
-- [ ] Rotation
-- [ ] Friction
-- [ ] Separation of nested spawned objects
-- [X] Rendering
-- [ ] Better collision check algorithm
+# Follow the progress : 
+  https://trello.com/b/8og3yTb4/engine

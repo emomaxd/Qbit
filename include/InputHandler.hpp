@@ -1,10 +1,8 @@
 #pragma once
+
 #include "../Dependencies/Raylib/include/raylib.h"
 
-
-#include "ObjectFactory.hpp"
-
-
+#include "Vector.hpp"
 
 
 class InputHandler{
@@ -23,4 +21,5 @@ private:
     InputHandler(){} 
     ~InputHandler() = default;
 
+    void createSphereWithVelocity(Vector velocity, int radius, int mass);
 };

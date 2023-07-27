@@ -6,6 +6,10 @@
 #include "Vector.hpp"
 
 
+/// ADD THIS METHOD TO REFACTORED OBJECT CLASS LIKE UNITY DOES
+/// Instantiate<GameObject>(Vector position)
+
+
 class Object
 {
 public:
@@ -14,9 +18,11 @@ public:
     Object(float  mass, Vector position);
     virtual ~Object();
 
+    // ?
     void addForce( const Vector& F );
 
     void removeForce( const Vector& F );
+    //
 
     virtual bool isColliding( const std::unique_ptr<Object>& ) = 0;
     virtual void handleCollision( const std::unique_ptr<Object>& ) = 0;
@@ -50,6 +56,9 @@ public:
    
     inline Vector getNetForce() const { return _netForce; }
     inline void setNetForce(const Vector& netForce) { _netForce = netForce; }
+    
+
+    std::string name{};
 
 
 protected:
