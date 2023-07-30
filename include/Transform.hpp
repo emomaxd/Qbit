@@ -1,13 +1,18 @@
 #pragma once
 
 #include "Component.hpp"
-#include "GameObject.hpp"
 #include "Vector.hpp"
 
-class Transform : public Component {
+#include "GameObject.hpp"
+
+/// RENAME THIS CLASS AS "Transform" after remove the raylib from the project
+
+class cTransform : public Component {
 
 public:
-    GameObject* gameObject;
-    Vector position;
-    Vector rotation;
+    cTransform(){
+        name = "Transform";       
+    }
+    Vector position{};
+    Vector rotation{};
 };

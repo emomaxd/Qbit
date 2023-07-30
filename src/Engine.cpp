@@ -9,6 +9,7 @@ void Engine::start(){
         activeScene->update(1.0/GetFPS());
         renderer->render();
         
+        
     } 
     CloseWindow();
 }

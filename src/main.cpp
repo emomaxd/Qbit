@@ -5,6 +5,10 @@
 
 #include "../include/Engine.hpp"
 
+#include "../include/GameObject.hpp"
+
+#include "../include/Transform.hpp"
+
 //
 int TARGET_FPS = 60;
 int WIDTH = 800;
@@ -24,11 +28,17 @@ int main(){
     /// FIX THIS FUNCTION
     //scene->getObject((uint64_t)0);
 
-    
-    engine.start();
 
     
-    
-    
+    GameObject g1;
+
+    g1.AddComponent<cTransform>();
+
+
+
+
+    engine.start();
+
+
     return 0;
 }

@@ -2,39 +2,68 @@
 
 #include "Object.hpp"
 #include "Scene.hpp"
-#include "Transform.hpp"
+#include "Component.hpp"
 
-
-#include <string>
 #include <unordered_map>
+#include <typeindex>
+
 
 // Inherits from Object - NEW OBJECT CLASS IN PROGRESS
 class GameObject {
 public:
 
-    void AddComponent(Component c);
+    GameObject();
+    ~GameObject();
 
     template <typename T>
-    T* AddComponent() {
+    void AddComponent(){
         T* component = new T();
-        component->entity = this;
-        components[typeid(T).name()] = component;
-        return component;
+    
+        component->gameObject = this;
+
+        auto typeIndex = std::type_index(typeid(T));
+
+        auto it = components.find(typeIndex);
+        if (it == components.end()) {
+            components.emplace(typeIndex, std::vector<Component*>());
+            it = components.find(typeIndex);
+        }
+
+        it->second.push_back(static_cast<Component*>(component));
+    }
+        
+    /// same type multiple component - not for every component
+    /// transform and rb not allowed but collider allowed
+    
+    template <typename T>
+    T* GetComponent(){
+        auto typeIndex = std::type_index(typeid(T));
+        auto it = components.find(typeIndex);
+        if (it != components.end() && !it->second.empty()) {
+            return static_cast<T*>(it->second.front());
+        }
+        return nullptr;
     }
 
     template <typename T>
-    T* GetComponent() {
-        return static_cast<T*>(components[typeid(T).name()]);
+    std::vector<Component*>* GetComponents(){
+        auto typeIndex = std::type_index(typeid(T));
+        auto it = components.find(typeIndex);
+        if (it != components.end()) {
+            return &it->second;
+        }
+        return nullptr;
     }
 
     // Properties
-    Transform transform;
     bool activeInHierarchy;
-    const bool activeSelf;
+    const bool activeSelf{true};
     Scene* scene;
     std::string tag;
+    uint32_t id;
+    static uint32_t nextID; 
 
 private:
-    std::unordered_map<std::string, Component*> components;
+    std::unordered_map<std::type_index, std::vector<Component*>> components;
 
 };
