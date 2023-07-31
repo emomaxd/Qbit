@@ -10,11 +10,13 @@ GameObject::GameObject(){
 
 GameObject::~GameObject(){
 
+    
     std::for_each(components.begin(), components.end(), [](auto& pair) {
             std::vector<Component*>& componentVector = pair.second;
             for (Component* component : componentVector) {
                 delete component;
             }
+            componentVector.clear();
         });
 
         components.clear();

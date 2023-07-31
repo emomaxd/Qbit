@@ -24,6 +24,19 @@ public:
         
     }
 
+    ~Engine(){
+
+        for(Scene* s : scenes)
+            delete s;
+        scenes.clear();
+
+        delete renderer;
+        renderer = nullptr;
+
+        delete inputHandler;
+        inputHandler=nullptr;
+    }
+
     void start();
     static inline Scene* getActiveScene(){return activeScene;}
     inline Scene* getScene(int index){return scenes[index];}

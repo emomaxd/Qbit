@@ -12,14 +12,16 @@ public:
 
     void listen();
    
-
+    ~InputHandler(){
+        delete _instance;
+        _instance=nullptr;
+    }
 
 private:
 
     static InputHandler* _instance;
 
     InputHandler(){} 
-    ~InputHandler() = default;
 
     void createSphereWithVelocity(Vector velocity, int radius, int mass);
 };

@@ -17,8 +17,6 @@ public:
     Sphere(const Sphere&) = delete;
     ~Sphere();
 
-    operator=(const Sphere&) = delete;
-
     bool isColliding(const std::unique_ptr<Object>& other) override;
     void handleCollision(const std::unique_ptr<Object>& other) override;
 
