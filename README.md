@@ -1,10 +1,10 @@
 # BUILDING THE PROJECT
 <pre>
-    build & build-cmake files are included
+build & build-cmake files are included
     .sh extension is for linux
     .bat extension is for windows
 
-    only build.bat works correctly - for now -
+only build.bat works correctly - for now -
 </pre>
 
 # Follow the progress : 
