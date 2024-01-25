@@ -44,11 +44,14 @@ public:
 
     inline uint32_t getSceneID(){return this->sceneID;}
 
+    uint32_t entityCount = 0;
 
 private:
     /// SCENE COUNT
     inline static uint32_t nextID = 0;
     uint32_t sceneID;
+
+    
 
     std::string name{"Scene - DEFAULT NAME"};
 
@@ -56,6 +59,6 @@ private:
     
     entt::registry registry{};
 
-    std::vector< entt::entity* > entityVector{};
+    std::unordered_map<std::string ,entt::entity* > entityVector;
 
 };

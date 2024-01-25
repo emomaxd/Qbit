@@ -57,7 +57,7 @@ public:
 
     Scene* getScene() { return scene; }
 
-    std::vector<Vertex> vertexes;
+    std::vector<Vertex> vertexes;  // This vector is for holding all the vertexes then we will draw everything with only 1 draw call
     std::vector<unsigned int> indices;
 
 private:
@@ -67,7 +67,7 @@ private:
     Shader* activeShader{}; // 
     Camera mainCamera;
 
-    // This vector is for holding all the vertexes then we will draw everything with only 1 draw call
+   
     
 
 };
