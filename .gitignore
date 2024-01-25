@@ -7,7 +7,6 @@
 /CMakeFiles
 CMakeCache.txt
 *.cmake
-/build
 
 # LINUX SPECIFIED BUILD FILES
 Makefile
