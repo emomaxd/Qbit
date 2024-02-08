@@ -10,12 +10,16 @@ file(GLOB SOURCES
 "src/Core/*.cpp"
 "src/Renderer/*.cpp"
 "src/Scene/*.cpp"
-"src/System/*.cpp")
+"src/System/*.cpp"
+"Dependencies/imgui/*.cpp")
 
 add_executable(game ${SOURCES})
 
 target_include_directories(game PRIVATE "Dependencies/glm")
 target_include_directories(game PRIVATE "Dependencies/enTT/src")
+target_include_directories(game PRIVATE ${GLFW_DIR}/include)
+target_include_directories(game PRIVATE ${GLEW_DIR}/include)
+
 
 add_compile_definitions(GLEW_STATIC)
 

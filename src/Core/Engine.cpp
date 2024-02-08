@@ -17,7 +17,7 @@ static void updateSystem(T* system){
 
 Engine::Engine(Renderer* renderer, Scene* initialScene){
         
-    window.init();
+    //window.Init();
         
     Engine::activeScene=initialScene;
     scenes.push_back(initialScene);
@@ -88,7 +88,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             vertical = 0.0f;
         }
     }
-   //    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
 
 static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -102,7 +102,7 @@ static void mouseButtonCallback(GLFWwindow* window, int button, int action, int 
             isMousePressed = false;
         }
     }
-    //ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
 }
 
@@ -131,7 +131,7 @@ static void cursorPositionCallback(GLFWwindow* window, double xPos, double yPos)
     }
     lastX = xPos;
     lastY = yPos;
-    //ImGui_ImplGlfw_CursorPosCallback(window, xPos, yPos);
+    ImGui_ImplGlfw_CursorPosCallback(window, xPos, yPos);
 }
 
 float lastX = 0.0f;
@@ -168,6 +168,7 @@ static void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
         cameraFront = glm::normalize(front);
 
     }
+    ImGui_ImplGlfw_CursorPosCallback(window, xPos, yPos);
 }
 
 static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
@@ -181,7 +182,7 @@ static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
     if (fov >= 45.0f)
         fov = 45.0f;
 
-    //ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
+    ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
 }
 
 void processInput(GLFWwindow* window)
@@ -214,9 +215,6 @@ void Engine::InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length,
 
 }
 
-/// TO DO 
-/// Camera movement wit WASD(Currently it is moving but looks at the same point from another angle)
-/// Change look direction while holding right mouse button down(Angle will be changed with mouse input)
 
 void Engine::start(){
     
@@ -324,6 +322,11 @@ void Engine::start(){
         InstantiateRectangle({ i, 0, 0 }, { length, length, length }, { normalizedColor * 2, normalizedColor * 3, normalizedColor, 1 });
     }
 
+
+
+    ImGuiIO& io = ImGui::GetIO(); 
+
+
     while (!glfwWindowShouldClose(GLFWwindow))
     {
 
@@ -334,6 +337,7 @@ void Engine::start(){
         processInput(GLFWwindow);
 
         renderer->Clear();
+        window.ImGuiNewFrame();
 
         //angle += 1.0f;
 
@@ -355,19 +359,32 @@ void Engine::start(){
             //cameraTarget.y += 0.05 * vertical;
         }
         
-        projectionMatrix = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 1.0f, 100.0f);
-        viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
-        rotationMatrix = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
-        scaleMatrix = glm::scale(glm::mat4(1), glm::vec3(scaleRatio));
+        projectionMatrix  = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 1.0f, 100.0f);
+        viewMatrix        = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+        rotationMatrix    = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
+        scaleMatrix       = glm::scale(glm::mat4(1), glm::vec3(scaleRatio));
         translationMatrix = glm::translate(glm::mat4(1), glm::vec3(translation));
-        combinedMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix;
+        combinedMatrix    = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix;
         shader.setMat4("Matrix", &combinedMatrix);
+
+        
+
+        // IMGUI
+
+            ImGui::Begin("Inspector Panel");       
+            
+            
+            
+            ImGui::End();
+            
+        // IMGUI
 
 
         renderer->render(shader);
+        window.ImGuiRender();
 
-        glfwSwapBuffers(GLFWwindow);
-        glfwPollEvents();
+        window.SwapBuffers();
+
     } 
-    window.destroy();
+    window.Cleanup();
 }

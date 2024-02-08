@@ -3,7 +3,7 @@
 #include "../Scene/Scene.hpp"
 #include "../Renderer/Renderer.hpp"
 #include "../System/Physic.hpp"
-#include "Window.hpp"
+#include "../Renderer/Window.hpp"
 
 #include <vector>
 
