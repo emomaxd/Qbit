@@ -15,17 +15,20 @@
 #include <iostream>
 #include <vector>
 
+class Texture;
+
 struct Position {
     glm::vec3 X, Y, Z;
 };
 
 struct Color {
-    float R, G, B, A;
+    glm::vec4 color;
 };
 
 struct Vertex {
     glm::vec3 position;
     glm::vec4 color;
+    glm::vec2 textureCoordinates;
 };
 
 class Renderer{
@@ -47,9 +50,9 @@ public:
 
     void Clear();
 
-    void drawTriangle(const Position& position, const Color& color);
+    void drawTriangle(const Position& position, const Color& color, const Texture* texture = nullptr);
 
-    void drawRectangle(const glm::vec3& position, const Color& color, float width, float height, float depth);
+    void drawRectangle(const glm::vec3& position, const Color& color, float width, float height, float depth, const Texture* texture = nullptr);
 
     GLFWwindow* getWindow(){ return window; }
 

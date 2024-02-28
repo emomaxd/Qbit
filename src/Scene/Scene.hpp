@@ -44,7 +44,12 @@ public:
 
     inline uint32_t getSceneID(){return this->sceneID;}
 
+    std::vector<entt::entity> entities;
+
     uint32_t entityCount = 0;
+
+    entt::registry registry{};
+
 
 private:
     /// SCENE COUNT
@@ -57,7 +62,6 @@ private:
 
     float TOTAL_TIME{0};
     
-    entt::registry registry{};
 
     std::unordered_map<std::string ,entt::entity* > entityVector;
 

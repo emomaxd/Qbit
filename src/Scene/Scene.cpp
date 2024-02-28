@@ -19,6 +19,7 @@ Scene::~Scene(){
 entt::entity Scene::createEntity(){
     auto entity = registry.create();
     entityVector.insert( std::make_pair("GameObject " + entityCount++, &entity));
+    entities.push_back(entity);
     return entity;
 }
 

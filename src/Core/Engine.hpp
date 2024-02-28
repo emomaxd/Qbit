@@ -20,7 +20,7 @@ public:
     Scene* getScene(const std::string& name);
     void addScene(Scene* scene){ scenes.push_back(scene); }
 
-    void InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length, const Color& color);
+    void InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length, const Color& color, const Texture* texture = nullptr);
 
 private:
     Window window;

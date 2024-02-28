@@ -21,6 +21,7 @@ public:
 
 	void AddUniform(const std::string& uniformName);
 
+	void setUniformInteger(const std::string& uniformName, int value);
 	void setUniformFloat(const std::string& uniformName, float value);
 	void setVec3(const std::string& uniformName, const glm::vec3& value);
 	void setVec4(const std::string& uniformName, const glm::vec4& value);

@@ -104,6 +104,10 @@ void Shader::AddUniform(const std::string& uniformName) {
 	
 }
 
+void Shader::setUniformInteger(const std::string& uniformName, int value) {
+	glUniform1i(m_uniform[uniformName], value);
+}
+
 void Shader::setUniformFloat(const std::string& uniformName, float value) {
 	glUniform1f(m_uniform[uniformName], value);
 }

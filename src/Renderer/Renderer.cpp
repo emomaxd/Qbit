@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include "Texture.hpp"
 
 #include <iostream>
 
@@ -17,48 +18,49 @@ void Renderer::draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     glDrawElements(GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, 0);
 }
 
-void Renderer::drawTriangle(const Position& position, const Color& color) {
+void Renderer::drawTriangle(const Position& position, const Color& color, const Texture* texture) {
 
     const glm::vec3 X = position.X;
     const glm::vec3 Y = position.Y;
     const glm::vec3 Z = position.Z;
 
     float vertices[] = {
-        X.x, X.y, X.z,     // Vertex 0
-        Y.x, Y.y, Y.z, // Vertex 1
-        Z.x, Z.y, Z.z  // Vertex 2
+        X.x, X.y, X.z, 0,0,     // Vertex 0
+        Y.x, Y.y, Y.z, 0.5,1,     // Vertex 1
+        Z.x, Z.y, Z.z,  1,0    // Vertex 2
     };
 
-    // Define the indices for the triangle
+    
     unsigned int indices[] = {
-        0, 1, 2  // Triangle indices
+        0, 1, 2  
     };
 
-    // Assuming vertexes is your container for vertices (use whatever is appropriate)
     const size_t numIndices = sizeof(indices) / sizeof(indices[0]);
     for (size_t i = 0; i < numIndices; ++i) {
         const unsigned int index = indices[i];
-        vertexes.push_back({ { vertices[index * 3], vertices[index * 3 + 1], vertices[index * 3 + 2] }, { color.R, color.G, color.B, color.A } });
+        vertexes.push_back({ { vertices[index * 5], vertices[index * 5 + 1], vertices[index * 5 + 2] }, color.color,
+        { vertices[index * 5 + 3], vertices[index * 5 + 4] } });
     }
     
 }
 
-void Renderer::drawRectangle(const glm::vec3& position, const Color& color, float width, float height, float depth) {
+void Renderer::drawRectangle(const glm::vec3& position, const Color& color, float width, float height, float depth, const Texture* texture) {
 
     const float X = position.x;
     const float Y = position.y;
     const float Z = position.z;
 
     float vertices[] = {
-        X - width, Y + height, Z + depth,  // 0: Top Left Front
-        X + width, Y + height, Z + depth,  // 1: Top Right Front
-        X + width, Y - height, Z + depth,  // 2: Bottom Right Front
-        X - width, Y - height, Z + depth,  // 3: Bottom Left Front
+        // Position                       // Texture coordinates
+        X - width, Y + height, Z + depth, 0, 1,  // 0: Top Left Front
+        X + width, Y + height, Z + depth, 1, 1,  // 1: Top Right Front
+        X + width, Y - height, Z + depth, 1, 0,  // 2: Bottom Right Front
+        X - width, Y - height, Z + depth, 0, 0,  // 3: Bottom Left Front
 
-        X - width, Y + height, Z - depth,  // 4: Top Left Back
-        X + width, Y + height, Z - depth,  // 5: Top Right Back
-        X + width, Y - height, Z - depth,  // 6: Bottom Right Back
-        X - width, Y - height, Z - depth   // 7: Bottom Left Back
+        X - width, Y + height, Z - depth, 1, 1,  // 4: Top Left Back
+        X + width, Y + height, Z - depth, 0, 1,  // 5: Top Right Back
+        X + width, Y - height, Z - depth, 0, 0,  // 6: Bottom Right Back
+        X - width, Y - height, Z - depth, 1, 0   // 7: Bottom Left Back
     };
 
     // Define the indices for the rectangle
@@ -77,11 +79,11 @@ void Renderer::drawRectangle(const glm::vec3& position, const Color& color, floa
         6, 7, 3
     };
 
-    // Assuming vertexes is your container for vertices (use whatever is appropriate)
     const size_t numIndices = sizeof(indices) / sizeof(indices[0]);
     for (size_t i = 0; i < numIndices; ++i) {
         const unsigned int index = indices[i];
-        vertexes.push_back({ { vertices[index * 3], vertices[index * 3 + 1], vertices[index * 3 + 2] }, { color.R, color.G, color.B, color.A } });
+        vertexes.push_back({ { vertices[index * 5], vertices[index * 5 + 1], vertices[index * 5 + 2] }, color.color,
+        { vertices[index * 5 + 3], vertices[index * 5 + 4] } });
     }
 }
 
@@ -90,11 +92,18 @@ void Renderer::render(const Shader& shader){
     Clear();
     shader.Bind();
 
+    auto transformView = scene->registry.view<Transform>();
+    auto colorView     = scene->registry.view<Color>();
+    //auto textureView = scene->getWholeComponents<Texture>();
+    
+    
+
     VertexArray VAO;
     VertexBuffer VBO(vertexes.data(), vertexes.size() * sizeof(Vertex));
     VertexBufferLayout layout;
-    layout.Push<float>(3); // position - glm::vec3 - 3 floats
-    layout.Push<float>(4); // color    - glm::vec4 - 4 floats
+    layout.Push<float>(3); // position            - glm::vec3 - 3 floats
+    layout.Push<float>(4); // color               - glm::vec4 - 4 floats
+    layout.Push<float>(2); // texture coordinates - glm::vec2 - 2 floats
 
     VAO.AddBuffer(VBO, layout);
 

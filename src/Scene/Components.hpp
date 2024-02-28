@@ -26,5 +26,3 @@ private:
 public:
     Offset offset{0.0f, 0.0f};
 };
-
-

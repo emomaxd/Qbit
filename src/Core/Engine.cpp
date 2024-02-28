@@ -3,10 +3,13 @@
 #include <iostream>
 #include <thread>
 #include <cmath>
+#include "../Renderer/Texture.hpp"
 
 #include <gtc/matrix_transform.hpp>
 
 #define M_PI       3.14159265358979323846   // pi
+
+
 
 
 template <typename T>
@@ -202,7 +205,7 @@ void processInput(GLFWwindow* window)
 }
 
 
-void Engine::InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length, const Color& color) {
+void Engine::InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length, const Color& color, const Texture* texture) {
 
     Scene* activeScene = Engine::getActiveScene();
 
@@ -210,8 +213,11 @@ void Engine::InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length,
 
     // position - rotation - scale
     activeScene->addComponent<Transform, glm::vec3, glm::vec3, glm::vec3>(entity, glm::vec3{ pos }, { 0,0,0 }, { 1,1,1 });
+    // Color
+    activeScene->addComponent<Color, glm::vec4>(entity, glm::vec4{color.color});
+    // Texture
 
-    renderer->drawRectangle(pos, color, length.x, length.y, length.z);
+    renderer->drawRectangle(pos, color, length.x, length.y, length.z, texture);
 
 }
 
@@ -230,71 +236,10 @@ void Engine::start(){
     // Basic & Essential shader for rendering with position and color settings
     Shader shader("src/Renderer/Shader/BasicShader.glsl");
 
-    //shader.AddUniform("color");
     shader.AddUniform("Matrix");
+    //shader.AddUniform("ourTexture");
 
-    shader.Bind();
-
-    auto& v = renderer->vertexes;
-
-    float vertices[] = {
-
-
-       -length / 2, -length / 2, -length / 2,
-       length / 2, -length / 2, -length / 2,
-       length / 2, -length / 2, length / 2,
-       - length / 2, -length / 2, length / 2,
-
-       - length / 2, length / 2, -length / 2,
-       length / 2, length / 2, -length / 2,
-       length / 2, length / 2, length / 2,
-       -length / 2, length / 2, length / 2,
-
-
-    };
-
-
-    VertexArray vao;
-    VertexBuffer vb(vertices, sizeof(vertices));
-    VertexBufferLayout layout;
-    layout.Push<float>(3);
-
-    vao.AddBuffer(vb, layout);
-
-    GLuint indices[] = {
-        7,3,2,
-
-        7,2,6,
-
-        
-        6,2,1,
-        
-        6,1,5,
-        
-        
-        4,7,6,
-         
-        4,6,5,
-         
-         
-        0,3,2,
-         
-        0,2,1,
-
-         
-        4,0,1,
-         
-        4,1,5,
-
-                 
-        7,3,0,
-         
-        7,0,4,
-
-    };
-
-    IndexBuffer ib(indices, 36);
-    
+    shader.Bind(); 
     
     glm::mat4 rotationMatrix(1);
     glm::mat4 scaleMatrix(1);
@@ -317,10 +262,18 @@ void Engine::start(){
     const float minTranslation = -300.0f; 
     const float maxTranslation = 300.0f;
 
+    //Texture setup
+
+    Texture texture("Assets/tx.jpg");
+    texture.Bind();
+    //shader.setUniformInteger("ourTexture", 0);
+
     for(float i = 0; i < 25; ++i) {
         float normalizedColor = 0.5f + 0.5f * std::sin(i / 25.0f * M_PI);  // Sine function for smoother transition
-        InstantiateRectangle({ i, 0, 0 }, { length, length, length }, { normalizedColor * 2, normalizedColor * 3, normalizedColor, 1 });
+        InstantiateRectangle({ i, 0, 0 }, { length, length, length }, Color{ glm::vec4{normalizedColor * 2, normalizedColor * 3, normalizedColor, 1} }, &texture);
     }
+
+    renderer->drawTriangle({{0,0,-5}, {0.5,1,-5}, {1,0,-5}}, Color{glm::vec4{1, 0, 0, 1}}, &texture);
 
 
 
