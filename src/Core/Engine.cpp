@@ -231,19 +231,83 @@ void Engine::start(){
     glfwSetMouseButtonCallback(GLFWwindow, mouseButtonCallback);
     glfwSetCursorPosCallback(GLFWwindow, mouse_callback);
 
-    //Shader setup
 
+    const float width  = length;
+    const float height = length;
+    const float depth  = length;
+
+    float vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    };
+
+    //Shader setup
+    glEnable(GL_DEPTH_TEST);
     // Basic & Essential shader for rendering with position and color settings
     Shader shader("src/Renderer/Shader/BasicShader.glsl");
+    
+    Shader LightingShader("src/Renderer/Shader/BasicLighting.glsl");
+    Shader LightCubeShader("src/Renderer/Shader/LightCube.glsl");
 
-    shader.AddUniform("Matrix");
-    //shader.AddUniform("ourTexture");
+    LightCubeShader.Bind();
+    LightCubeShader.AddUniform("model");
+    LightCubeShader.AddUniform("view");
+    LightCubeShader.AddUniform("projection");
 
-    shader.Bind(); 
+    //shader.AddUniform("Matrix");
+
+    LightingShader.Bind();
+    LightingShader.AddUniform("model");
+    LightingShader.AddUniform("view");
+    LightingShader.AddUniform("projection");
+
+    LightingShader.AddUniform("lightPos");
+    LightingShader.AddUniform("lightColor");
+    LightingShader.AddUniform("objectColor");
     
     glm::mat4 rotationMatrix(1);
     glm::mat4 scaleMatrix(1);
     glm::mat4 translationMatrix(1);
+    glm::mat4 modelMatrix(1);
 
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 1.0f, 100.0f);
 
@@ -252,36 +316,58 @@ void Engine::start(){
     float angle = 0.0f;
     float scaleRatio = 1.0f;
     float translation = 0.0f;
-    float scaleDirection = 1.0f; 
-    float translationDirection = 1.0f; 
+
 
     glm::mat4 combinedMatrix(1);
 
-    const float minScale = 1.0f;
-    const float maxScale = 10.0f;
-    const float minTranslation = -300.0f; 
-    const float maxTranslation = 300.0f;
-
-    //Texture setup
-
-    Texture texture("Assets/tx.jpg");
-    texture.Bind();
-    //shader.setUniformInteger("ourTexture", 0);
-
-    for(float i = 0; i < 25; ++i) {
-        float normalizedColor = 0.5f + 0.5f * std::sin(i / 25.0f * M_PI);  // Sine function for smoother transition
-        InstantiateRectangle({ i, 0, 0 }, { length, length, length }, Color{ glm::vec4{normalizedColor * 2, normalizedColor * 3, normalizedColor, 1} }, &texture);
-    }
-
-    renderer->drawTriangle({{0,0,-5}, {0.5,1,-5}, {1,0,-5}}, Color{glm::vec4{1, 0, 0, 1}}, &texture);
+    //renderer->drawTriangle({{0,0,-5}, {0.5,1,-5}, {1,0,-5}}, Color{glm::vec4{1, 0, 0, 1}}, &texture);
+    
+    //InstantiateRectangle({ 0, 0, 0 }, { length, length, length }, Color{ glm::vec4{1,1,1,1} });
 
 
+    //lighting setup
 
-    ImGuiIO& io = ImGui::GetIO(); 
+    glm::vec3 lightPos(0.2f, 0.0f, 1.0f);
+
+    LightingShader.setVec3("objectColor",  glm::vec3{1.0f, 0.3f, 0.2f});
+    LightingShader.setVec3("lightColor",  glm::vec3{1.0f, 1.0f, 1.0f});
+    LightingShader.setVec3("lightPos",  lightPos);
+
+    
+
+    ImGuiIO& io = ImGui::GetIO();
+
+    unsigned int VBO, cubeVAO;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &VBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(cubeVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
+    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+    unsigned int lightCubeVAO;
+    glGenVertexArrays(1, &lightCubeVAO);
+    glBindVertexArray(lightCubeVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
 
     while (!glfwWindowShouldClose(GLFWwindow))
     {
+
 
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
@@ -292,33 +378,17 @@ void Engine::start(){
         renderer->Clear();
         window.ImGuiNewFrame();
 
-        //angle += 1.0f;
-
-        //scaleRatio += 0.02f * scaleDirection;
-
-        if (scaleRatio >= maxScale || scaleRatio <= minScale)
-        {
-            scaleDirection *= -1.0f;
-        }
-
-        if (horizontal != 0.0f) {
-            //cameraPosition.x += 0.05 * horizontal;
-            //cameraTarget.x += 0.05 * horizontal;
-        }
-            
-        
-        if(vertical != 0.0f){
-            //cameraPosition.y += 0.05 * vertical;
-            //cameraTarget.y += 0.05 * vertical;
-        }
-        
         projectionMatrix  = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 1.0f, 100.0f);
         viewMatrix        = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
         rotationMatrix    = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
         scaleMatrix       = glm::scale(glm::mat4(1), glm::vec3(scaleRatio));
         translationMatrix = glm::translate(glm::mat4(1), glm::vec3(translation));
-        combinedMatrix    = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix;
-        shader.setMat4("Matrix", &combinedMatrix);
+        modelMatrix       = translationMatrix * rotationMatrix * scaleMatrix;
+  
+        LightingShader.Bind();
+        LightingShader.setMat4("model",      &modelMatrix);
+        LightingShader.setMat4("view",       &viewMatrix);
+        LightingShader.setMat4("projection", &projectionMatrix);
 
         
 
@@ -333,7 +403,22 @@ void Engine::start(){
         // IMGUI
 
 
-        renderer->render(shader);
+        //renderer->render(shader);
+         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        modelMatrix = glm::translate(modelMatrix, lightPos);
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
+        LightCubeShader.Bind();
+        LightCubeShader.setMat4("model",      &modelMatrix);
+        LightCubeShader.setMat4("view",       &viewMatrix);
+        LightCubeShader.setMat4("projection", &projectionMatrix);
+
+
+         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        
         window.ImGuiRender();
 
         window.SwapBuffers();

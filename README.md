@@ -12,3 +12,5 @@ only build-cmake.bat works correctly
 
 
 ![Alt text](demo1.png)
+![Alt text](Texture.png)
+![Alt text](DiffuseLight.png)
