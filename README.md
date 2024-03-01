@@ -11,6 +11,8 @@ only build-cmake.bat works correctly
   https://trello.com/b/8og3yTb4/engine
 
 
-![Alt text](demo1.png)
-![Alt text](Texture.png)
-![Alt text](DiffuseLight.png)
+<div style="display: inline-block;">
+    <img src="demo1.png" alt="Demo 1" style="width: 200px; height: auto; margin-right: 10px;">
+    <img src="Texture.png" alt="Texture" style="width: 200px; height: auto; margin-right: 10px;">
+    <img src="Diffuse-Specular-Lighting.png" alt="Diffuse Specular Lighting" style="width: 200px; height: auto; margin-right: 10px;">
+</div>

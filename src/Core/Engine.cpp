@@ -46,7 +46,7 @@ const float ldtwo = length / 2;
 bool isMousePressed = false;
 
 
-glm::vec3 cameraPosition(0.0f, 0.0f, 5.0f);
+glm::vec3 cameraPosition(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
@@ -231,11 +231,6 @@ void Engine::start(){
     glfwSetMouseButtonCallback(GLFWwindow, mouseButtonCallback);
     glfwSetCursorPosCallback(GLFWwindow, mouse_callback);
 
-
-    const float width  = length;
-    const float height = length;
-    const float depth  = length;
-
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
          0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -303,6 +298,7 @@ void Engine::start(){
     LightingShader.AddUniform("lightPos");
     LightingShader.AddUniform("lightColor");
     LightingShader.AddUniform("objectColor");
+    LightingShader.AddUniform("viewPos");
     
     glm::mat4 rotationMatrix(1);
     glm::mat4 scaleMatrix(1);
@@ -327,7 +323,7 @@ void Engine::start(){
 
     //lighting setup
 
-    glm::vec3 lightPos(0.2f, 0.0f, 1.0f);
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     LightingShader.setVec3("objectColor",  glm::vec3{1.0f, 0.3f, 0.2f});
     LightingShader.setVec3("lightColor",  glm::vec3{1.0f, 1.0f, 1.0f});
@@ -389,7 +385,7 @@ void Engine::start(){
         LightingShader.setMat4("model",      &modelMatrix);
         LightingShader.setMat4("view",       &viewMatrix);
         LightingShader.setMat4("projection", &projectionMatrix);
-
+        LightingShader.setVec3("viewPos", cameraPosition);
         
 
         // IMGUI
@@ -402,9 +398,9 @@ void Engine::start(){
             
         // IMGUI
 
-
-        //renderer->render(shader);
-         glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        /// Draw the cube
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
         modelMatrix = glm::translate(modelMatrix, lightPos);
@@ -414,8 +410,8 @@ void Engine::start(){
         LightCubeShader.setMat4("view",       &viewMatrix);
         LightCubeShader.setMat4("projection", &projectionMatrix);
 
-
-         glDrawArrays(GL_TRIANGLES, 0, 36);
+        /// Draw the light as a cube
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
         
