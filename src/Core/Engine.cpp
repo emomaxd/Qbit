@@ -4,8 +4,11 @@
 #include <thread>
 #include <cmath>
 #include "../Renderer/Texture.hpp"
+#include "../../Dependencies/stb_image.h"
 
 #include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
 
 #define M_PI       3.14159265358979323846   // pi
 
@@ -232,51 +235,54 @@ void Engine::start(){
     glfwSetCursorPosCallback(GLFWwindow, mouse_callback);
 
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+    // Positions            // Texture Coords     // Normals
+    -0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          0.0f,  0.0f, -1.0f, // Front bottom-left
+     0.5f, -0.5f, -0.5f,     1.0f, 0.0f,          0.0f,  0.0f, -1.0f, // Front bottom-right
+     0.5f,  0.5f, -0.5f,     1.0f, 1.0f,          0.0f,  0.0f, -1.0f, // Front top-right
+     0.5f,  0.5f, -0.5f,     1.0f, 1.0f,          0.0f,  0.0f, -1.0f, // Front top-right
+    -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          0.0f,  0.0f, -1.0f, // Front top-left
+    -0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          0.0f,  0.0f, -1.0f, // Front bottom-left
 
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,          0.0f,  0.0f,  1.0f, // Back bottom-left
+     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          0.0f,  0.0f,  1.0f, // Back bottom-right
+     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          0.0f,  0.0f,  1.0f, // Back top-right
+     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          0.0f,  0.0f,  1.0f, // Back top-right
+    -0.5f,  0.5f,  0.5f,     0.0f, 1.0f,          0.0f,  0.0f,  1.0f, // Back top-left
+    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,          0.0f,  0.0f,  1.0f, // Back bottom-left
 
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,     0.0f, 1.0f,         -1.0f,  0.0f,  0.0f, // Left top-left
+    -0.5f,  0.5f, -0.5f,     1.0f, 1.0f,         -1.0f,  0.0f,  0.0f, // Left top-right
+    -0.5f, -0.5f, -0.5f,     1.0f, 0.0f,         -1.0f,  0.0f,  0.0f, // Left bottom-right
+    -0.5f, -0.5f, -0.5f,     1.0f, 0.0f,         -1.0f,  0.0f,  0.0f, // Left bottom-right
+    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,         -1.0f,  0.0f,  0.0f, // Left bottom-left
+    -0.5f,  0.5f,  0.5f,     0.0f, 1.0f,         -1.0f,  0.0f,  0.0f, // Left top-left
 
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          1.0f,  0.0f,  0.0f, // Right top-right
+     0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          1.0f,  0.0f,  0.0f, // Right top-left
+     0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          1.0f,  0.0f,  0.0f, // Right bottom-left
+     0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          1.0f,  0.0f,  0.0f, // Right bottom-left
+     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          1.0f,  0.0f,  0.0f, // Right bottom-right
+     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          1.0f,  0.0f,  0.0f, // Right top-right
 
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,          0.0f, -1.0f,  0.0f, // Bottom bottom-left
+     0.5f, -0.5f, -0.5f,     1.0f, 1.0f,          0.0f, -1.0f,  0.0f, // Bottom bottom-right
+     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          0.0f, -1.0f,  0.0f, // Bottom top-right
+     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          0.0f, -1.0f,  0.0f, // Bottom top-right
+    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,          0.0f, -1.0f,  0.0f, // Bottom top-left
+    -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,          0.0f, -1.0f,  0.0f, // Bottom bottom-left
 
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-    };
+    -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          0.0f,  1.0f,  0.0f, // Top top-left
+     0.5f,  0.5f, -0.5f,     1.0f, 1.0f,          0.0f,  1.0f,  0.0f, // Top top-right
+     0.5f,  0.5f,  0.5f,     1.0f, 0.0f,          0.0f,  1.0f,  0.0f, // Top bottom-right
+     0.5f,  0.5f,  0.5f,     1.0f, 0.0f,          0.0f,  1.0f,  0.0f, // Top bottom-right
+    -0.5f,  0.5f,  0.5f,     0.0f, 0.0f,          0.0f,  1.0f,  0.0f, // Top bottom-left
+    -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          0.0f,  1.0f,  0.0f  // Top top-left
+};
+
+    stbi_set_flip_vertically_on_load(1);
+    glEnable(GL_DEPTH_TEST);
 
     //Shader setup
-    glEnable(GL_DEPTH_TEST);
     // Basic & Essential shader for rendering with position and color settings
     Shader shader("src/Renderer/Shader/BasicShader.glsl");
     
@@ -288,17 +294,19 @@ void Engine::start(){
     LightCubeShader.AddUniform("view");
     LightCubeShader.AddUniform("projection");
 
-    //shader.AddUniform("Matrix");
-
     LightingShader.Bind();
     LightingShader.AddUniform("model");
     LightingShader.AddUniform("view");
     LightingShader.AddUniform("projection");
 
-    LightingShader.AddUniform("lightPos");
-    LightingShader.AddUniform("lightColor");
-    LightingShader.AddUniform("objectColor");
-    LightingShader.AddUniform("viewPos");
+    LightingShader.AddUniform("material.ambient");
+    LightingShader.AddUniform("material.diffuse");
+    LightingShader.AddUniform("material.specular");
+    LightingShader.AddUniform("material.shininess");
+    LightingShader.AddUniform("light.position");
+    LightingShader.AddUniform("light.ambient");
+    LightingShader.AddUniform("light.diffuse");
+    LightingShader.AddUniform("light.specular");
     
     glm::mat4 rotationMatrix(1);
     glm::mat4 scaleMatrix(1);
@@ -316,18 +324,12 @@ void Engine::start(){
 
     glm::mat4 combinedMatrix(1);
 
-    //renderer->drawTriangle({{0,0,-5}, {0.5,1,-5}, {1,0,-5}}, Color{glm::vec4{1, 0, 0, 1}}, &texture);
-    
-    //InstantiateRectangle({ 0, 0, 0 }, { length, length, length }, Color{ glm::vec4{1,1,1,1} });
-
-
     //lighting setup
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-    LightingShader.setVec3("objectColor",  glm::vec3{1.0f, 0.3f, 0.2f});
-    LightingShader.setVec3("lightColor",  glm::vec3{1.0f, 1.0f, 1.0f});
-    LightingShader.setVec3("lightPos",  lightPos);
+    LightingShader.Bind();
+    LightingShader.setVec3("light.position",  lightPos);
 
     
 
@@ -336,18 +338,22 @@ void Engine::start(){
     unsigned int VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
-
+    
+    glBindVertexArray(cubeVAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindVertexArray(cubeVAO);
+    
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
 
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
@@ -357,9 +363,77 @@ void Engine::start(){
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // note that we update the lamp's position attribute's stride to reflect the updated buffer data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+
+    /// Texture setup
+    glBindVertexArray(cubeVAO);
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("Assets/portal2_cube.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    /// ------
+    glBindVertexArray(lightCubeVAO);
+    unsigned int texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    int width1, height1, nrChannels1;
+    unsigned char *data1 = stbi_load("Assets/redstone_lamp1.jpg", &width1, &height1, &nrChannels1, 0);
+    if (data1)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width1, height1, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data1);
+
+
+
+
+    glm::vec3 lightColor(1);
+    // Define orbit parameters
+    float orbitRadius = 2.0f;
+    float orbitSpeed = 1.0f;
+    float orbitRadiusY = 1.0f; // Height of the orbit
+
+
+    /// Object rotation
+    glm::vec3 rotation(0);
+    const float rotationSpeed = 0.2f;
 
     while (!glfwWindowShouldClose(GLFWwindow))
     {
@@ -369,6 +443,23 @@ void Engine::start(){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        // Update light position for orbit
+        float orbitAngle = glfwGetTime() * orbitSpeed;
+        float lightPosX = orbitRadius * cos(orbitAngle);
+        float lightPosY = orbitRadiusY * sin(orbitAngle); // Adjusted for y-axis orbit
+        float lightPosZ = orbitRadius * sin(orbitAngle);
+
+        lightPos = glm::vec3(lightPosX, lightPosY, lightPosZ);
+    
+        
+        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); 
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); 
+        
+        rotation.x += deltaTime * rotationSpeed;
+        rotation.y += deltaTime * rotationSpeed;
+        rotation.z += deltaTime * rotationSpeed;
+        
+
         processInput(GLFWwindow);
 
         renderer->Clear();
@@ -376,23 +467,45 @@ void Engine::start(){
 
         projectionMatrix  = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 1.0f, 100.0f);
         viewMatrix        = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+
         rotationMatrix    = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
+        rotationMatrix = glm::rotate(rotationMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)); // X-axis rotation
+        rotationMatrix = glm::rotate(rotationMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)); // Y-axis rotation
+        rotationMatrix = glm::rotate(rotationMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f)); // Z-axis rotation
+
         scaleMatrix       = glm::scale(glm::mat4(1), glm::vec3(scaleRatio));
         translationMatrix = glm::translate(glm::mat4(1), glm::vec3(translation));
         modelMatrix       = translationMatrix * rotationMatrix * scaleMatrix;
-  
+
+        glBindVertexArray(cubeVAO);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        
+
         LightingShader.Bind();
         LightingShader.setMat4("model",      &modelMatrix);
         LightingShader.setMat4("view",       &viewMatrix);
         LightingShader.setMat4("projection", &projectionMatrix);
         LightingShader.setVec3("viewPos", cameraPosition);
+
+        LightingShader.setVec3("material.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setVec3("material.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setVec3("material.specular", glm::vec3(0.05f, 0.05f, 0.05f));
+        LightingShader.setUniformFloat("material.shininess", 32.0f);
         
+        LightingShader.setVec3("light.position", lightPos);
+        LightingShader.setVec3("light.ambient", ambientColor);
+        LightingShader.setVec3("light.diffuse", diffuseColor);
+        LightingShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
         // IMGUI
 
             ImGui::Begin("Inspector Panel");       
             
-            
+            // Adjust light color
+            ImGui::SliderFloat3("Light Color", glm::value_ptr(lightColor), 1, 255);
+
+            // Adjust ambient color
+            ImGui::SliderFloat3("Ambient Color", glm::value_ptr(ambientColor), 1, 255);
             
             ImGui::End();
             
@@ -402,9 +515,13 @@ void Engine::start(){
         /// Draw the cube
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-
+        modelMatrix    = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
         modelMatrix = glm::translate(modelMatrix, lightPos);
         modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
+        
+        glBindVertexArray(lightCubeVAO);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        
         LightCubeShader.Bind();
         LightCubeShader.setMat4("model",      &modelMatrix);
         LightCubeShader.setMat4("view",       &viewMatrix);
