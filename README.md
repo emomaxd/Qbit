@@ -12,4 +12,3 @@ only build-cmake.bat works correctly
 
 
 ![Alt Text](lighting_demo1.gif)
-![Alt Text](Diffuse-Specular-Lighting.png)
