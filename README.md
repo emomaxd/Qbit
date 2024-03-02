@@ -11,5 +11,5 @@ only build-cmake.bat works correctly
   https://trello.com/b/8og3yTb4/engine
 
 
-![Alt Text](lighting_demo.gif)
+![Alt Text](lighting_demo1.gif)
 ![Alt Text](Diffuse-Specular-Lighting.png)
