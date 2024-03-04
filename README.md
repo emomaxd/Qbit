@@ -10,6 +10,8 @@ only build-cmake.bat works correctly
 # Follow the progress : 
   https://trello.com/b/8og3yTb4/engine
 
+---
 
 ![Alt Text](lighting_demo2.gif)
-![Alt Text](lighting_demo3.gif)
+![Alt Text](lighting_demo4-diffuse_map.gif)
+![Alt Text](lighting_demo3-diffuse_map-specular_map.gif)
