@@ -224,6 +224,43 @@ void Engine::InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length,
 
 }
 
+unsigned int loadTexture(char const * path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
+}
+
 
 void Engine::start(){
     
@@ -235,48 +272,48 @@ void Engine::start(){
     glfwSetCursorPosCallback(GLFWwindow, mouse_callback);
 
     float vertices[] = {
-    // Positions            // Texture Coords     // Normals
-    -0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          0.0f,  0.0f, -1.0f, // Front bottom-left
-     0.5f, -0.5f, -0.5f,     1.0f, 0.0f,          0.0f,  0.0f, -1.0f, // Front bottom-right
-     0.5f,  0.5f, -0.5f,     1.0f, 1.0f,          0.0f,  0.0f, -1.0f, // Front top-right
-     0.5f,  0.5f, -0.5f,     1.0f, 1.0f,          0.0f,  0.0f, -1.0f, // Front top-right
-    -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          0.0f,  0.0f, -1.0f, // Front top-left
-    -0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          0.0f,  0.0f, -1.0f, // Front bottom-left
+    // positions          // normals           // texture coords
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,          0.0f,  0.0f,  1.0f, // Back bottom-left
-     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          0.0f,  0.0f,  1.0f, // Back bottom-right
-     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          0.0f,  0.0f,  1.0f, // Back top-right
-     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          0.0f,  0.0f,  1.0f, // Back top-right
-    -0.5f,  0.5f,  0.5f,     0.0f, 1.0f,          0.0f,  0.0f,  1.0f, // Back top-left
-    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,          0.0f,  0.0f,  1.0f, // Back bottom-left
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-    -0.5f,  0.5f,  0.5f,     0.0f, 1.0f,         -1.0f,  0.0f,  0.0f, // Left top-left
-    -0.5f,  0.5f, -0.5f,     1.0f, 1.0f,         -1.0f,  0.0f,  0.0f, // Left top-right
-    -0.5f, -0.5f, -0.5f,     1.0f, 0.0f,         -1.0f,  0.0f,  0.0f, // Left bottom-right
-    -0.5f, -0.5f, -0.5f,     1.0f, 0.0f,         -1.0f,  0.0f,  0.0f, // Left bottom-right
-    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,         -1.0f,  0.0f,  0.0f, // Left bottom-left
-    -0.5f,  0.5f,  0.5f,     0.0f, 1.0f,         -1.0f,  0.0f,  0.0f, // Left top-left
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          1.0f,  0.0f,  0.0f, // Right top-right
-     0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          1.0f,  0.0f,  0.0f, // Right top-left
-     0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          1.0f,  0.0f,  0.0f, // Right bottom-left
-     0.5f, -0.5f, -0.5f,     0.0f, 0.0f,          1.0f,  0.0f,  0.0f, // Right bottom-left
-     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          1.0f,  0.0f,  0.0f, // Right bottom-right
-     0.5f,  0.5f,  0.5f,     1.0f, 1.0f,          1.0f,  0.0f,  0.0f, // Right top-right
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,          0.0f, -1.0f,  0.0f, // Bottom bottom-left
-     0.5f, -0.5f, -0.5f,     1.0f, 1.0f,          0.0f, -1.0f,  0.0f, // Bottom bottom-right
-     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          0.0f, -1.0f,  0.0f, // Bottom top-right
-     0.5f, -0.5f,  0.5f,     1.0f, 0.0f,          0.0f, -1.0f,  0.0f, // Bottom top-right
-    -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,          0.0f, -1.0f,  0.0f, // Bottom top-left
-    -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,          0.0f, -1.0f,  0.0f, // Bottom bottom-left
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          0.0f,  1.0f,  0.0f, // Top top-left
-     0.5f,  0.5f, -0.5f,     1.0f, 1.0f,          0.0f,  1.0f,  0.0f, // Top top-right
-     0.5f,  0.5f,  0.5f,     1.0f, 0.0f,          0.0f,  1.0f,  0.0f, // Top bottom-right
-     0.5f,  0.5f,  0.5f,     1.0f, 0.0f,          0.0f,  1.0f,  0.0f, // Top bottom-right
-    -0.5f,  0.5f,  0.5f,     0.0f, 0.0f,          0.0f,  1.0f,  0.0f, // Top bottom-left
-    -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,          0.0f,  1.0f,  0.0f  // Top top-left
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
     stbi_set_flip_vertically_on_load(1);
@@ -330,6 +367,8 @@ void Engine::start(){
 
     LightingShader.Bind();
     LightingShader.setVec3("light.position",  lightPos);
+    LightingShader.setUniformInteger("material.diffuse", 0);
+    LightingShader.setUniformInteger("material.specular", 1);
 
     
 
@@ -349,10 +388,10 @@ void Engine::start(){
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
 
@@ -366,61 +405,18 @@ void Engine::start(){
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
 
-    /// Texture setup
-    glBindVertexArray(cubeVAO);
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("Assets/portal2_cube.jpg", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
+    /// Texture setup    
 
-    /// ------
-    glBindVertexArray(lightCubeVAO);
-    unsigned int texture1;
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
-    int width1, height1, nrChannels1;
-    unsigned char *data1 = stbi_load("Assets/redstone_lamp1.jpg", &width1, &height1, &nrChannels1, 0);
-    if (data1)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width1, height1, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data1);
-
+    unsigned int diffuseMap = loadTexture("Assets/container2.png");
+    unsigned int specularMap = loadTexture("Assets/container2_specular.png");
+    unsigned int lightCubeTexture = loadTexture("Assets/redstone_lamp1.jpg");
 
 
 
@@ -475,11 +471,7 @@ void Engine::start(){
 
         scaleMatrix       = glm::scale(glm::mat4(1), glm::vec3(scaleRatio));
         translationMatrix = glm::translate(glm::mat4(1), glm::vec3(translation));
-        modelMatrix       = translationMatrix * rotationMatrix * scaleMatrix;
-
-        glBindVertexArray(cubeVAO);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        
+        modelMatrix       = translationMatrix * rotationMatrix * scaleMatrix;        
 
         LightingShader.Bind();
         LightingShader.setMat4("model",      &modelMatrix);
@@ -511,6 +503,11 @@ void Engine::start(){
             
         // IMGUI
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        // bind specular map
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
         
         /// Draw the cube
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -520,7 +517,8 @@ void Engine::start(){
         modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
         
         glBindVertexArray(lightCubeVAO);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, lightCubeTexture);
         
         LightCubeShader.Bind();
         LightCubeShader.setMat4("model",      &modelMatrix);

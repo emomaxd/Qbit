@@ -4,7 +4,7 @@
 #include <gtc/matrix_transform.hpp>
 
 const static float NEAR = 1.0f, FAR = 100.0f;
-const static float WIDTH = 800, HEIGHT = 800;
+const static float WIDTH = 1920, HEIGHT = 1080;
 
 class Camera {
 public:

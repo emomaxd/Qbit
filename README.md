@@ -12,3 +12,4 @@ only build-cmake.bat works correctly
 
 
 ![Alt Text](lighting_demo2.gif)
+![Alt Text](lighting_demo3.gif)
