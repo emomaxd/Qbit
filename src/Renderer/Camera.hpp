@@ -3,8 +3,8 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
-const static float NEAR = 1.0f, FAR = 100.0f;
-const static float WIDTH = 1920, HEIGHT = 1080;
+const static float NEAR = 0.1f, FAR = 100.0f;
+const static float WIDTH = 800, HEIGHT = 800;
 
 class Camera {
 public:

@@ -5,7 +5,7 @@
 #include <cmath>
 #include "../Renderer/Texture.hpp"
 #include "../../Dependencies/stb_image.h"
-
+#include <random>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
@@ -65,6 +65,12 @@ float horizontal = 0.0f;;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE)
@@ -261,6 +267,24 @@ unsigned int loadTexture(char const * path)
     return textureID;
 }
 
+std::vector<glm::vec3> generateRandomPositions(int n, float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
+    std::vector<glm::vec3> positions;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> disX(minX, maxX);
+    std::uniform_real_distribution<float> disY(minY, maxY);
+    std::uniform_real_distribution<float> disZ(minZ, maxZ);
+
+    for (int i = 0; i < n; ++i) {
+        float x = disX(gen);
+        float y = disY(gen);
+        float z = disZ(gen);
+        positions.push_back(glm::vec3(x, y, z));
+    }
+
+    return positions;
+}
+
 
 void Engine::start(){
     
@@ -270,6 +294,7 @@ void Engine::start(){
     glfwSetScrollCallback(GLFWwindow, scrollCallback);
     glfwSetMouseButtonCallback(GLFWwindow, mouseButtonCallback);
     glfwSetCursorPosCallback(GLFWwindow, mouse_callback);
+    glfwSetFramebufferSizeCallback(GLFWwindow, framebuffer_size_callback);
 
     float vertices[] = {
     // positions          // normals           // texture coords
@@ -323,27 +348,8 @@ void Engine::start(){
     // Basic & Essential shader for rendering with position and color settings
     Shader shader("src/Renderer/Shader/BasicShader.glsl");
     
-    Shader LightingShader("src/Renderer/Shader/BasicLighting.glsl");
+    Shader LightingShader("src/Renderer/Shader/MultipleLights.glsl");
     Shader LightCubeShader("src/Renderer/Shader/LightCube.glsl");
-
-    LightCubeShader.Bind();
-    LightCubeShader.AddUniform("model");
-    LightCubeShader.AddUniform("view");
-    LightCubeShader.AddUniform("projection");
-
-    LightingShader.Bind();
-    LightingShader.AddUniform("model");
-    LightingShader.AddUniform("view");
-    LightingShader.AddUniform("projection");
-
-    LightingShader.AddUniform("material.ambient");
-    LightingShader.AddUniform("material.diffuse");
-    LightingShader.AddUniform("material.specular");
-    LightingShader.AddUniform("material.shininess");
-    LightingShader.AddUniform("light.position");
-    LightingShader.AddUniform("light.ambient");
-    LightingShader.AddUniform("light.diffuse");
-    LightingShader.AddUniform("light.specular");
     
     glm::mat4 rotationMatrix(1);
     glm::mat4 scaleMatrix(1);
@@ -366,7 +372,7 @@ void Engine::start(){
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     LightingShader.Bind();
-    LightingShader.setVec3("light.position",  lightPos);
+    //LightingShader.setVec3("light.position",  lightPos);
     LightingShader.setUniformInteger("material.diffuse", 0);
     LightingShader.setUniformInteger("material.specular", 1);
 
@@ -421,15 +427,43 @@ void Engine::start(){
 
 
     glm::vec3 lightColor(1);
-    // Define orbit parameters
-    float orbitRadius = 2.0f;
-    float orbitSpeed = 1.0f;
-    float orbitRadiusY = 1.0f; // Height of the orbit
 
 
-    /// Object rotation
-    glm::vec3 rotation(0);
-    const float rotationSpeed = 0.2f;
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
+    glm::vec3 pointLightPositions[] = {
+        glm::vec3( 0.7f,  0.2f,  2.0f),
+        glm::vec3( 2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f,  2.0f, -12.0f),
+        glm::vec3( 0.0f,  0.0f, -3.0f)
+    };
+
+    LightingShader.setUniformFloat("light.constant",  1.0f);
+    LightingShader.setUniformFloat("light.linear",    0.09f);
+    LightingShader.setUniformFloat("light.quadratic", 0.032f);
+
+    int n = 10000; // Number of positions
+    float minRange = -100.0f; // Minimum range for positions
+    float maxRange = 100.0f; // Maximum range for positions	
+
+    // Generating random cube positions
+    std::vector<glm::vec3> RandomcubePositions = generateRandomPositions(n, minRange, maxRange, minRange, maxRange, minRange, maxRange);
+
+    // Generating random point light positions (n / 2.5)
+    int numPointLights = n / 2.5;
+    std::vector<glm::vec3> RandompointLightPositions = generateRandomPositions(numPointLights, minRange, maxRange, minRange, maxRange, minRange, maxRange);
+
 
     while (!glfwWindowShouldClose(GLFWwindow))
     {
@@ -439,21 +473,6 @@ void Engine::start(){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Update light position for orbit
-        float orbitAngle = glfwGetTime() * orbitSpeed;
-        float lightPosX = orbitRadius * cos(orbitAngle);
-        float lightPosY = orbitRadiusY * sin(orbitAngle); // Adjusted for y-axis orbit
-        float lightPosZ = orbitRadius * sin(orbitAngle);
-
-        lightPos = glm::vec3(lightPosX, lightPosY, lightPosZ);
-    
-        
-        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); 
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); 
-        
-        rotation.x += deltaTime * rotationSpeed;
-        rotation.y += deltaTime * rotationSpeed;
-        rotation.z += deltaTime * rotationSpeed;
         
 
         processInput(GLFWwindow);
@@ -465,9 +484,6 @@ void Engine::start(){
         viewMatrix        = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 
         rotationMatrix    = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
-        rotationMatrix = glm::rotate(rotationMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)); // X-axis rotation
-        rotationMatrix = glm::rotate(rotationMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)); // Y-axis rotation
-        rotationMatrix = glm::rotate(rotationMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f)); // Z-axis rotation
 
         scaleMatrix       = glm::scale(glm::mat4(1), glm::vec3(scaleRatio));
         translationMatrix = glm::translate(glm::mat4(1), glm::vec3(translation));
@@ -484,20 +500,64 @@ void Engine::start(){
         LightingShader.setVec3("material.specular", glm::vec3(0.05f, 0.05f, 0.05f));
         LightingShader.setUniformFloat("material.shininess", 32.0f);
         
-        LightingShader.setVec3("light.position", lightPos);
-        LightingShader.setVec3("light.ambient", ambientColor);
-        LightingShader.setVec3("light.diffuse", diffuseColor);
-        LightingShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        // directional light
+        LightingShader.setVec3("dirLight.direction",  glm::vec3(-0.2f, -1.0f, -0.3f));
+        LightingShader.setVec3("dirLight.ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
+        LightingShader.setVec3("dirLight.diffuse",  glm::vec3(0.4f, 0.4f, 0.4f));
+        LightingShader.setVec3("dirLight.specular",  glm::vec3(0.5f, 0.5f, 0.5f));
+        // point light 1
+        LightingShader.setVec3("pointLights[0].position", pointLightPositions[0]);
+        LightingShader.setVec3("pointLights[0].ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
+        LightingShader.setVec3("pointLights[0].diffuse",  glm::vec3(0.8f, 0.8f, 0.8f));
+        LightingShader.setVec3("pointLights[0].specular",  glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setUniformFloat("pointLights[0].constant", 1.0f);
+        LightingShader.setUniformFloat("pointLights[0].linear", 0.09f);
+        LightingShader.setUniformFloat("pointLights[0].quadratic", 0.032f);
+        // point light 2
+        LightingShader.setVec3("pointLights[1].position", pointLightPositions[1]);
+        LightingShader.setVec3("pointLights[1].ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
+        LightingShader.setVec3("pointLights[1].diffuse",  glm::vec3(0.8f, 0.8f, 0.8f));
+        LightingShader.setVec3("pointLights[1].specular",  glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setUniformFloat("pointLights[1].constant", 1.0f);
+        LightingShader.setUniformFloat("pointLights[1].linear", 0.09f);
+        LightingShader.setUniformFloat("pointLights[1].quadratic", 0.032f);
+        // point light 3
+        LightingShader.setVec3("pointLights[2].position", pointLightPositions[2]);
+        LightingShader.setVec3("pointLights[2].ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
+        LightingShader.setVec3("pointLights[2].diffuse",  glm::vec3(0.8f, 0.8f, 0.8f));
+        LightingShader.setVec3("pointLights[2].specular",  glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setUniformFloat("pointLights[2].constant", 1.0f);
+        LightingShader.setUniformFloat("pointLights[2].linear", 0.09f);
+        LightingShader.setUniformFloat("pointLights[2].quadratic", 0.032f);
+        // point light 4
+        LightingShader.setVec3("pointLights[3].position", pointLightPositions[3]);
+        LightingShader.setVec3("pointLights[3].ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
+        LightingShader.setVec3("pointLights[3].diffuse",  glm::vec3(0.8f, 0.8f, 0.8f));
+        LightingShader.setVec3("pointLights[3].specular",  glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setUniformFloat("pointLights[3].constant", 1.0f);
+        LightingShader.setUniformFloat("pointLights[3].linear", 0.09f);
+        LightingShader.setUniformFloat("pointLights[3].quadratic", 0.032f);
+        // spotLight
+        LightingShader.setVec3("spotLight.position", cameraPosition);
+        LightingShader.setVec3("spotLight.direction", cameraFront);
+        LightingShader.setVec3("spotLight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+        LightingShader.setVec3("spotLight.diffuse",  glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setVec3("spotLight.specular",  glm::vec3(1.0f, 1.0f, 1.0f));
+        LightingShader.setUniformFloat("spotLight.constant", 1.0f);
+        LightingShader.setUniformFloat("spotLight.linear", 0.09f);
+        LightingShader.setUniformFloat("spotLight.quadratic", 0.032f);
+        LightingShader.setUniformFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+        LightingShader.setUniformFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));     
 
         // IMGUI
 
             ImGui::Begin("Inspector Panel");       
             
-            // Adjust light color
-            ImGui::SliderFloat3("Light Color", glm::value_ptr(lightColor), 1, 255);
 
-            // Adjust ambient color
-            ImGui::SliderFloat3("Ambient Color", glm::value_ptr(ambientColor), 1, 255);
+            ImGui::Text("Object count : %d", n);
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+           
             
             ImGui::End();
             
@@ -510,7 +570,16 @@ void Engine::start(){
         glBindTexture(GL_TEXTURE_2D, specularMap);
         
         /// Draw the cube
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for(unsigned int i = 0; i < n; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, RandomcubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            LightingShader.setMat4("model", &model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }   
 
         modelMatrix    = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
         modelMatrix = glm::translate(modelMatrix, lightPos);
@@ -526,7 +595,14 @@ void Engine::start(){
         LightCubeShader.setMat4("projection", &projectionMatrix);
 
         /// Draw the light as a cube
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (unsigned int i = 0; i < numPointLights; i++)
+        {
+            modelMatrix = glm::mat4(1.0f);
+            modelMatrix = glm::translate(modelMatrix, RandompointLightPositions[i]);
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f)); // Make it a smaller cube
+            LightCubeShader.setMat4("model", &modelMatrix);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
 
         
