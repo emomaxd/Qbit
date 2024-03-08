@@ -65,12 +65,24 @@ float horizontal = 0.0f;;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+int g_width  = WIDTH;
+int g_height = HEIGHT;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+    //glViewport(0, 0, width, height);
+
+    // Update ImGui layout
+    ImGui::SetNextWindowSize(ImVec2(width * 0.20f, height), ImGuiCond_Always); // Adjust the size of the folders window
+    ImGui::SetNextWindowSize(ImVec2(width * 0.8f, height), ImGuiCond_Always); // Adjust the size of the inspector panel
+
+    g_width  = width;
+    g_height = height;
+
 }
+
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE)
@@ -285,6 +297,21 @@ std::vector<glm::vec3> generateRandomPositions(int n, float minX, float maxX, fl
     return positions;
 }
 
+void setupPointLights(const std::vector<glm::vec3> positions, Shader& shader) {
+    for (size_t i = 0; i < positions.size(); ++i) {
+        
+        std::string prefix = "pointLights[" + std::to_string(i) + "].";
+
+        shader.setVec3(prefix + "position", positions[i]);
+        shader.setVec3(prefix + "ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
+        shader.setVec3(prefix + "diffuse",  glm::vec3(0.8f, 0.8f, 0.8f));
+        shader.setVec3(prefix + "specular",  glm::vec3(1.0f, 1.0f, 1.0f));
+        shader.setUniformFloat(prefix + "constant", 1.0f);
+        shader.setUniformFloat(prefix + "linear", 0.09f);
+        shader.setUniformFloat(prefix + "quadratic", 0.032f);
+    }
+}
+
 
 void Engine::start(){
     
@@ -356,7 +383,7 @@ void Engine::start(){
     glm::mat4 translationMatrix(1);
     glm::mat4 modelMatrix(1);
 
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 1.0f, 100.0f);
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), (float)g_width / (float)g_height, 1.0f, 100.0f);
 
     glm::mat4 viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 
@@ -453,17 +480,30 @@ void Engine::start(){
     LightingShader.setUniformFloat("light.linear",    0.09f);
     LightingShader.setUniformFloat("light.quadratic", 0.032f);
 
-    int n = 10000; // Number of positions
-    float minRange = -100.0f; // Minimum range for positions
-    float maxRange = 100.0f; // Maximum range for positions	
+    int n = 240; // Number of positions
+    float g_density = 20.0f;
+    float minRange = -g_density; // Minimum range for positions
+    float maxRange = g_density; // Maximum range for positions	
 
     // Generating random cube positions
     std::vector<glm::vec3> RandomcubePositions = generateRandomPositions(n, minRange, maxRange, minRange, maxRange, minRange, maxRange);
 
     // Generating random point light positions (n / 2.5)
-    int numPointLights = n / 2.5;
+    int npl = n / 2.5f;
+    int numPointLights = npl > 60 ? 60 : npl ;
     std::vector<glm::vec3> RandompointLightPositions = generateRandomPositions(numPointLights, minRange, maxRange, minRange, maxRange, minRange, maxRange);
 
+    int numCubes  = n;
+    int numLights = numPointLights;
+    float density = g_density;
+
+    float inspectorWidth = g_width * 0.1f;
+
+    float viewportX = 0;
+    float viewportY = 0;
+    float viewportWidth = 0;
+    float viewportHeight = 0;
+ 
 
     while (!glfwWindowShouldClose(GLFWwindow))
     {
@@ -473,14 +513,18 @@ void Engine::start(){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        
+        viewportX = 0;
+        viewportY = 0;
+        viewportWidth = g_width - g_width * 0.20f;
+        viewportHeight = g_height;
 
         processInput(GLFWwindow);
 
-        renderer->Clear();
+        renderer->Clear(g_width, g_height);
+        glViewport(viewportX, viewportY, viewportWidth, viewportHeight); // Set the size and position of the OpenGL viewport
         window.ImGuiNewFrame();
 
-        projectionMatrix  = glm::perspective(glm::radians(fov), WIDTH / HEIGHT, 1.0f, 100.0f);
+        projectionMatrix  = glm::perspective(glm::radians(fov), viewportWidth / viewportHeight, 1.0f, 100.0f);
         viewMatrix        = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 
         rotationMatrix    = glm::rotate(glm::mat4(1), glm::radians(angle), glm::vec3(0, 0, 1));
@@ -505,7 +549,7 @@ void Engine::start(){
         LightingShader.setVec3("dirLight.ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
         LightingShader.setVec3("dirLight.diffuse",  glm::vec3(0.4f, 0.4f, 0.4f));
         LightingShader.setVec3("dirLight.specular",  glm::vec3(0.5f, 0.5f, 0.5f));
-        // point light 1
+        /*// point light 1
         LightingShader.setVec3("pointLights[0].position", pointLightPositions[0]);
         LightingShader.setVec3("pointLights[0].ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
         LightingShader.setVec3("pointLights[0].diffuse",  glm::vec3(0.8f, 0.8f, 0.8f));
@@ -537,6 +581,8 @@ void Engine::start(){
         LightingShader.setUniformFloat("pointLights[3].constant", 1.0f);
         LightingShader.setUniformFloat("pointLights[3].linear", 0.09f);
         LightingShader.setUniformFloat("pointLights[3].quadratic", 0.032f);
+        */
+        setupPointLights(RandompointLightPositions, LightingShader);
         // spotLight
         LightingShader.setVec3("spotLight.position", cameraPosition);
         LightingShader.setVec3("spotLight.direction", cameraFront);
@@ -549,17 +595,62 @@ void Engine::start(){
         LightingShader.setUniformFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
         LightingShader.setUniformFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));     
 
-        // IMGUI
+            // IMGUI
+            ImGui::SetNextWindowPos(ImVec2(g_width * 0.80f, 0), ImGuiCond_Always); // Adjust the position of the inspector panel
+            ImGui::SetNextWindowSize(ImVec2(g_width * 0.20f, g_height), ImGuiCond_Always); // Set the size of the inspector panel
 
-            ImGui::Begin("Inspector Panel");       
+            ImGui::Begin("Inspector Panel", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);       
             
 
-            ImGui::Text("Object count : %d", n);
+            ImGui::Text("Object count : %d", n + numPointLights);
+            // Declare a variable to store the cube count
+            
+
+            // In your ImGui panel
+            ImGui::SliderInt("Cube Count", &numCubes, 0, 100000);
+            ImGui::SliderInt("Light Count", &numLights, 0, 60);
+
+            ImGui::SliderFloat("Density", &density, 0.0f, 1000.0f);
+
+            // Update position range if it has changed
+            if (density != g_density) {
+                g_density = density; 
+                RandomcubePositions = generateRandomPositions(n, -g_density, g_density, -g_density, g_density, -g_density, g_density);
+                RandompointLightPositions = generateRandomPositions(numPointLights, -g_density, g_density, -g_density, g_density, -g_density, g_density);
+                setupPointLights(RandompointLightPositions, LightingShader);
+            }
+
+            // Update cube count if it has changed
+            if (numCubes != n) {
+                n = numCubes;
+                RandomcubePositions = generateRandomPositions(n, -g_density, g_density, -g_density, g_density, -g_density, g_density);
+            }
+
+            if(numLights != numPointLights){
+                numPointLights = numLights;
+                RandompointLightPositions = generateRandomPositions(numPointLights, -g_density, g_density, -g_density, g_density, -g_density, g_density);
+                setupPointLights(RandompointLightPositions, LightingShader);
+            }
+
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
            
             
             ImGui::End();
+
+        /*
+            // Set up ImGui layout for the folders window at the bottom
+            ImGui::SetNextWindowPos(ImVec2(0, g_height * 0.75f), ImGuiCond_Always); // Adjust the position of the folders window
+            ImGui::SetNextWindowSize(ImVec2(g_width, g_height * 0.25f), ImGuiCond_Always); // Set the size of the folders window
+
+            // Begin ImGui window for the folders window
+            ImGui::Begin("Folders", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+            // Add ImGui content for folders window
+
+            // End ImGui window for the folders window
+            ImGui::End();
+        */
             
         // IMGUI
 

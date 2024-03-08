@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-void Renderer::Clear() {
+void Renderer::Clear(int w = WIDTH, int h = HEIGHT) {
     glViewport(0, 0, WIDTH, HEIGHT);
     //glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
     glClearColor(0.f, 0.f, 0.f, 1.0f);

@@ -48,7 +48,7 @@ public:
 
     void render(const Shader& shader);
 
-    void Clear();
+    void Clear(int w, int h);
 
     void drawTriangle(const Position& position, const Color& color, const Texture* texture = nullptr);
 
