@@ -1,6 +1,17 @@
 #pragma once
 
 #include <glm.hpp>
+#include <string>
+#include <vector>
+
+
+struct EntityProperties{
+    bool isActive{false};
+
+    std::string name{"GameObject"};
+
+    std::vector<std::string> tags;
+};
 
 
 struct Rigidbody{

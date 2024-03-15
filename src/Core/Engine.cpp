@@ -17,26 +17,18 @@ Engine::Engine(){
     m_Renderer = new Renderer();
 
     Scene* tempScene = new Scene();
-    m_Scenes.push_back(tempScene);
+    AddScene(tempScene);
     s_ActiveScene = tempScene;
 }
 
-Engine::Engine(Renderer* renderer, Scene* initialScene){
-        
-    Engine::s_ActiveScene=initialScene;
-    
-    m_Scenes.push_back(initialScene);
 
-    m_Renderer = renderer;
-    
-}
 
 Engine::~Engine(){
 
     std::cout << "ENGINE DESTRUCTED\n";
 
     for (auto s : m_Scenes)
-        delete s;
+        delete s.second;
 
     delete m_Renderer;
 
@@ -437,6 +429,8 @@ void Engine::start(){
     
     auto GLFWwindow = m_Window.GetWindow();
 
+    auto scene = s_ActiveScene;
+
    // glfwSetKeyCallback(GLFWwindow, key_callback);
     glfwSetScrollCallback(GLFWwindow, scrollCallback);
     glfwSetMouseButtonCallback(GLFWwindow, mouseButtonCallback);
@@ -575,6 +569,14 @@ void Engine::start(){
     total_percent_imgui_start_X_affect += hierarchy_size;
     total_percent_imgui_width += hierarchy_size;
 
+
+    auto entity0 = scene->CreateEntity();
+    auto entity1 = scene->CreateEntity();
+
+
+    auto& entityVector = scene->m_EntityVector;
+
+
     while (!glfwWindowShouldClose(GLFWwindow))
     {
 
@@ -658,6 +660,16 @@ void Engine::start(){
             ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.20f, windowHeight), ImGuiCond_Always); // Set the size of the inspector panel
 
             ImGui::Begin("Hierarchy", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);       
+            
+            for(auto entity : entityVector){
+                EntityProperties* eP = scene->GetComponent<EntityProperties>(entity);
+                
+                if (ImGui::Button(eP->name.c_str())) {
+                    // Button action here
+                }
+
+            }
+            
             ImGui::End();
             
         // IMGUI

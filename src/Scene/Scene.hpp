@@ -22,47 +22,47 @@ public:
 
     ~Scene();
 
-    entt::entity createEntity();
+    entt::entity CreateEntity();
 
-    void destroyEntity(entt::entity);
+    void DestroyEntity(entt::entity);
 
     template <typename T, typename... Args>
-    T* addComponent(entt::entity entity, Args&&... args){
-        return &registry.emplace<T>(entity, std::forward<Args>(args)...);
+    T* AddComponent(entt::entity entity, Args&&... args){
+        return &m_Registry.emplace<T>(entity, std::forward<Args>(args)...);
     }
 
     template <typename T>
-    T* getComponent(entt::entity entity){
-        return &registry.get<T>(entity);
+    T* GetComponent(entt::entity entity){
+        return &m_Registry.get<T>(entity);
     }
 
     template <typename T>
-    void removeComponent(entt::entity entity) {
-        registry.remove<T>(entity);
+    void RemoveComponent(entt::entity entity) {
+        m_Registry.remove<T>(entity);
     }
     
 
-    inline uint32_t getSceneID(){return this->sceneID;}
+    inline uint32_t GetSceneID(){ return m_SceneID; }
 
-    std::vector<entt::entity> entities;
+    inline std::string GetName(){ return m_Name; }
 
-    uint32_t entityCount = 0;
+    std::vector<entt::entity> m_EntityVector;
 
-    entt::registry registry{};
 
+    entt::registry m_Registry{};
+
+    uint32_t m_EntityCount = 0;
 
 private:
     /// SCENE COUNT
     inline static uint32_t nextID = 0;
-    uint32_t sceneID;
+    uint32_t m_SceneID;
 
     
 
-    std::string name{"Scene - DEFAULT NAME"};
 
-    float TOTAL_TIME{0};
-    
+    std::string m_Name{"Scene - DEFAULT NAME"};    
 
-    std::unordered_map<std::string ,entt::entity* > entityVector;
+    std::unordered_map<std::string ,entt::entity* > m_EntityMap;
 
 };

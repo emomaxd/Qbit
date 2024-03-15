@@ -15,21 +15,6 @@
 #include <iostream>
 #include <vector>
 
-class Texture;
-
-struct Position {
-    glm::vec3 X, Y, Z;
-};
-
-struct Color {
-    glm::vec4 color;
-};
-
-struct Vertex {
-    glm::vec3 position;
-    glm::vec4 color;
-    glm::vec2 textureCoordinates;
-};
 
 class Renderer{
 public:
