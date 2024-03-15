@@ -3,6 +3,7 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
+/*
 const static float NEAR = 0.1f, FAR = 100.0f;
 const static float WIDTH = 800, HEIGHT = 800;
 
@@ -28,4 +29,4 @@ public:
 	
 
 	glm::mat4 viewMatrix = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-};
+};*/

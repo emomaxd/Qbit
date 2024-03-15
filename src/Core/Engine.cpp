@@ -43,6 +43,7 @@ glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
 float yaw = -90.0f;
+float roll = 0.0f;
 float pitch = 0.0f;
 float fov = 45.0f;
 
@@ -182,18 +183,22 @@ static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
 
 void processInput(GLFWwindow* window)
 {
+
+    auto cam = Engine::s_ActiveScene->m_EntityVector[0];
+    auto transform = Engine::s_ActiveScene->GetComponent<Transform>(cam);
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
     float cameraSpeed = static_cast<float>(2.5 * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPosition += cameraSpeed * cameraFront;
+        transform->position += cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPosition -= cameraSpeed * cameraFront;
+        transform->position -= cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        transform->position -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        transform->position += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
 }
 
@@ -425,11 +430,34 @@ void renderScene(Shader &shader)
 }
 
 
+
+void DrawCameraInspector(Camera& camera) {
+    ImGui::Text("Camera");
+
+    ImGui::Combo("Projection", reinterpret_cast<int*>(&camera.projection), "Perspective\0Orthographic\0");
+
+    ImGui::DragFloat("Field of View", &fov, 1.0f, 1.0f, 45.0f);
+    ImGui::ColorEdit4("Clear Color", glm::value_ptr(camera.clearColor));
+
+
+    // Here you can add more controls for other camera properties if needed
+}
+
+
 void Engine::start(){
     
     auto GLFWwindow = m_Window.GetWindow();
 
     auto scene = s_ActiveScene;
+
+    auto& entityVector = scene->m_EntityVector;
+
+    auto mainCam = entityVector[0];
+
+    auto cameraComponent = scene->GetComponent<Camera>(mainCam);
+
+    //                         index 0 -> main camera
+    entt::entity selectedEntity = entityVector[0]; /// This will show up in the inspector panel
 
    // glfwSetKeyCallback(GLFWwindow, key_callback);
     glfwSetScrollCallback(GLFWwindow, scrollCallback);
@@ -572,14 +600,30 @@ void Engine::start(){
 
     auto entity0 = scene->CreateEntity();
     auto entity1 = scene->CreateEntity();
+    auto entity2 = scene->CreateEntity();
 
 
-    auto& entityVector = scene->m_EntityVector;
+
 
 
     while (!glfwWindowShouldClose(GLFWwindow))
     {
 
+        cameraComponent->cameraFront = cameraFront;
+        
+        cameraComponent->fov = fov;
+
+        auto cameraTransform = scene->GetComponent<Transform>(mainCam);
+
+        cameraTransform->rotation = {pitch, roll, yaw};
+
+
+        cameraPosition = cameraTransform->position;
+
+        Window::s_Red = cameraComponent->clearColor.r;
+        Window::s_Green = cameraComponent->clearColor.g;
+        Window::s_Blue = cameraComponent->clearColor.b;
+        Window::s_Alpha = cameraComponent->clearColor.a;
 
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
@@ -625,15 +669,59 @@ void Engine::start(){
 
             ImGui::Begin("Inspector Panel", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-            ImGui::Text("Camera position: %.2f, %.2f, %.2f", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-            ImGui::Text("Viewport X = %.2f & Width = %.2f", viewportX, viewportWidth);
-            ImGui::Text("Viewport Y = %.2f & Height = %.2f", viewportY, viewportHeight);
-            ImGui::Text("Window Width = %d & Height = %d", windowWidth, windowHeight);
-            ImGui::Text("Aspect ratio = %f / %f", viewportWidth, viewportHeight);
+                auto entityProperties = scene->GetComponent<EntityProperties>(selectedEntity);
+                auto transform = scene->GetComponent<Transform>(selectedEntity);
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+                // Checkbox for isActive
+                static bool isActive = entityProperties->isActive; // Initialize from entityProperties
+                ImGui::Checkbox("isActive", &isActive);
+                entityProperties->isActive = isActive; // Update entityProperties
 
-           
+                ImGui::SameLine(); // Put the next item on the same line
+
+                // Text field for name
+                std::string name = entityProperties->name; // Initialize from entityProperties
+                char nameBuffer[256];
+                strcpy(nameBuffer, name.c_str()); // Convert std::string to char array
+                ImGui::InputText("Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
+                name = nameBuffer; // Update name in std::string format
+                entityProperties->name = name; // Update entityProperties
+
+                // Draw a horizontal line
+                ImGui::Separator();
+
+                // Transform Component using Entt
+                // Assuming you have some way to get the transform component from Entt
+                // Here, I'm just showing placeholder values
+                ImGui::Text("Transform Component");
+
+                // Display and modify position
+                // Display and modify position
+                float position[3] = { transform->position.x, transform->position.y, transform->position.z };
+                ImGui::DragFloat3("Position", position, 1.0f);
+                transform->position.x = position[0];
+                transform->position.y = position[1];
+                transform->position.z = position[2];
+
+                // Display and modify rotation
+                float rotation[3] = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
+                ImGui::DragFloat3("Rotation", rotation, 1.0f, 0.0f, 360.0f);
+                transform->rotation.x = rotation[0];
+                transform->rotation.y = rotation[1];
+                transform->rotation.z = rotation[2];
+
+                // Display and modify scale
+                float scale[3] = { transform->scale.x, transform->scale.y, transform->scale.z };
+                ImGui::DragFloat3("Scale", scale, 1.0f);
+                transform->scale.x = scale[0];
+                transform->scale.y = scale[1];
+                transform->scale.z = scale[2];
+
+                ImGui::Separator();
+
+                if(!entityProperties->name.compare("Main Camera"))
+                    DrawCameraInspector(*cameraComponent);
+                        
             
             ImGui::End();
 
@@ -657,18 +745,38 @@ void Engine::start(){
 
             
             ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always); // Adjust the position of the inspector panel
-            ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.20f, windowHeight), ImGuiCond_Always); // Set the size of the inspector panel
+            ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.20f, windowHeight * 0.8f), ImGuiCond_Always); // Set the size of the inspector panel
 
             ImGui::Begin("Hierarchy", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);       
-            
-            for(auto entity : entityVector){
-                EntityProperties* eP = scene->GetComponent<EntityProperties>(entity);
-                
-                if (ImGui::Button(eP->name.c_str())) {
-                    // Button action here
-                }
+            ImGui::Separator();
 
-            }
+                for(auto entity : entityVector){
+                    EntityProperties* eP = scene->GetComponent<EntityProperties>(entity);
+                    
+                    if (ImGui::Button(eP->name.c_str())) {
+                        selectedEntity = entity;
+                    }
+
+                }
+            
+            ImGui::End();
+
+
+            // Engine information
+            ImGui::SetNextWindowPos(ImVec2(0, windowHeight * 0.8f), ImGuiCond_Always); // Adjust the position of the inspector panel
+            ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.20f, windowHeight * 0.2f), ImGuiCond_Always); // Set the size of the inspector panel
+
+            ImGui::Begin("Engine Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);       
+            ImGui::Separator();
+
+                ImGui::Text("Camera position: %.2f, %.2f, %.2f", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+                ImGui::Text("Viewport X = %.2f & Width = %.2f", viewportX, viewportWidth);
+                ImGui::Text("Viewport Y = %.2f & Height = %.2f", viewportY, viewportHeight);
+                ImGui::Text("Window Width = %d & Height = %d", windowWidth, windowHeight);
+                ImGui::Text("Aspect ratio = %f / %f", viewportWidth, viewportHeight);
+
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
             
             ImGui::End();
             

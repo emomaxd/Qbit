@@ -5,10 +5,14 @@
 #include "Scene.hpp"
 
 Scene::Scene(){
-    m_EntityVector.reserve(1000);
+    //m_EntityVector.reserve(1000);
     m_SceneID = nextID++;
     
     m_Name = std::string("Scene" + std::to_string(m_SceneID));
+
+    auto mainCamera = CreateEntity();
+    GetComponent<EntityProperties>(mainCamera)->name = std::string("Main Camera");
+    AddComponent<Camera>(mainCamera);
 }
 
 Scene::~Scene(){
@@ -23,7 +27,7 @@ entt::entity Scene::CreateEntity(){
 
     Transform transform; /// (0, 0, 0)
 
-    EntityProperties entityProperties{false, name}; // isActive = false, name = name, std::vector = null
+    EntityProperties entityProperties{true, name}; // isActive = false, name = name, std::vector = null
 
     AddComponent<Transform>(entity, transform);
     AddComponent<EntityProperties>(entity, entityProperties);
@@ -37,4 +41,8 @@ entt::entity Scene::CreateEntity(){
 void Scene::DestroyEntity(entt::entity entity)
 {
    m_Registry.destroy(entity);
+}
+
+entt::entity Scene::FindEntity(const std::string& name){
+    return *m_EntityMap[name];
 }

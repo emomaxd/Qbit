@@ -6,11 +6,35 @@
 
 
 struct EntityProperties{
-    bool isActive{false};
+    bool isActive{true};
 
     std::string name{"GameObject"};
 
     std::vector<std::string> tags;
+};
+
+struct Camera{
+
+private:
+    enum class Projection {PERSPECTIVE, ORTHOGRAPHIC};
+
+public:
+
+    // Camera looks to origin as default
+	glm::vec3 cameraTarget{0}; // position + front
+
+	// Default camera up direction
+	glm::vec3 cameraUp{ 0.0f, 1.0f, 0.0f };
+
+	glm::vec3 cameraFront{0.0f, 0.0f, -1.0f};
+
+	float fov = 45.0f;
+
+    glm::vec4 clearColor{0.0f, 0.0f, 0.0f, 1.0f};
+
+    Projection projection = Projection::PERSPECTIVE;
+
+
 };
 
 

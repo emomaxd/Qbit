@@ -46,6 +46,8 @@ public:
 
     inline std::string GetName(){ return m_Name; }
 
+    entt::entity FindEntity(const std::string& name);
+
     std::vector<entt::entity> m_EntityVector;
 
 

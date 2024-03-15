@@ -12,6 +12,6 @@ only build-cmake.bat works correctly
 
 ---
 
-![Alt Text](Shadow_Mapping.png)
+![Alt Text](engine_demo.png)
 ![Alt Text](lighting_demo4-diffuse_map.gif)
 ![Alt Text](lighting_demo3-diffuse_map-specular_map.gif)
