@@ -4,7 +4,6 @@
 #include "../../Dependencies/imgui/imgui.h"
 #include "../../Dependencies/imgui/imgui_impl_glfw.h"
 #include "../../Dependencies/imgui/imgui_impl_opengl3.h"
-//#include "../../Dependencies/imgui/imgui_impl_glfw.cpp"
 
 
 #include "Renderer.hpp"
@@ -24,7 +23,20 @@ public:
 	void ImGuiRender();
 
 
-	inline GLFWwindow* getWindow() { return this->window; }
+	inline GLFWwindow* GetWindow() { return m_Window; }
+
+	/// Variables below are static because of ease of sharing
+
+	static int s_WindowWidth;
+	static int s_WindowHeight;
+
+	static float s_ViewportWidth;
+	static float s_ViewportHeight;
+
+	static float s_ViewportMinX; /// The position of the left edge of the viewport
+	static float s_ViewportMinY; /// The position of the bottom edge of the viewport
+
+	static float s_Red, s_Green, s_Blue, s_Alpha; /// For the clear color values
 
 private:
 
@@ -37,7 +49,8 @@ private:
 
 private:
 
-	GLFWwindow* window;
+	GLFWwindow* m_Window;
+	
 
 
 };

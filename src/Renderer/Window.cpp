@@ -1,6 +1,17 @@
 #include "Window.hpp"
 
 
+int Window::s_WindowWidth = 800;
+int Window::s_WindowHeight = 800;
+
+float Window::s_ViewportWidth = 800;
+float Window::s_ViewportHeight = 800;
+
+float Window::s_ViewportMinX = 0;
+float Window::s_ViewportMinY = 0;
+
+float Window::s_Red = 0.0f, Window::s_Green = 0.0f, Window::s_Blue = 0.0f, Window::s_Alpha = 1.0f;
+
 Window::Window() {
 	Init();	
 }
@@ -18,13 +29,13 @@ void Window::Init() {
 
 
 void Window::ClearScreen() {
-	glViewport(0, 0, WIDTH, HEIGHT);
-	glClearColor(0.1f, 0.4f, 0.7f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glViewport(s_ViewportMinX, s_ViewportMinY, s_ViewportWidth, s_ViewportHeight);
+	glClearColor(s_Red, s_Green, s_Blue, s_Alpha);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::SwapBuffers() {
-	glfwSwapBuffers(window);
+	glfwSwapBuffers(m_Window);
 	glfwPollEvents();
 }
 
@@ -47,7 +58,7 @@ void Window::ImGuiInit(){
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
 
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
@@ -55,16 +66,16 @@ void Window::GLFWInit(){
 	if (!glfwInit())
 		std::cout << "error on GLFW init" << std::endl;
 	
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Engine", glfwGetPrimaryMonitor(), nullptr);
+	m_Window = glfwCreateWindow(WIDTH, HEIGHT, "Engine", nullptr, nullptr);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(m_Window);
 
 
-	if (!window)
+	if (!m_Window)
 		std::cout << "window creation failed!" << std::endl;
 }
 
@@ -82,6 +93,6 @@ void Window::ImGuiCleanup(){
 
 void Window::GLFWCleanup(){
 	std::cout << "GLFW CLEANUP\n";
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(m_Window);
 	glfwTerminate();
 }

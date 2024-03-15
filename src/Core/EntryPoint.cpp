@@ -3,12 +3,7 @@
 
 int main(){
 
-    /// INITIAL SCENE
-    Scene* scene = new Scene();
-    
-    Renderer* renderer = new Renderer(scene);
-
-    Engine engine(renderer, scene);
+    Engine engine;
 
     engine.start();
 

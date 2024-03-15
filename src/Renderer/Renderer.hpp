@@ -35,42 +35,21 @@ class Renderer{
 public:
 
     Renderer(){
-        vertexes.reserve(5000);
-    }
-    Renderer(Scene* scene) : scene(scene){
+        
     }
 
     ~Renderer(){
         std::cout << "RENDERER DESTRUCTED\n";
     }
 
-    void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
+    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
 
-    void render(const Shader& shader);
+    void setScene(Scene* scene) { m_Scene = scene; }
 
-    void Clear(int w, int h);
-
-    void drawTriangle(const Position& position, const Color& color, const Texture* texture = nullptr);
-
-    void drawRectangle(const glm::vec3& position, const Color& color, float width, float height, float depth, const Texture* texture = nullptr);
-
-    GLFWwindow* getWindow(){ return window; }
-
-    void setScene(Scene* scene) { this->scene = scene; }
-
-    Scene* getScene() { return scene; }
-
-    std::vector<Vertex> vertexes;  // This vector is for holding all the vertexes then we will draw everything with only 1 draw call
-    std::vector<unsigned int> indices;
+    Scene* getScene() { return m_Scene; }
 
 private:
     
-    Scene* scene{nullptr}; // Scene to be render - this could change in the runtime
-    GLFWwindow* window{nullptr}; // This one will be deleted only the engine class will be responsible for window operations
-    Shader* activeShader{}; // 
-    Camera mainCamera;
-
-   
-    
+    Scene* m_Scene{nullptr}; // Scene to be render - this could change in the runtime
 
 };

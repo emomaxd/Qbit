@@ -10,23 +10,21 @@
 class Engine{
 
 public:
-    Engine() = default;
+    Engine();
     Engine(Renderer* renderer, Scene* initialScene);
     ~Engine();
 
     void start();
-    static inline Scene* getActiveScene(){ return activeScene; }
-    inline Scene* getScene(int index){ return scenes[index]; }
-    Scene* getScene(const std::string& name);
-    void addScene(Scene* scene){ scenes.push_back(scene); }
-
-    void InstantiateRectangle(const glm::vec3& pos, const glm::vec3& length, const Color& color, const Texture* texture = nullptr);
+    static inline Scene* GetActiveScene(){ return s_ActiveScene; }
+    inline Scene* GetScene(int index){ return m_Scenes[index]; }
+    Scene* GetScene(const std::string& name);
+    void AddScene(Scene* scene){ m_Scenes.push_back(scene); }
 
 private:
-    Window window;
-    Renderer* renderer;
-    std::vector<Scene*> scenes;
-    inline static Scene* activeScene{nullptr};  ///
+    Window m_Window;
+    Renderer* m_Renderer;
+    std::vector<Scene*> m_Scenes;
+    inline static Scene* s_ActiveScene{nullptr};
 
-    System::Physic physicSystem;
+    System::Physic m_PhysicSystem;
 };

@@ -7,7 +7,7 @@
 namespace System{
 
     Physic::Physic(){
-        m_scene = Engine::getActiveScene();
+        m_scene = Engine::GetActiveScene();
         m_gravity = gravityConstant;
     }
 
