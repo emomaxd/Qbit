@@ -1,11 +1,11 @@
 #include "Window.hpp"
 
 
-int Window::s_WindowWidth = 800;
-int Window::s_WindowHeight = 800;
+int Window::s_WindowWidth = 1600;
+int Window::s_WindowHeight = 900;
 
-float Window::s_ViewportWidth = 800;
-float Window::s_ViewportHeight = 800;
+float Window::s_ViewportWidth = 1600;
+float Window::s_ViewportHeight = 900;
 
 float Window::s_ViewportMinX = 0;
 float Window::s_ViewportMinY = 0;

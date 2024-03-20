@@ -11,7 +11,7 @@
 
 #define M_PI       3.14159265358979323846   // pi
 
-
+std::vector<glm::mat4> getLightSpaceMatrices();
 Engine::Engine(){
         
     m_Renderer = new Renderer();
@@ -42,6 +42,22 @@ glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
+
+const glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 20.0f));
+unsigned int lightFBO;
+unsigned int lightDepthMaps;
+constexpr unsigned int depthMapResolution = 4096;
+std::vector<glm::mat4> lightMatricesCache;
+int fb_width = 1600;
+int fb_height = 900;
+
+bool showQuad = false;
+
+float cameraNearPlane = 0.1f;
+float cameraFarPlane = 100.0f;
+
+int debugLayer = 0;
+
 float yaw = -90.0f;
 float roll = 0.0f;
 float pitch = 0.0f;
@@ -54,12 +70,16 @@ float horizontal = 0.0f;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+std::vector<float> shadowCascadeLevels{ cameraFarPlane / 50.0f, cameraFarPlane / 25.0f, cameraFarPlane / 10.0f, cameraFarPlane / 2.0f };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 
     Window::s_WindowWidth = width;
     Window::s_WindowHeight = height;
+
+    fb_width = width;
+    fb_height = height;
 
 }
 
@@ -199,6 +219,31 @@ void processInput(GLFWwindow* window)
         transform->position -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         transform->position += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
+        static int fPress = GLFW_RELEASE;
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE && fPress == GLFW_PRESS)
+    {
+        showQuad = !showQuad;
+    }
+    fPress = glfwGetKey(window, GLFW_KEY_F);
+
+    static int plusPress = GLFW_RELEASE;
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_RELEASE && plusPress == GLFW_PRESS)
+    {
+        debugLayer++;
+        if (debugLayer > shadowCascadeLevels.size())
+        {
+            debugLayer = 0;
+        }
+    }
+    plusPress = glfwGetKey(window, GLFW_KEY_N);
+
+    static int cPress = GLFW_RELEASE;
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE && cPress == GLFW_PRESS)
+    {
+        lightMatricesCache = getLightSpaceMatrices();
+    }
+    cPress = glfwGetKey(window, GLFW_KEY_C);
 
 }
 
@@ -403,29 +448,29 @@ void renderQuad()
 }
 
 unsigned int planeVAO;
-void renderScene(Shader &shader)
+void renderScene(Shader1 &shader)
 {
     // floor
     glm::mat4 model = glm::mat4(1.0f);
-    shader.setMat4("model", &model);
+    shader.setMat4("model", model);
     glBindVertexArray(planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     // cubes
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
     model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", &model);
+    shader.setMat4("model", model);
     renderCube();
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
     model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", &model);
+    shader.setMat4("model", model);
     renderCube();
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0));
     model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
     model = glm::scale(model, glm::vec3(0.25));
-    shader.setMat4("model", &model);
+    shader.setMat4("model", model);
     renderCube();
 }
 
@@ -443,6 +488,179 @@ void DrawCameraInspector(Camera& camera) {
     // Here you can add more controls for other camera properties if needed
 }
 
+std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview)
+{
+    const auto inv = glm::inverse(projview);
+
+    std::vector<glm::vec4> frustumCorners;
+    for (unsigned int x = 0; x < 2; ++x)
+    {
+        for (unsigned int y = 0; y < 2; ++y)
+        {
+            for (unsigned int z = 0; z < 2; ++z)
+            {
+                const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+                frustumCorners.push_back(pt / pt.w);
+            }
+        }
+    }
+
+    return frustumCorners;
+}
+
+
+std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
+{
+    return getFrustumCornersWorldSpace(proj * view);
+}
+
+glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane)
+{
+
+    auto vievm = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+    const auto proj = glm::perspective(
+        glm::radians(fov), (float)fb_width / (float)fb_height, nearPlane,
+        farPlane);
+    const auto corners = getFrustumCornersWorldSpace(proj, vievm);
+
+    glm::vec3 center = glm::vec3(0, 0, 0);
+    for (const auto& v : corners)
+    {
+        center += glm::vec3(v);
+    }
+    center /= corners.size();
+
+    const auto lightView = glm::lookAt(center + lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::lowest();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::lowest();
+    float minZ = std::numeric_limits<float>::max();
+    float maxZ = std::numeric_limits<float>::lowest();
+    for (const auto& v : corners)
+    {
+        const auto trf = lightView * v;
+        minX = std::min(minX, trf.x);
+        maxX = std::max(maxX, trf.x);
+        minY = std::min(minY, trf.y);
+        maxY = std::max(maxY, trf.y);
+        minZ = std::min(minZ, trf.z);
+        maxZ = std::max(maxZ, trf.z);
+    }
+
+    // Tune this parameter according to the scene
+    constexpr float zMult = 10.0f;
+    if (minZ < 0)
+    {
+        minZ *= zMult;
+    }
+    else
+    {
+        minZ /= zMult;
+    }
+    if (maxZ < 0)
+    {
+        maxZ /= zMult;
+    }
+    else
+    {
+        maxZ *= zMult;
+    }
+
+    const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+    return lightProjection * lightView;
+}
+
+std::vector<glm::mat4> getLightSpaceMatrices()
+{
+    std::vector<glm::mat4> ret;
+    for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
+    {
+        if (i == 0)
+        {
+            ret.push_back(getLightSpaceMatrix(cameraNearPlane, shadowCascadeLevels[i]));
+        }
+        else if (i < shadowCascadeLevels.size())
+        {
+            ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], shadowCascadeLevels[i]));
+        }
+        else
+        {
+            ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], cameraFarPlane));
+        }
+    }
+    return ret;
+}
+std::vector<GLuint> visualizerVAOs;
+std::vector<GLuint> visualizerVBOs;
+std::vector<GLuint> visualizerEBOs;
+void drawCascadeVolumeVisualizers(const std::vector<glm::mat4>& lightMatrices, Shader1* shader)
+{
+    visualizerVAOs.resize(8);
+    visualizerEBOs.resize(8);
+    visualizerVBOs.resize(8);
+
+    const GLuint indices[] = {
+        0, 2, 3,
+        0, 3, 1,
+        4, 6, 2,
+        4, 2, 0,
+        5, 7, 6,
+        5, 6, 4,
+        1, 3, 7,
+        1, 7, 5,
+        6, 7, 3,
+        6, 3, 2,
+        1, 5, 4,
+        0, 1, 4
+    };
+
+    const glm::vec4 colors[] = {
+        {1.0, 0.0, 0.0, 0.5f},
+        {0.0, 1.0, 0.0, 0.5f},
+        {0.0, 0.0, 1.0, 0.5f},
+    };
+
+    for (int i = 0; i < lightMatrices.size(); ++i)
+    {
+        const auto corners = getFrustumCornersWorldSpace(lightMatrices[i]);
+        std::vector<glm::vec3> vec3s;
+        for (const auto& v : corners)
+        {
+            vec3s.push_back(glm::vec3(v));
+        }
+
+        glGenVertexArrays(1, &visualizerVAOs[i]);
+        glGenBuffers(1, &visualizerVBOs[i]);
+        glGenBuffers(1, &visualizerEBOs[i]);
+
+        glBindVertexArray(visualizerVAOs[i]);
+
+        glBindBuffer(GL_ARRAY_BUFFER, visualizerVBOs[i]);
+        glBufferData(GL_ARRAY_BUFFER, vec3s.size() * sizeof(glm::vec3), &vec3s[0], GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, visualizerEBOs[i]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+        glBindVertexArray(visualizerVAOs[i]);
+        shader->setVec4("color", colors[i % 3]);
+        glDrawElements(GL_TRIANGLES, GLsizei(36), GL_UNSIGNED_INT, 0);
+
+        glDeleteBuffers(1, &visualizerVBOs[i]);
+        glDeleteBuffers(1, &visualizerEBOs[i]);
+        glDeleteVertexArrays(1, &visualizerVAOs[i]);
+
+        glBindVertexArray(0);
+    }
+
+    visualizerVAOs.clear();
+    visualizerEBOs.clear();
+    visualizerVBOs.clear();
+}
 
 void Engine::start(){
     
@@ -501,18 +719,18 @@ void Engine::start(){
 
     //Shader setup
     // Basic & Essential shader for rendering with position and color settings
-    Shader shader("src/Renderer/Shader/shadow_mapping.glsl");
+    //Shader shader("src/Renderer/Shader/shadow_mapping.glsl");
 
-    Shader skyboxShader("src/Renderer/Shader/skybox.glsl");
+    //Shader skyboxShader("src/Renderer/Shader/skybox.glsl");
     
-    Shader LightingShader("src/Renderer/Shader/Blinn-Phong.glsl");
-    Shader LightCubeShader("src/Renderer/Shader/LightCube.glsl");
+    //Shader LightingShader("src/Renderer/Shader/Blinn-Phong.glsl");
+    //Shader LightCubeShader("src/Renderer/Shader/LightCube.glsl");
 
-    Shader simpleDepthShader("src/Renderer/Shader/shadow_mapping_depth.glsl");
-    Shader debugDepthQuad("src/Renderer/Shader/debug_quad.glsl");
+    //Shader simpleDepthShader("src/Renderer/Shader/shadow_mapping_depth.glsl");
+    //Shader debugDepthQuad("src/Renderer/Shader/debug_quad.glsl");
 
-    debugDepthQuad.Bind();
-    debugDepthQuad.setUniformInteger("depthMap", 0);
+    //debugDepthQuad.Bind();
+    //debugDepthQuad.setUniformInteger("depthMap", 0);
     
     glm::mat4 rotationMatrix(1);
     glm::mat4 scaleMatrix(1);
@@ -562,7 +780,7 @@ void Engine::start(){
     unsigned int lightCubeTexture = loadTexture("Assets/redstone_lamp1.jpg");
     unsigned int woodTexture = loadTexture("Assets/wood.png");
     
-
+    /*
     unsigned int depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
 
@@ -575,9 +793,11 @@ void Engine::start(){
                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
-
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);  
+    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
     glDrawBuffer(GL_NONE);
@@ -589,21 +809,82 @@ void Engine::start(){
     shader.setUniformInteger("shadowMap", 1);
     debugDepthQuad.Bind();
     debugDepthQuad.setUniformInteger("depthMap", 0);
+    */
 
     float inspector_size = 0.2f;
-    total_percent_imgui_width += inspector_size;
+    //total_percent_imgui_width += inspector_size;
 
     float hierarchy_size = 0.2f;
-    total_percent_imgui_start_X_affect += hierarchy_size;
-    total_percent_imgui_width += hierarchy_size;
+    //total_percent_imgui_start_X_affect += hierarchy_size;
+    //total_percent_imgui_width += hierarchy_size;
 
 
     auto entity0 = scene->CreateEntity();
     auto entity1 = scene->CreateEntity();
-    auto entity2 = scene->CreateEntity();
+    auto entity2 = scene->CreateEntity(); 
 
+    const glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 20.0f));
+    unsigned int lightFBO;
+    unsigned int lightDepthMaps;
+    constexpr unsigned int depthMapResolution = 4096;
 
+    bool showQuad = false;
 
+    // build and compile shaders
+    // -------------------------
+    Shader1 shader("src/Renderer/Shader/shadow_mapping.vs", "src/Renderer/Shader/shadow_mapping.fs");
+    Shader1 simpleDepthShader("src/Renderer/Shader/shadow_mapping_depth.vs", "src/Renderer/Shader/shadow_mapping_depth.fs", "src/Renderer/Shader/shadow_mapping_depth.gs");
+    Shader1 debugDepthQuad("src/Renderer/Shader/debug_quad.vs", "src/Renderer/Shader/debug_quad.fs");
+    Shader1 debugCascadeShader("src/Renderer/Shader/debug_cascade.vs", "src/Renderer/Shader/debug_cascade.fs");
+
+    // configure light FBO
+    // -----------------------
+    glGenFramebuffers(1, &lightFBO);
+
+    glGenTextures(1, &lightDepthMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, lightDepthMaps);
+    glTexImage3D(
+        GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, depthMapResolution, depthMapResolution, int(shadowCascadeLevels.size()) + 1,
+        0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    constexpr float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, lightFBO);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, lightDepthMaps, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+        throw 0;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // configure UBO
+    // --------------------
+    unsigned int matricesUBO;
+    glGenBuffers(1, &matricesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4x4) * 16, nullptr, GL_STATIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, matricesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    // shader configuration
+    // --------------------
+    shader.use();
+    shader.setInt("diffuseTexture", 0);
+    shader.setInt("shadowMap", 1);
+    debugDepthQuad.use();
+    debugDepthQuad.setInt("depthMap", 0);
 
 
     while (!glfwWindowShouldClose(GLFWwindow))
@@ -662,7 +943,7 @@ void Engine::start(){
 
             /// Inspector Panel
 
-            
+            /*
 
             ImGui::SetNextWindowPos(ImVec2(windowWidth * 0.80f, 0), ImGuiCond_Always); // Adjust the position of the inspector panel
             ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.20f, windowHeight), ImGuiCond_Always); // Set the size of the inspector panel
@@ -739,7 +1020,7 @@ void Engine::start(){
 
             // End ImGui window for the folders window
             ImGui::End();
-        */
+        
             /// Hierarchy panel
 
 
@@ -781,66 +1062,85 @@ void Engine::start(){
             ImGui::End();
             
         // IMGUI
-
+*/
     
         
         /// Draw the cube
 
         
-
+        // 0. UBO setup
+        const auto lightMatrices = getLightSpaceMatrices();
+        glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+        for (size_t i = 0; i < lightMatrices.size(); ++i)
+        {
+            glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::mat4x4), sizeof(glm::mat4x4), &lightMatrices[i]);
+        }
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
      
-        
-           // 1. render depth of scene to texture (from light's perspective)
+        // 1. render depth of scene to texture (from light's perspective)
         // --------------------------------------------------------------
-        glm::mat4 lightProjection, lightView;
-        glm::mat4 lightSpaceMatrix;
-        float near_plane = 1.0f, far_plane = 7.5f;
-        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-        lightSpaceMatrix = lightProjection * lightView;
+        //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
         // render scene from light's point of view
-        simpleDepthShader.Bind();
-        simpleDepthShader.setMat4("lightSpaceMatrix", &lightSpaceMatrix);
+        simpleDepthShader.use();
 
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, woodTexture);
-            renderScene(simpleDepthShader);
+        glBindFramebuffer(GL_FRAMEBUFFER, lightFBO);
+        glViewport(0, 0, depthMapResolution, depthMapResolution);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);  // peter panning
+        renderScene(simpleDepthShader);
+        glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // Set viewport & Clear the screen
-
-        
-        
-        m_Window.ClearScreen();
-
-
+        // reset viewport
+        glViewport(0, 0, fb_width, fb_height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 2. render scene as normal using the generated depth/shadow map  
         // --------------------------------------------------------------
-        shader.Bind();
-        shader.setMat4("projection", &projectionMatrix);
-        shader.setMat4("view", &viewMatrix);
+        glViewport(0, 0, fb_width, fb_height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shader.use();
+        const glm::mat4 projection = glm::perspective(glm::radians(fov), (float)fb_width / (float)fb_height, cameraNearPlane, cameraFarPlane);
+        const glm::mat4 view = viewMatrix;
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
         // set light uniforms
         shader.setVec3("viewPos", cameraPosition);
-        shader.setVec3("lightPos", lightPos);
-        shader.setMat4("lightSpaceMatrix", &lightSpaceMatrix);
+        shader.setVec3("lightDir", lightDir);
+        shader.setFloat("farPlane", cameraFarPlane);
+        shader.setInt("cascadeCount", shadowCascadeLevels.size());
+        for (size_t i = 0; i < shadowCascadeLevels.size(); ++i)
+        {
+            shader.setFloat("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+        }
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, woodTexture);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, lightDepthMaps);
         renderScene(shader);
+
+        if (lightMatricesCache.size() != 0)
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            debugCascadeShader.use();
+            debugCascadeShader.setMat4("projection", projection);
+            debugCascadeShader.setMat4("view", view);
+            drawCascadeVolumeVisualizers(lightMatricesCache, &debugCascadeShader);
+            glDisable(GL_BLEND);
+        }
 
         // render Depth map to quad for visual debugging
         // ---------------------------------------------
-        debugDepthQuad.Bind();
-        debugDepthQuad.setUniformFloat("near_plane", near_plane);
-        debugDepthQuad.setUniformFloat("far_plane", far_plane);
+        debugDepthQuad.use();
+        debugDepthQuad.setInt("layer", debugLayer);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        //renderQuad();
+        glBindTexture(GL_TEXTURE_2D_ARRAY, lightDepthMaps);
+        if (showQuad)
+        {
+            renderQuad();
+        }
+        
         
         m_Window.ImGuiRender();
 

@@ -7,6 +7,7 @@
 #include "VertexArray.hpp"
 #include "VertexBuffer.hpp"
 #include "Shader.hpp"
+#include "Shad.hpp"
 #include "IndexBuffer.hpp"
 #include "Camera.hpp"
 
