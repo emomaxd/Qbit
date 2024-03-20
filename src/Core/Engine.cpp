@@ -812,11 +812,11 @@ void Engine::start(){
     */
 
     float inspector_size = 0.2f;
-    //total_percent_imgui_width += inspector_size;
+    total_percent_imgui_width += inspector_size;
 
     float hierarchy_size = 0.2f;
-    //total_percent_imgui_start_X_affect += hierarchy_size;
-    //total_percent_imgui_width += hierarchy_size;
+    total_percent_imgui_start_X_affect += hierarchy_size;
+    total_percent_imgui_width += hierarchy_size;
 
 
     auto entity0 = scene->CreateEntity();
@@ -925,6 +925,9 @@ void Engine::start(){
         viewportX = Window::s_ViewportMinX;
         viewportY = Window::s_ViewportMinY;
 
+        fb_width = viewportWidth;
+        fb_height = viewportHeight;
+
         processInput(GLFWwindow);
 
         m_Window.ImGuiNewFrame();
@@ -943,7 +946,7 @@ void Engine::start(){
 
             /// Inspector Panel
 
-            /*
+         
 
             ImGui::SetNextWindowPos(ImVec2(windowWidth * 0.80f, 0), ImGuiCond_Always); // Adjust the position of the inspector panel
             ImGui::SetNextWindowSize(ImVec2(windowWidth * 0.20f, windowHeight), ImGuiCond_Always); // Set the size of the inspector panel
@@ -1020,7 +1023,7 @@ void Engine::start(){
 
             // End ImGui window for the folders window
             ImGui::End();
-        
+        */
             /// Hierarchy panel
 
 
@@ -1062,8 +1065,7 @@ void Engine::start(){
             ImGui::End();
             
         // IMGUI
-*/
-    
+   
         
         /// Draw the cube
 
@@ -1092,12 +1094,13 @@ void Engine::start(){
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // reset viewport
-        glViewport(0, 0, fb_width, fb_height);
+        //glViewport(0, 0, fb_width, fb_height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 2. render scene as normal using the generated depth/shadow map  
         // --------------------------------------------------------------
-        glViewport(0, 0, fb_width, fb_height);
+        //glViewport(0, 0, fb_width, fb_height);
+        m_Window.ClearScreen();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
         const glm::mat4 projection = glm::perspective(glm::radians(fov), (float)fb_width / (float)fb_height, cameraNearPlane, cameraFarPlane);
