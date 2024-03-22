@@ -11,7 +11,7 @@ build-cmake.bat creates mingw-w64 makefiles for windows
 
 If you want to use makefiles in windows you have to change the linked library directory for glfw3 in CMakeLists.txt
 
-*Linux build is not working
+Linux build is not working
 </pre>
 
 # Follow the progress : 
