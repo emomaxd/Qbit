@@ -20,6 +20,10 @@ Makefile
 /x64
 /Physics.dir
 /.vs
+/game.dir
+/build
+/Release
+/Debug
 
 # ! SUS !
 token.txt

@@ -27,7 +27,7 @@ entt::entity Scene::CreateEntity(){
 
     Transform transform; /// (0, 0, 0)
 
-    EntityProperties entityProperties{true, name}; // isActive = false, name = name, std::vector = null
+    EntityProperties entityProperties{true, name}; // isActive = true, name = name, std::vector = null
 
     AddComponent<Transform>(entity, transform);
     AddComponent<EntityProperties>(entity, entityProperties);

@@ -3,7 +3,7 @@
 
 int main(){
 
-    Engine engine;
+    EMax3D::Engine engine;
 
     engine.start();
 

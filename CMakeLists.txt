@@ -28,7 +28,7 @@ add_compile_definitions(GLEW_STATIC)
 if(WIN32)
     # For Windows, link opengl32, gdi32, and winmm
     target_link_libraries(game PRIVATE glew32s glfw3 opengl32 gdi32 winmm)
-    target_link_directories(game PRIVATE ${GLFW_DIR}/lib-mingw-w64 ${GLEW_DIR}/lib/Release/x64)
+    target_link_directories(game PRIVATE ${GLFW_DIR}/lib-vc2022 ${GLEW_DIR}/lib/Release/x64)
 elseif(UNIX)
     # For UNIX-based systems (Linux and macOS), link m, dl, pthread, and GL
     target_link_libraries(game PRIVATE glfw3 GLEW)

@@ -40,7 +40,27 @@ public:
     void RemoveComponent(entt::entity entity) {
         m_Registry.remove<T>(entity);
     }
-    
+
+    void DeleteAllEntities() {
+        // If there are no entities, nothing to delete
+        if (m_EntityCount == 0)
+            return;
+
+        // Keep the reference to the main camera entity at index 0
+        entt::entity mainCamera = m_EntityVector[0]; // Assuming Entity is your entity type
+
+        // Clear the vector and map
+        m_EntityVector.clear();
+        m_EntityMap.clear();
+
+        // Add the main camera entity back to the vector
+        m_EntityVector.push_back(mainCamera);
+
+        m_EntityMap.insert({ GetComponent<EntityProperties>(mainCamera)->name = std::string("Main Camera"), &mainCamera });
+
+        // Update the entity count
+        m_EntityCount = 1;
+    }
 
     inline uint32_t GetSceneID(){ return m_SceneID; }
 
