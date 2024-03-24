@@ -1,4 +1,4 @@
 @echo off
 mkdir build
-cmake . -B /build
+cmake -S . -B build/
 pause
