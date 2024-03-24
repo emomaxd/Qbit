@@ -9,6 +9,8 @@
 #include <gtc/type_ptr.hpp>
 #include <gtc/random.hpp>
 
+#include <filesystem>
+
 
 namespace EMax3D{
 
@@ -513,17 +515,17 @@ namespace EMax3D{
 
     std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview)
     {
-        const auto inv = glm::inverse(projview);
+        const auto inv = glm::inverse(projview); // Get the inverse of the projection * view matrix, that gives us the world space coordinates of the view frustum
 
         std::vector<glm::vec4> frustumCorners;
-        for (unsigned int x = 0; x < 2; ++x)
+        for (unsigned int x = 0; x < 2; ++x) // Iterate through x, y & z coordinates of both near and far clip of the view frustum and save them into a vector
         {
             for (unsigned int y = 0; y < 2; ++y)
             {
                 for (unsigned int z = 0; z < 2; ++z)
                 {
-                    const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
-                    frustumCorners.push_back(pt / pt.w);
+                    const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f); // Limit the ranges of the values between [-1, 1] for NDC
+                    frustumCorners.push_back(pt / pt.w); // Push vector the normalized values the values will be between [-1, 1]
                 }
             }
         }
@@ -618,6 +620,12 @@ namespace EMax3D{
   
 
     int renderRange = 5;
+
+    std::string str = "../";
+
+    std::string GetAbsolutePath(const std::string& relativePath) {
+        return std::string(str) + relativePath;
+    }
 
     void Engine::start(){
         
@@ -725,7 +733,7 @@ namespace EMax3D{
         
 
         /// Texture setup    
-        unsigned int woodTexture = loadTexture("Assets/wood.png");
+        unsigned int woodTexture = loadTexture(GetAbsolutePath("Assets/wood.png").c_str());
         
 
         float inspector_size = 0.2f;
@@ -742,12 +750,14 @@ namespace EMax3D{
 
         bool showQuad = false;
 
+        std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+
         // build and compile shaders
         // -------------------------
-        Shader1 shader("src/Renderer/Shader/shadow_mapping.vs", "src/Renderer/Shader/shadow_mapping.fs");
-        Shader1 simpleDepthShader("src/Renderer/Shader/shadow_mapping_depth.vs", "src/Renderer/Shader/shadow_mapping_depth.fs", "src/Renderer/Shader/shadow_mapping_depth.gs");
-        Shader1 debugDepthQuad("src/Renderer/Shader/debug_quad.vs", "src/Renderer/Shader/debug_quad.fs");
-        Shader1 debugCascadeShader("src/Renderer/Shader/debug_cascade.vs", "src/Renderer/Shader/debug_cascade.fs");
+        Shader1 shader(GetAbsolutePath("Engine/src/Renderer/Shader/shadow_mapping.vs").c_str(), GetAbsolutePath("Engine/src/Renderer/Shader/shadow_mapping.fs").c_str());
+        Shader1 simpleDepthShader(GetAbsolutePath("Engine/src/Renderer/Shader/shadow_mapping_depth.vs").c_str(), GetAbsolutePath("Engine/src/Renderer/Shader/shadow_mapping_depth.fs").c_str(), GetAbsolutePath("Engine/src/Renderer/Shader/shadow_mapping_depth.gs").c_str());
+        Shader1 debugDepthQuad(GetAbsolutePath("Engine/src/Renderer/Shader/debug_quad.vs").c_str(), GetAbsolutePath("Engine/src/Renderer/Shader/debug_quad.fs").c_str());
+        Shader1 debugCascadeShader(GetAbsolutePath("Engine/src/Renderer/Shader/debug_cascade.vs").c_str(), GetAbsolutePath("Engine/src/Renderer/Shader/debug_cascade.fs").c_str());
 
         // configure light FBO
         // -----------------------

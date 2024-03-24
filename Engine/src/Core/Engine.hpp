@@ -2,7 +2,6 @@
 
 #include "../Scene/Scene.hpp"
 #include "../Renderer/Renderer.hpp"
-#include "../System/Physic.hpp"
 #include "../Renderer/Window.hpp"
 
 #include <vector>
@@ -30,7 +29,7 @@ class Engine{
         std::unordered_map<std::string, Scene*> m_Scenes;
         unsigned int m_SceneCount = 0;
 
-        Physic m_PhysicSystem;
+        
     };
 
 }

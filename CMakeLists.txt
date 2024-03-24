@@ -1,41 +1,33 @@
 cmake_minimum_required(VERSION 3.10)
-project(Engine)
+project(GameEngine)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Dependencies/GLEW")
-set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Dependencies/GLFW")
+# Include subdirectories
+add_subdirectory(Engine)
+# add_subdirectory(Editor) # Currently not present
+add_subdirectory(Vendor/glfw)
+add_subdirectory(Vendor/imgui)
 
-file(GLOB SOURCES 
-"src/Core/*.cpp"
-"src/Renderer/*.cpp"
-"src/Scene/*.cpp"
-"src/System/*.cpp"
-"Dependencies/imgui/*.cpp")
+# Set the location for the main function
+set(MAIN_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Engine/src/Core/EntryPoint.cpp")
 
-add_executable(game ${SOURCES})
+# Define the executable target and specify the main file
+add_executable(GameEngine ${MAIN_FILE_PATH})
 
-target_include_directories(game PRIVATE "Dependencies/glm")
-target_include_directories(game PRIVATE "Dependencies/enTT/src")
-target_include_directories(game PRIVATE ${GLFW_DIR}/include)
-target_include_directories(game PRIVATE ${GLEW_DIR}/include)
 
+target_include_directories(GameEngine PUBLIC Vendor)
+target_include_directories(GameEngine PUBLIC Vendor/glfw/include)
+target_include_directories(GameEngine PUBLIC Vendor/imgui)
+target_include_directories(GameEngine PUBLIC Vendor/enTT/src/entt)
+target_include_directories(GameEngine PUBLIC Vendor/glm)
+target_include_directories(GameEngine PUBLIC Vendor/GLEW/include)
 
 add_compile_definitions(GLEW_STATIC)
 
-
-# Linking libraries based on the operating system
-if(WIN32)
-    # For Windows, link opengl32, gdi32, and winmm
-    target_link_libraries(game PRIVATE glew32s glfw3 opengl32 gdi32 winmm)
-    target_link_directories(game PRIVATE ${GLFW_DIR}/lib-vc2022 ${GLEW_DIR}/lib/Release/x64)
-elseif(UNIX)
-    # For UNIX-based systems (Linux and macOS), link m, dl, pthread, and GL
-    target_link_libraries(game PRIVATE glfw3 GLEW)
-    target_link_libraries(game PRIVATE m dl pthread GL)
-else()
-    message(FATAL_ERROR "Unsupported operating system")
-endif()
-
-# Set the output directory for the executable
-set_target_properties(game PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build")
+target_link_directories(GameEngine 
+PUBLIC build/Vendor/glfw/src/Debug 
+PUBLIC Vendor/GLEW/lib/Release/x64
+)
+# Link the executable with the Engine libraries and glfw
+target_link_libraries(GameEngine PUBLIC Core Renderer Scene ImGui glfw glew32s opengl32 gdi32 winmm)
