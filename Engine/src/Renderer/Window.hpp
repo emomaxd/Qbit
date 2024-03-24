@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../Dependencies/GLEW/include/GL/glew.h"
-#include "../../Dependencies/imgui/imgui.h"
-#include "../../Dependencies/imgui/imgui_impl_glfw.h"
-#include "../../Dependencies/imgui/imgui_impl_opengl3.h"
+#include <GL/glew.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 
 #include "Renderer.hpp"

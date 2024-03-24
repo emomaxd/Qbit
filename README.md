@@ -7,9 +7,13 @@ build & build-cmake files are included
 only build.bat works correctly
 
 build.bat,      creates Visual Studio Solution
-build-cmake.bat creates mingw-w64 makefiles for windows
+After running the script
+*Ppen up the GameEngine.sln in the build/ directory
+*Build glfw & ImGui
+*Build GameEngine
+*Set GameEngine as Startup project
+*Run
 
-If you want to use makefiles in windows you have to change the linked library directory for glfw3 in CMakeLists.txt
 
 Linux build is not working
 </pre>

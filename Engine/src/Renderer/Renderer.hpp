@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../Dependencies/GLEW/include/GL/glew.h"
-#include "../../Dependencies/GLFW/include/GLFW/glfw3.h"
+#include <GL/glew.h>"
+#include <GLFW/glfw3.h>
 #include "../Scene/Scene.hpp"
 
 #include "VertexArray.hpp"

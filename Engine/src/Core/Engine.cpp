@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <cmath>
-#include "../../Dependencies/stb_image.h"
+#include <stb_image.h>
 #include <random>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>

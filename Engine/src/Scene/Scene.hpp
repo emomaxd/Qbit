@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "../../Dependencies/enTT/src/entt/entt.hpp"
+#include <entt.hpp>
 
 //#include "../Core/ECS.hpp"
 
