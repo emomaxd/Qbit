@@ -1,3 +1,12 @@
-[submodule "Vendor/glfw"]
-	path = Vendor/glfw
+[submodule "Engine/vendor/imgui"]
+	path = Engine/vendor/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "Engine/vendor/glm"]
+	path = Engine/vendor/glm
+	url = https://github.com/g-truc/glm
+[submodule "Engine/vendor/glfw"]
+	path = Engine/vendor/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "Engine/vendor/entt"]
+	path = Engine/vendor/entt
+	url = https://github.com/skypjack/entt

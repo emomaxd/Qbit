@@ -1,33 +1,76 @@
 cmake_minimum_required(VERSION 3.10)
 project(GameEngine)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
-# Include subdirectories
+# Define directories for third-party libraries
+set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
+set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
+set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
+set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
+set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
+
+# Include the Engine directory
 add_subdirectory(Engine)
-# add_subdirectory(Editor) # Currently not present
-add_subdirectory(Vendor/glfw)
-add_subdirectory(Vendor/imgui)
+add_subdirectory(Editor)
 
-# Set the location for the main function
-set(MAIN_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Engine/src/Core/EntryPoint.cpp")
-
-# Define the executable target and specify the main file
-add_executable(GameEngine ${MAIN_FILE_PATH})
-
-
-target_include_directories(GameEngine PUBLIC Vendor)
-target_include_directories(GameEngine PUBLIC Vendor/glfw/include)
-target_include_directories(GameEngine PUBLIC Vendor/imgui)
-target_include_directories(GameEngine PUBLIC Vendor/enTT/src/entt)
-target_include_directories(GameEngine PUBLIC Vendor/glm)
-target_include_directories(GameEngine PUBLIC Vendor/GLEW/include)
-
-add_compile_definitions(GLEW_STATIC)
-
-target_link_directories(GameEngine 
-PUBLIC build/Vendor/glfw/src/Debug 
-PUBLIC Vendor/GLEW/lib/Release/x64
+# Define source files for the executable
+set(PROJECT_SOURCES 
+    "${CMAKE_SOURCE_DIR}/Engine/src/Core/EntryPoint.cpp"
 )
-# Link the executable with the Engine libraries and glfw
-target_link_libraries(GameEngine PUBLIC Core Renderer Scene ImGui glfw glew32s opengl32 gdi32 winmm)
+
+# Create the executable
+add_executable(GameEngine ${PROJECT_SOURCES})
+
+# Link the Engine library to the executable
+target_link_libraries(GameEngine PRIVATE Engine Editor)
+
+# Include directories
+target_include_directories(GameEngine PRIVATE 
+    Engine/vendor
+    ${GLFW_DIR}/install/include 
+    ${GLEW_DIR}/include
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${GLM_DIR}/glm
+    ${ENTT_DIR}/src/entt
+)
+
+# Compile definitions
+target_compile_definitions(GameEngine PRIVATE GLEW_STATIC)
+
+# Link directories
+if(WIN32)
+    target_link_directories(GameEngine PRIVATE 
+        ${GLFW_DIR}/install/lib
+        ${GLEW_DIR}/Windows/lib/Release/x64
+    )
+elseif(UNIX)
+    target_link_directories(GameEngine PRIVATE 
+        ${GLFW_DIR}/install/lib 
+        ${GLEW_DIR}/lib
+    )
+endif()
+
+# Link libraries based on the operating system
+if(WIN32)
+    target_link_libraries(GameEngine PRIVATE 
+        glew32s 
+        glfw3 
+        opengl32 
+        gdi32 
+        winmm
+    )
+elseif(UNIX)
+    target_link_libraries(GameEngine PRIVATE 
+        glfw3 
+        GLEW 
+        m 
+        dl 
+        pthread 
+        GL
+    )
+else()
+    message(FATAL_ERROR "Unsupported operating system")
+endif()
+
