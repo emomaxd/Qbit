@@ -20,7 +20,7 @@ namespace EMax3D {
 			
 		}
 
-		assert(!s_Instance, "Application already exists!");
+		//assert(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
 		//m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));

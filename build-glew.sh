@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd ../Vendor/glew
+cd Engine/vendor/glew
 make glew.lib

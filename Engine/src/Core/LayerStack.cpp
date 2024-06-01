@@ -1,4 +1,5 @@
 #include "LayerStack.hpp"
+#include <algorithm>
 
 namespace EMax3D {
 

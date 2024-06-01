@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the GLFW source directory
-GLFW_SOURCE_DIR="../Vendor/glfw"
+GLFW_SOURCE_DIR="Engine/vendor/glfw"
 cd "$GLFW_SOURCE_DIR" || exit
 
 # Run CMake to configure the build

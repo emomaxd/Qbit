@@ -18,8 +18,8 @@ namespace EMax3D{
 	}
 
 	void Window::Cleanup(){
-		GLFWCleanup();
 		ImGuiCleanup();
+		GLFWCleanup();
 	}
 
 	void Window::Init() {
@@ -88,8 +88,9 @@ namespace EMax3D{
 
 
 	void Window::ImGuiCleanup(){
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
-
 	}
 
 	void Window::GLFWCleanup(){
