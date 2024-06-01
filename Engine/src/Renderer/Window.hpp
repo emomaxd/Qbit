@@ -8,7 +8,7 @@
 
 #include "Renderer.hpp"
 
-namespace EMax3D{
+namespace Qbit {
 
 	struct WindowProps
 	{

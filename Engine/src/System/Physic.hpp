@@ -3,7 +3,7 @@
 #include "../Scene/Scene.hpp"
 #include "../Scene/Components.hpp"
 
-namespace EMax3D{
+namespace Qbit{
 
 
     class Physic{

@@ -36,13 +36,15 @@ source_group("System" FILES ${SYSTEM_SRC})
 source_group("ImGui" FILES ${IMGUI_SRC})
 
 # Create Engine library
-add_library(Engine 
+add_executable(Engine 
     ${CORE_SRC}
     ${RENDERER_SRC}
     ${SCENE_SRC}
     ${SYSTEM_SRC}
     ${IMGUI_SRC}
 )
+
+#add_executable(Engine "${CMAKE_SOURCE_DIR}/Engine/src/Core/EntryPoint.hpp")
 
 # Include directories
 target_include_directories(Engine PRIVATE 

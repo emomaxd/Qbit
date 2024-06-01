@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace EMax3D{
+namespace Qbit {
 
 
 class Engine{

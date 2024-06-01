@@ -1,7 +1,7 @@
 #include "LayerStack.hpp"
 #include <algorithm>
 
-namespace EMax3D {
+namespace Qbit {
 
 	LayerStack::LayerStack()
 	{

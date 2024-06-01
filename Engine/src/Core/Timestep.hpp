@@ -1,6 +1,6 @@
 #pragma once
 
-namespace EMax3D {
+namespace Qbit {
 
 	class Timestep
 	{

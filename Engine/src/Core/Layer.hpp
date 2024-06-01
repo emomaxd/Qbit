@@ -11,7 +11,7 @@
 #include "Timestep.hpp"
 
 
-namespace EMax3D{
+namespace Qbit {
 
     class Layer
     {

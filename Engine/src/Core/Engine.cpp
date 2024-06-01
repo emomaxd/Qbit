@@ -12,7 +12,7 @@
 #include <filesystem>
 
 
-namespace EMax3D{
+namespace Qbit {
 
     std::vector<glm::mat4> getLightSpaceMatrices();
     Engine::Engine(){
@@ -80,8 +80,8 @@ namespace EMax3D{
     void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     {
 
-        EMax3D::Window::s_WindowWidth = width;
-        EMax3D::Window::s_WindowHeight = height;
+        Qbit::Window::s_WindowWidth = width;
+        Qbit::Window::s_WindowHeight = height;
 
         fb_width = width;
         fb_height = height;

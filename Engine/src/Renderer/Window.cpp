@@ -1,6 +1,6 @@
 #include "Window.hpp"
 
-namespace EMax3D{
+namespace Qbit {
 
 	int Window::s_WindowWidth = 1600;
 	int Window::s_WindowHeight = 900;

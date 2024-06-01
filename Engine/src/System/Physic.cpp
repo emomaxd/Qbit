@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace EMax3D{
+namespace Qbit{
 
     
     Physic::Physic(){
