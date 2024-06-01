@@ -49,7 +49,7 @@ Qbit is licensed under the [MIT License](LICENSE), allowing for free use and mod
 Qbit draws inspiration from various game engines and learning resources, including the [Hazel](https://github.com/TheCherno/Hazel) Engine by TheCherno.
 
 ## Follow the progress : 
-https://trello.com/b/8og3yTb4/engine
+[Trello](https://trello.com/b/8og3yTb4/engine)
 ---
 ![Alt Text](GithubResources/engine_demo.png)
 ![Alt Text](GithubResources/cascaded_shadow_map.gif)
