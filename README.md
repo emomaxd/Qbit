@@ -6,11 +6,9 @@ Qbit is a lightweight game engine designed for learning purposes. It's built wit
 
 ### Windows:
 
-1. Run `build-glfw.bat` to compile GLFW.
-2. Run `build.bat` to generate the Visual Studio Solution.
-3. After running the scripts:
-    - Open `Qbit.sln` in the `build/` directory.
-    - Set `Engine` as the Startup project.
+1. Run `CreateSolution.bat` to generate the Visual Studio Solution.
+2. After running the script:
+    - Open `Qbit.sln`
     - Run the project.
 
 ### Linux:
@@ -27,7 +25,7 @@ Qbit's project structure is designed to promote clarity and organization:
 - **Editor**: Provides the editor layer of the engine.
 - **src**: Contains the source code of the engine.
 - **vendor**: Third-party dependencies are stored here.
-- **sandbox**: Provides a sandbox application for testing the engine.
+- **Sandbox**: Provides a sandbox application for testing the engine.
 
 ## Features
 
@@ -48,10 +46,8 @@ Qbit is licensed under the [MIT License](LICENSE), allowing for free use and mod
 
 Qbit draws inspiration from various game engines and learning resources, including the [Hazel](https://github.com/TheCherno/Hazel) Engine by TheCherno.
 
-## Follow the progress : 
+## Follow the progress : [Trello](https://trello.com/b/8og3yTb4/engine)
 
-[Trello](https://trello.com/b/8og3yTb4/engine)
----
 ![Alt Text](GithubResources/engine_demo.png)
 ![Alt Text](GithubResources/cascaded_shadow_map.gif)
 ![Alt Text](GithubResources/lighting_demo4-diffuse_map.gif)

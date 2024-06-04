@@ -1,8 +1,7 @@
 @echo off
 cd ..
 cd ..
-mkdir build
-cmake -S . -B build/
-cd build
+::mkdir build
+cmake -S . -B .
+::cd build
 ::cmake --build .
-pause

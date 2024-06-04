@@ -13,4 +13,10 @@ set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 # Include the Engine directory
 add_subdirectory(Engine)
 add_subdirectory(Editor)
-#add_subdirectory(Sandbox)
+add_subdirectory(Sandbox)
+
+# Set Engine as the startup project
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Engine)
+
+# Remove ALL_BUILD and ZERO_CHECK targets
+set(CMAKE_SUPPRESS_REGENERATION true)

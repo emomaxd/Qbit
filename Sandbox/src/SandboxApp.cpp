@@ -1,22 +1,24 @@
 #include <Core/Layer.hpp>
-#include <Core/EntryPoint.h>
+#include <Core/EntryPoint.hpp>
+#include <Core/Application.hpp>
 
-class Sandbox : public EMax3D::Application
+class Sandbox : public Qbit::Application
 {
 public:
-    Sandbox(const EMax3D::ApplicationSpecification& specification)
-        : EMax3D::Application(specification)
+    Sandbox(const Qbit::ApplicationSpecification& specification)
+        : Qbit::Application(specification)
     {
-        PushLayer(new ExampleLayer());
-        PushLayer(new Sandbox2D());
+        //PushLayer(new ExampleLayer());
+        //PushLayer(new Sandbox2D());
     }
 
     ~Sandbox() = default;
 };
 
-EMax3D::Application* EMax3D::CreateApplication(EMax3D::ApplicationCommandLineArgs args)
+Qbit::Application* Qbit::CreateApplication(Qbit::ApplicationCommandLineArgs args)
 {
-    EMax3D::ApplicationSpecification spec;
+    std::cout << "Hello from sandbox!\n";
+    Qbit::ApplicationSpecification spec;
     spec.Name = "Sandbox";
     spec.WorkingDirectory = "../Editor";
     spec.CommandLineArgs = args;
