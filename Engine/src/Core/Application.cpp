@@ -1,6 +1,6 @@
 #include "Application.hpp"
 
-//#include "Log.h"
+#include "Log.h"
 
 //#include "Input.h"
 

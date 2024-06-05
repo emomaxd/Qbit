@@ -6,25 +6,10 @@ set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
 set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 
 # Glob source files
-file(GLOB CORE_SRC
-    "${CMAKE_SOURCE_DIR}/Engine/src/Core/*.cpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/Core/*.hpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/Core/*.h"
-)
-file(GLOB RENDERER_SRC
-    "${CMAKE_SOURCE_DIR}/Engine/src/Renderer/*.cpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/Renderer/*.hpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/Renderer/*.h"
-)
-file(GLOB SCENE_SRC
-    "${CMAKE_SOURCE_DIR}/Engine/src/Scene/*.cpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/Scene/*.hpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/Scene/*.h"
-)
-file(GLOB SYSTEM_SRC
-    "${CMAKE_SOURCE_DIR}/Engine/src/System/*.cpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/System/*.hpp"
-    "${CMAKE_SOURCE_DIR}/Engine/src/System/*.h"
+file(GLOB_RECURSE ENGINE_SRC
+    "${CMAKE_SOURCE_DIR}/Engine/src/*.cpp"
+    "${CMAKE_SOURCE_DIR}/Engine/src/*.hpp"
+    "${CMAKE_SOURCE_DIR}/Engine/src/*.h"
 )
 file(GLOB IMGUI_SRC
     "${IMGUI_DIR}/*.cpp"
@@ -32,23 +17,12 @@ file(GLOB IMGUI_SRC
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
 )
 
-# Group files
-source_group("Core" FILES ${CORE_SRC})
-source_group("Renderer" FILES ${RENDERER_SRC})
-source_group("Scene" FILES ${SCENE_SRC})
-source_group("System" FILES ${SYSTEM_SRC})
-source_group("ImGui" FILES ${IMGUI_SRC})
 
 # Create Engine library
 add_executable(Engine 
-    ${CORE_SRC}
-    ${RENDERER_SRC}
-    ${SCENE_SRC}
-    ${SYSTEM_SRC}
+    ${ENGINE_SRC}
     ${IMGUI_SRC}
 )
-
-#add_executable(Engine "${CMAKE_SOURCE_DIR}/Engine/src/Core/EntryPoint.hpp")
 
 # Include directories
 target_include_directories(Engine PRIVATE 
@@ -69,6 +43,8 @@ target_compile_definitions(Engine PRIVATE GLEW_STATIC)
 
 # Link libraries based on the operating system
 if(WIN32)
+    target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
+
     target_link_directories(Engine PRIVATE 
         ${GLFW_DIR}/install/lib
         ${GLEW_DIR}/Windows/lib/Release/x64
