@@ -7,7 +7,7 @@ REM Build the project
 cmake --build . --config Release
 
 REM Run the executable
-.\Qbit.exe
+.\Engine\Release\Engine.exe
 
 REM Pause to keep the console window open
 pause

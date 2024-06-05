@@ -1,6 +1,4 @@
-#include <Core/Layer.hpp>
-#include <Core/EntryPoint.hpp>
-#include <Core/Application.hpp>
+#include <Qbit.h>
 
 class Sandbox : public Qbit::Application
 {

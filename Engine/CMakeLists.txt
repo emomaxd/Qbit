@@ -9,18 +9,22 @@ set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 file(GLOB CORE_SRC
     "${CMAKE_SOURCE_DIR}/Engine/src/Core/*.cpp"
     "${CMAKE_SOURCE_DIR}/Engine/src/Core/*.hpp"
+    "${CMAKE_SOURCE_DIR}/Engine/src/Core/*.h"
 )
 file(GLOB RENDERER_SRC
     "${CMAKE_SOURCE_DIR}/Engine/src/Renderer/*.cpp"
     "${CMAKE_SOURCE_DIR}/Engine/src/Renderer/*.hpp"
+    "${CMAKE_SOURCE_DIR}/Engine/src/Renderer/*.h"
 )
 file(GLOB SCENE_SRC
     "${CMAKE_SOURCE_DIR}/Engine/src/Scene/*.cpp"
     "${CMAKE_SOURCE_DIR}/Engine/src/Scene/*.hpp"
+    "${CMAKE_SOURCE_DIR}/Engine/src/Scene/*.h"
 )
 file(GLOB SYSTEM_SRC
     "${CMAKE_SOURCE_DIR}/Engine/src/System/*.cpp"
     "${CMAKE_SOURCE_DIR}/Engine/src/System/*.hpp"
+    "${CMAKE_SOURCE_DIR}/Engine/src/System/*.h"
 )
 file(GLOB IMGUI_SRC
     "${IMGUI_DIR}/*.cpp"
@@ -48,7 +52,10 @@ add_executable(Engine
 
 # Include directories
 target_include_directories(Engine PRIVATE 
+    ${CMAKE_SOURCE_DIR}/Engine
+    ${CMAKE_SOURCE_DIR}/Engine/src
     ${CMAKE_SOURCE_DIR}/Engine/vendor
+    ${CMAKE_SOURCE_DIR}/Engine/vendor/spdlog/include
     ${GLFW_DIR}/install/include 
     ${GLEW_DIR}/include
     ${IMGUI_DIR}

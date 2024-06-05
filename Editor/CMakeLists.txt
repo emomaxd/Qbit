@@ -18,3 +18,7 @@ add_library(Editor ${CORE_SOURCES})
 #)
 
 #target_link_libraries(Editor PUBLIC glfw glew32s gdi32 winmm opengl32)
+
+# Enable "Show All Files" option for Visual Studio projects
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET Editor PROPERTY VS_SOLUTION_SHOW_ALL_FILES ON)
