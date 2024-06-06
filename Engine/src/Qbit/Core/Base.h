@@ -5,29 +5,29 @@
 #include <memory>
 
 
-/*
-#ifdef HZ_DEBUG
-#if defined(HZ_PLATFORM_WINDOWS)
-#define HZ_DEBUGBREAK() __debugbreak()
+
+#ifdef QB_DEBUG
+#if defined(QB_PLATFORM_WINDOWS)
+#define QB_DEBUGBREAK() __debugbreak()
 #elif defined(HZ_PLATFORM_LINUX)
 #include <signal.h>
-#define HZ_DEBUGBREAK() raise(SIGTRAP)
+#define QB_DEBUGBREAK() raise(SIGTRAP)
 #else
 #error "Platform doesn't support debugbreak yet!"
 #endif
-#define HZ_ENABLE_ASSERTS
+#define QB_ENABLE_ASSERTS
 #else
-#define HZ_DEBUGBREAK()
+#define QB_DEBUGBREAK()
 #endif
-*/
 
 
-#define QBIT_EXPAND_MACRO(x) x
-#define QBIT_STRINGIFY_MACRO(x) #x
+
+#define QB_EXPAND_MACRO(x) x
+#define QB_STRINGIFY_MACRO(x) #x
 
 #define BIT(x) (1 << x)
 
-#define QBIT_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+#define QB_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 namespace Qbit {
 
@@ -49,5 +49,5 @@ namespace Qbit {
 
 }
 
-#include "Core/Log.h"
-//#include "Core/Assert.h"
+#include "Qbit/Core/Log.h"
+#include "Qbit/Core/Assert.h"

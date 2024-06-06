@@ -6,7 +6,11 @@
 
 #include "LayerStack.hpp"
 
-#include "../Renderer/Window.hpp"
+#include "Window.h"
+
+#include "Qbit/Core/Base.h"
+
+#include "Qbit/Events/ApplicationEvent.h"
 
 extern int main(int argc, char** argv);
 
@@ -19,14 +23,14 @@ namespace Qbit {
 
 		const char* operator[](int index) const
 		{
-			//HZ_CORE_ASSERT(index < Count);
+			//QB_CORE_ASSERT(index < Count);
 			return Args[index];
 		}
 	};
 
 	struct ApplicationSpecification
 	{
-		std::string Name = "Hazel Application";
+		std::string Name = "Qbit Application";
 		std::string WorkingDirectory;
 		ApplicationCommandLineArgs CommandLineArgs;
 	};
@@ -42,7 +46,7 @@ namespace Qbit {
 
 		
 
-		//void OnEvent(Event& e);
+		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
@@ -55,7 +59,7 @@ namespace Qbit {
 
 
 	private:
-		//bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowClose(WindowCloseEvent& e);
 
 	private:
 		ApplicationSpecification m_Specification;

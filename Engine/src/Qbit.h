@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/Application.hpp"
-#include "Core/Log.h"
+#include "Qbit/Core/Application.hpp"
+#include "Qbit/Core/Log.h"
 
 
-#include "Core/EntryPoint.hpp"
+#include "Qbit/Core/EntryPoint.hpp"

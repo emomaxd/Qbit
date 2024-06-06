@@ -11,7 +11,7 @@
 
 #include <filesystem>
 
-
+/*
 namespace Qbit {
 
     std::vector<glm::mat4> getLightSpaceMatrices();
@@ -496,7 +496,7 @@ namespace Qbit {
         model = glm::scale(model, glm::vec3(0.25));
         shader.setMat4("model", model);
         renderCube();
-        */
+        
     }
 
 
@@ -944,7 +944,7 @@ namespace Qbit {
 
                 // End ImGui window for the folders window
                 ImGui::End();
-            */
+            
                 /// Hierarchy panel
 
 
@@ -1087,4 +1087,4 @@ namespace Qbit {
         m_Window.Cleanup();
     }
 
-}
+}*/

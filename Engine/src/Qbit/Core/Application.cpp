@@ -8,7 +8,7 @@
 
 namespace Qbit {
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+#define QB_BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
 
@@ -17,15 +17,15 @@ namespace Qbit {
 	{
 		//HZ_PROFILE_FUNCTION();
 
-		//HZ_CORE_ASSERT(!s_Instance, "Application already exists!");
+		QB_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
 		// Set working directory here
-		//if (!m_Specification.WorkingDirectory.empty())
-		//	std::filesystem::current_path(m_Specification.WorkingDirectory);
+		if (!m_Specification.WorkingDirectory.empty())
+			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
-		//m_Window = Window::Create(WindowProps(m_Specification.Name));
-		//m_Window->SetEventCallback(HZ_BIND_EVENT_FN(Application::OnEvent));
+		m_Window = Window::Create(WindowProps(m_Specification.Name));
+		m_Window->SetEventCallback(QB_BIND_EVENT_FN(Application::OnEvent));
 
 		//Renderer::Init();
 
@@ -42,11 +42,11 @@ namespace Qbit {
 			
 		}
 
-		//assert(!s_Instance, "Application already exists!");
+		assert(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		//m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));
-		//m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_Window = std::unique_ptr<Window>(Window::Create({ name, width, height }));
+		m_Window->SetEventCallback(QB_BIND_EVENT_FN(OnEvent));
 
 		// Renderer::Init();
 
@@ -64,18 +64,20 @@ namespace Qbit {
 		m_LayerStack.PushOverlay(layer);
 	}
 
-	/*void Application::OnEvent(Event& e)
+	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+		dispatcher.Dispatch<WindowCloseEvent>(QB_BIND_EVENT_FN(OnWindowClose));
 
-		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
-		{
-			(*--it)->OnEvent(e);
-			if (e.Handled)
-				break;
-		}
-	}*/
+		QB_CORE_INFO(e.ToString());
+
+		//for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		//{
+		//	(*--it)->OnEvent(e);
+		//	if (e.Handled)
+		//		break;
+		//}
+	}
 
 	void Application::Run()
 	{
@@ -85,22 +87,25 @@ namespace Qbit {
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(timestep);
+			glClearColor(1, 0, 1, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			//for (Layer* layer : m_LayerStack)
+				//layer->OnUpdate(timestep);
 
 			//m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
+			//for (Layer* layer : m_LayerStack)
+				//layer->OnImGuiRender();
 			//m_ImGuiLayer->End();
 
-			//m_Window->OnUpdate();
+			m_Window->OnUpdate();
 		}
 	}
 
-	/*bool Application::OnWindowClose(WindowCloseEvent& e)
+	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		m_Running = false;
 		return true;
-	}*/
+	}
 
 }

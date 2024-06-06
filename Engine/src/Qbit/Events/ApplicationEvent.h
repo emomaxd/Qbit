@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Events/Event.h"
+#include "Qbit/Events/Event.h"
 #include <sstream>
 
 namespace Qbit {

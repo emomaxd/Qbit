@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #include "../Scene/Scene.hpp"
 #include "../Renderer/Renderer.hpp"
 #include "../Renderer/Window.hpp"
@@ -33,3 +33,4 @@ class Engine{
     };
 
 }
+*/

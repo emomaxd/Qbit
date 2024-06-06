@@ -1,15 +1,11 @@
-
-/*
-/// This class has been copied from The Cherno's Github Page
-/// https://github.com/TheCherno/OpenGL
-*/
-
 #pragma once
 
 #include <string>
 
 #include "Timestep.hpp"
 
+
+#include "Qbit/Events/Event.h"
 
 namespace Qbit {
 
@@ -23,7 +19,7 @@ namespace Qbit {
             virtual void OnDetach() {}
             virtual void OnUpdate(Timestep ts) {}
             virtual void OnImGuiRender() {}
-            //virtual void OnEvent(Event& event) {}
+            virtual void OnEvent(Event& event) {}
 
             inline const std::string& GetName() const { return m_DebugName; }
     protected:

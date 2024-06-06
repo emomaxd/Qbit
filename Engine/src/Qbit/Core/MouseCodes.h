@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Hazel
+namespace Qbit
 {
 	using MouseCode = uint16_t;
 

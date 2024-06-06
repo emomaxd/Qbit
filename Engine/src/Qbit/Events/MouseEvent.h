@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Events/Event.h"
-#include "Core/MouseCodes.h"
+#include "Qbit/Events/Event.h"
+#include "Qbit/Core/MouseCodes.h"
 #include <sstream>
 
 namespace Qbit {

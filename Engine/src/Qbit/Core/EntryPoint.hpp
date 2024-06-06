@@ -6,8 +6,8 @@ extern Qbit::Application* Qbit::CreateApplication(Qbit::ApplicationCommandLineAr
 int main(int argc, char** argv)
 {
     Qbit::Log::Init();
-    QBIT_CORE_WARN("Initialized Log!");
-    QBIT_WARN("Initialized Log!");
+    QB_CORE_WARN("Initialized Log!");
+    QB_WARN("Initialized Log!");
 
     auto app = Qbit::CreateApplication({ argc, argv });
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Events/Event.h"
-#include "Core/KeyCodes.h"
+#include "Qbit/Events/Event.h"
+#include "Qbit/Core/KeyCodes.h"
 #include <sstream>
 
 namespace Qbit {

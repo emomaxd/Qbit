@@ -41,9 +41,17 @@ target_include_directories(Engine PRIVATE
 # Compile definitions
 target_compile_definitions(Engine PRIVATE GLEW_STATIC)
 
+# Define QB_DEBUG for Debug configuration only
+target_compile_definitions(Engine PRIVATE 
+    $<$<CONFIG:Debug>:QB_DEBUG>
+)
+
 # Link libraries based on the operating system
 if(WIN32)
     target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
+    target_compile_definitions(Engine PRIVATE QB_PLATFORM_WINDOWS)
+
+    
 
     target_link_directories(Engine PRIVATE 
         ${GLFW_DIR}/install/lib

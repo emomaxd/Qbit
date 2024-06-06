@@ -8,7 +8,7 @@ namespace Qbit{
 
     
     Physic::Physic(){
-        m_scene = Engine::GetActiveScene();
+        //m_scene = Engine::GetActiveScene();
         m_gravity = gravityConstant;
     }
 
