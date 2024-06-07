@@ -11,7 +11,7 @@
 
 //#include "Qbit/Renderer/Renderer.h"
 
-//#include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Qbit {
 
@@ -64,8 +64,8 @@ namespace Qbit {
 			++s_GLFWWindowCount;
 		}
 
-		//m_Context = GraphicsContext::Create(m_Window);
-		//m_Context->Init();
+		m_Context = GraphicsContext::Create(m_Window);
+		m_Context->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
@@ -177,9 +177,8 @@ namespace Qbit {
 	void WindowsWindow::OnUpdate()
 	{
 		//HZ_PROFILE_FUNCTION();
-
 		glfwPollEvents();
-		//m_Context->SwapBuffers();
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

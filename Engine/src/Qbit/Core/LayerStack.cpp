@@ -1,4 +1,4 @@
-#include "LayerStack.hpp"
+#include "LayerStack.h"
 #include <algorithm>
 
 namespace Qbit {

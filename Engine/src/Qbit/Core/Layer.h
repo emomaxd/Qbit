@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Timestep.hpp"
+#include "Timestep.h"
 
 
 #include "Qbit/Events/Event.h"

@@ -19,7 +19,7 @@ file(GLOB IMGUI_SRC
 
 
 # Create Engine library
-add_executable(Engine 
+add_library(Engine 
     ${ENGINE_SRC}
     ${IMGUI_SRC}
 )
@@ -49,7 +49,7 @@ target_compile_definitions(Engine PRIVATE
 # Link libraries based on the operating system
 if(WIN32)
     target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
-    target_compile_definitions(Engine PRIVATE QB_PLATFORM_WINDOWS)
+    target_compile_definitions(Engine PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
     
 

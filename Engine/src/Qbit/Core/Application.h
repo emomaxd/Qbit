@@ -1,16 +1,18 @@
 #pragma once
 
-#include "TimeStep.hpp"
+#include "TimeStep.h"
 
-#include "Layer.hpp"
+#include "Layer.h"
 
-#include "LayerStack.hpp"
+#include "LayerStack.h"
 
 #include "Window.h"
 
 #include "Qbit/Core/Base.h"
 
 #include "Qbit/Events/ApplicationEvent.h"
+
+#include "Qbit/ImGui/ImGuiLayer.h"
 
 extern int main(int argc, char** argv);
 
@@ -64,7 +66,7 @@ namespace Qbit {
 	private:
 		ApplicationSpecification m_Specification;
 		std::unique_ptr<Window> m_Window;
-		//ImGuiLayer* m_ImGuiLayer;
+		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0.0f;

@@ -1,9 +1,10 @@
-#include "Application.hpp"
+#include "Application.h"
 
 #include "Log.h"
 
 //#include "Input.h"
 
+#include <GL/glew.h>
 #include <glfw/glfw3.h>
 
 namespace Qbit {
@@ -29,8 +30,8 @@ namespace Qbit {
 
 		//Renderer::Init();
 
-		//m_ImGuiLayer = new ImGuiLayer();
-		//PushOverlay(m_ImGuiLayer);
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
 	}
 
 
@@ -50,8 +51,8 @@ namespace Qbit {
 
 		// Renderer::Init();
 
-		//m_ImGuiLayer = new ImGuiLayer();
-		//PushOverlay(m_ImGuiLayer);
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -71,12 +72,12 @@ namespace Qbit {
 
 		QB_CORE_INFO(e.ToString());
 
-		//for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
-		//{
-		//	(*--it)->OnEvent(e);
-		//	if (e.Handled)
-		//		break;
-		//}
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		{
+			(*--it)->OnEvent(e);
+			if (e.Handled)
+				break;
+		}
 	}
 
 	void Application::Run()
@@ -87,16 +88,17 @@ namespace Qbit {
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			glClearColor(1, 0, 1, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+			// Will be moved into OpenGLRendererAPI
+			glClearColor(0.2f, 0.2f, 0.2f, 0.8f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			//for (Layer* layer : m_LayerStack)
-				//layer->OnUpdate(timestep);
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate(timestep);
 
-			//m_ImGuiLayer->Begin();
-			//for (Layer* layer : m_LayerStack)
-				//layer->OnImGuiRender();
-			//m_ImGuiLayer->End();
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : m_LayerStack)
+				layer->OnImGuiRender();
+			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
 		}

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Qbit/Core/Window.h"
-//#include "Qbit/Renderer/GraphicsContext.h"
+#include "Qbit/Renderer/GraphicsContext.h"
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 namespace Qbit {
@@ -29,7 +30,7 @@ namespace Qbit {
 		virtual void Shutdown();
 	private:
 		GLFWwindow* m_Window;
-		//Scope<GraphicsContext> m_Context;
+		Scope<GraphicsContext> m_Context;
 
 		struct WindowData
 		{
