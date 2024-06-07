@@ -35,6 +35,7 @@ target_include_directories(Engine PRIVATE
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
     ${GLM_DIR}/glm
+    ${GLM_DIR}
     ${ENTT_DIR}/src/entt
 )
 

@@ -1,4 +1,5 @@
 #include "qbpch.h"
+
 #include "Qbit/ImGui/ImGuiLayer.h"
 
 #include <imgui.h>
@@ -35,8 +36,8 @@ namespace Qbit {
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
@@ -50,11 +51,11 @@ namespace Qbit {
 
 		// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
 		ImGuiStyle& style = ImGui::GetStyle();
-		//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		//{
-			//style.WindowRounding = 0.0f;
-			//style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-		//}
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
 		SetDarkThemeColors();
 
@@ -87,34 +88,82 @@ namespace Qbit {
 
 	void ImGuiLayer::Begin()
 	{
-		//HZ_PROFILE_FUNCTION();
-
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		//ImGuizmo::BeginFrame();
+
+		// Set up a main docking space
+		static bool dockSpaceOpen = true;
+		static bool opt_fullscreen = true;
+		static bool opt_padding = false;
+		static ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_None;
+
+		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into.
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (opt_fullscreen)
+		{
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		}
+		else
+		{
+			dockSpaceFlags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+		}
+
+		if (!opt_padding)
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+		ImGui::Begin("DockSpace Demo", &dockSpaceOpen, windowFlags);
+
+		if (!opt_padding)
+			ImGui::PopStyleVar();
+
+		if (opt_fullscreen)
+			ImGui::PopStyleVar(2);
+
+		// DockSpace
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		float minWinSizeX = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockSpaceFlags);
+		}
+
+		style.WindowMinSize.x = minWinSizeX;
 	}
+
 
 	void ImGuiLayer::End()
 	{
-		//HZ_PROFILE_FUNCTION();
-
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
 		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
+
+		// End the main docking space window
+		ImGui::End();
 
 		// Rendering
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		//{
-		//	GLFWwindow* backup_current_context = glfwGetCurrentContext();
-			//ImGui::UpdatePlatformWindows();
-			//ImGui::RenderPlatformWindowsDefault();
-		//	glfwMakeContextCurrent(backup_current_context);
-		//}
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
 	}
+
 
 	void ImGuiLayer::SetDarkThemeColors()
 	{
