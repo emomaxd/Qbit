@@ -1,7 +1,7 @@
 @echo off
 
 :: Navigate to the GLFW source directory
-cd ../../Engine/vendor/glfw
+cd ../../../Engine/vendor/glfw
 
 :: Run CMake to configure the build
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX="install/"

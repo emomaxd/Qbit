@@ -48,7 +48,7 @@ Qbit draws inspiration from various game engines and learning resources, includi
 
 ## Follow the progress : [Trello](https://trello.com/b/8og3yTb4/engine)
 
-![Alt Text](GithubResources/engine_demo.png)
-![Alt Text](GithubResources/cascaded_shadow_map.gif)
-![Alt Text](GithubResources/lighting_demo4-diffuse_map.gif)
-![Alt Text](GithubResources/lighting_demo3-diffuse_map-specular_map.gif)
+![Alt Text](Dist/GithubResources/engine_demo.png)
+![Alt Text](Dist/GithubResources/cascaded_shadow_map.gif)
+![Alt Text](Dist/GithubResources/lighting_demo4-diffuse_map.gif)
+![Alt Text](Dist/GithubResources/lighting_demo3-diffuse_map-specular_map.gif)

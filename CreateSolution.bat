@@ -1,10 +1,10 @@
 @echo off
 
-cd BuildScripts/Windows
+cd Dist/BuildScripts/Windows
 
 call build-glfw.bat
 
-cd ../../../BuildScripts/Windows
+cd ../../../Dist/BuildScripts/Windows
 
 call build.bat
 
