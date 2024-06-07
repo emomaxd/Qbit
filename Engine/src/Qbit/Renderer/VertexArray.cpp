@@ -1,35 +1,22 @@
-#include "VertexArray.hpp"
+#include "qbpch.h"
+#include "Qbit/Renderer/VertexArray.h"
 
-VertexArray::VertexArray() {
-	glGenVertexArrays(1, &VAO);
-}
+#include "Qbit/Renderer/Renderer.h"
+#include "Platform/OpenGL/OpenGLVertexArray.h"
 
-VertexArray::~VertexArray() {
-	glDeleteVertexArrays(1, &VAO);
-}
+namespace Qbit {
 
-void VertexArray::Bind() const {
-	glBindVertexArray(VAO);
-}
+	Ref<VertexArray> VertexArray::Create()
+	{
+		//switch (Renderer::GetAPI())
+		//{
+		//case RendererAPI::API::None:    HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		//case RendererAPI::API::OpenGL:  
+		return CreateRef<OpenGLVertexArray>();
+		//}
 
-void VertexArray::UnBind() const {
-	glBindVertexArray(0);
-}
-
-void VertexArray::AddBuffer(const VertexBuffer& VB, const VertexBufferLayout& layout) {
-	
-	Bind();
-	VB.Bind();
-
-	const auto& elements = layout.m_elements;
-	
-	unsigned int offset = 0;
-	for (int i = 0; i < elements.size(); ++i) {
-
-		const auto& element = elements[i];
-		glEnableVertexAttribArray(i);
-		glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.m_stride, (const void*)offset );
-		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
+		QB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
 	}
-	
+
 }
