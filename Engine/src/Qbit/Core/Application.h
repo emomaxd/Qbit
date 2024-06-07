@@ -70,6 +70,9 @@ namespace Qbit {
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0.0f;
+
+		unsigned int vao, vbo, ibo;
+
 	private:
 		static Application* s_Instance;
 		friend int ::main(int argc, char** argv);

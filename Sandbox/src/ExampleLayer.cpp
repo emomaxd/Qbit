@@ -26,6 +26,9 @@ void ExampleLayer::OnEvent(Qbit::Event& e)
 
 void ExampleLayer::OnImGuiRender()
 {
+
+	ImGui::ShowDemoWindow();
+
 	ImGui::Begin("Settings - ExampleLayer");
 
 	//auto stats = Hazel::Renderer2D::GetStats();
