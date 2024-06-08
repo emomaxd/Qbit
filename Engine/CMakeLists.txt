@@ -64,7 +64,6 @@ if(WIN32)
         opengl32 
         gdi32 
         winmm
-        Sandbox
     )
 elseif(UNIX)
     target_link_directories(Engine PRIVATE 
@@ -78,7 +77,6 @@ elseif(UNIX)
         dl 
         pthread 
         GL
-        Sandbox
     )
 else()
     message(FATAL_ERROR "Unsupported operating system")

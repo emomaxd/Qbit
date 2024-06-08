@@ -1,23 +1,66 @@
+project(Editor)
+
+set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
+set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
+set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
+set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
+set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
+
 # Include subdirectories
 file(GLOB_RECURSE CORE_SOURCES "*.cpp" "*.cxx" "*.cc" "*.hpp" ".h")
 
-add_library(Editor ${CORE_SOURCES})
+add_executable(Editor ${CORE_SOURCES})
 
-#target_include_directories(Editor PUBLIC ../Vendor)
-#target_include_directories(Editor PUBLIC ../Vendor/glfw/include)
-#target_include_directories(Editor PUBLIC ../Vendor/imgui)
-#target_include_directories(Editor PUBLIC ../Vendor/enTT/src/entt)
-#target_include_directories(Editor PUBLIC ../Vendor/glm)
-#target_include_directories(Editor PUBLIC ../Vendor/GLEW/include)
+# Include directories
+target_include_directories(Editor PRIVATE 
+    ${CMAKE_SOURCE_DIR}/Engine
+    ${CMAKE_SOURCE_DIR}/Engine/src
+    ${CMAKE_SOURCE_DIR}/Engine/vendor
+    ${CMAKE_SOURCE_DIR}/Engine/vendor/spdlog/include
+    ${GLFW_DIR}/install/include 
+    ${GLEW_DIR}/include
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${GLM_DIR}
+    ${GLM_DIR}/glm
+    ${ENTT_DIR}/src/entt
+)
 
-#add_compile_definitions(GLEW_STATIC)
+if(WIN32)
+    target_precompile_headers(Editor PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
+    target_compile_definitions(Editor PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
-#target_link_directories(Editor 
-#PUBLIC ../Vendor/glfw/src/Debug 
-#PUBLIC ../Vendor/GLEW/lib/Release/x64
-#)
+    
 
-#target_link_libraries(Editor PUBLIC glfw glew32s gdi32 winmm opengl32)
+    target_link_directories(Editor PRIVATE 
+        ${GLFW_DIR}/install/lib
+        ${GLEW_DIR}/Windows/lib/Release/x64
+    )
+    target_link_libraries(Editor PRIVATE 
+        glew32s 
+        glfw3 
+        opengl32 
+        gdi32 
+        winmm
+        Engine
+    )
+elseif(UNIX)
+    target_link_directories(Editor PRIVATE 
+        ${GLFW_DIR}/install/lib 
+        ${GLEW_DIR}/lib
+    )
+    target_link_libraries(Editor PRIVATE 
+        glfw3 
+        GLEW 
+        m 
+        dl 
+        pthread 
+        GL
+        Engine
+    )
+else()
+    message(FATAL_ERROR "Unsupported operating system")
+endif()
 
 # Enable "Show All Files" option for Visual Studio projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

@@ -2,13 +2,15 @@
 
 #include "Log.h"
 
-//#include "Input.h"
+#include "Input.h"
 
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
 
 #include "Qbit/Renderer/Shader.h"
 #include <Platform/OpenGL/OpenGLShader.h>
+
+#include "Qbit/Renderer/Renderer.h"
 
 namespace Qbit {
 
@@ -31,7 +33,7 @@ namespace Qbit {
 		m_Window = Window::Create(WindowProps(m_Specification.Name));
 		m_Window->SetEventCallback(QB_BIND_EVENT_FN(Application::OnEvent));
 
-		//Renderer::Init();
+		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);	
