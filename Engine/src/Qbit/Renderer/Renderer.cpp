@@ -10,7 +10,7 @@ namespace Qbit {
 	{
 		//HZ_PROFILE_FUNCTION();
 
-		//RenderCommand::Init();
+		RenderCommand::Init();
 		//Renderer2D::Init();
 	}
 
@@ -21,7 +21,7 @@ namespace Qbit {
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		//RenderCommand::SetViewport(0, 0, width, height);
+		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
 	//void Renderer::BeginScene(OrthographicCamera& camera)
@@ -40,7 +40,7 @@ namespace Qbit {
 		shader->SetMat4("u_Transform", transform);
 
 		vertexArray->Bind();
-		//RenderCommand::DrawIndexed(vertexArray);
+		RenderCommand::DrawIndexed(vertexArray);
 	}
 
 }

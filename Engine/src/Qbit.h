@@ -11,12 +11,12 @@
 
 #include "Qbit/Core/Timestep.h"
 
-//#include "Qbit/Core/Input.h"
+#include "Qbit/Core/Input.h"
 #include "Qbit/Core/KeyCodes.h"
 #include "Qbit/Core/MouseCodes.h"
 //#include "Qbit/Renderer/OrthographicCameraController.h"
 
-//#include "Qbit/ImGui/ImGuiLayer.h"
+#include "Qbit/ImGui/ImGuiLayer.h"
 
 //#include "Qbit/Scene/Scene.h"
 //#include "Qbit/Scene/Entity.h"
@@ -30,11 +30,11 @@
 //#include "Qbit/Renderer/Renderer2D.h"
 //#include "Qbit/Renderer/RenderCommand.h"
 
-//#include "Qbit/Renderer/Buffer.h"
-//#include "Qbit/Renderer/Shader.h"
+#include "Qbit/Renderer/Buffer.h"
+#include "Qbit/Renderer/Shader.h"
 //#include "Qbit/Renderer/Framebuffer.h"
 //#include "Qbit/Renderer/Texture.h"
-//#include "Qbit/Renderer/VertexArray.h"
+#include "Qbit/Renderer/VertexArray.h"
 
 //#include "Qbit/Renderer/OrthographicCamera.h"
 // -----------------------------------

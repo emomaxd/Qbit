@@ -28,7 +28,7 @@ namespace Qbit {
 #define QB_CORE_INFO(...)     ::Qbit::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define QB_CORE_WARN(...)     ::Qbit::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define QB_CORE_ERROR(...)    ::Qbit::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define QB_CORE_FATAL(...)    ::Qbit::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define QB_CORE_CRITICAL(...)    ::Qbit::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 
 // CLIENT
@@ -36,4 +36,4 @@ namespace Qbit {
 #define QB_INFO(...)          ::Qbit::Log::GetClientLogger()->info(__VA_ARGS__)
 #define QB_WARN(...)          ::Qbit::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define QB_ERROR(...)         ::Qbit::Log::GetClientLogger()->error(__VA_ARGS__)
-#define QB_FATAL(...)         ::Qbit::Log::GetClientLogger()->critical(__VA_ARGS__)
+#define QB_CRITICAL(...)         ::Qbit::Log::GetClientLogger()->critical(__VA_ARGS__)

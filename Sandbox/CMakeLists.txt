@@ -22,6 +22,7 @@ target_include_directories(Sandbox PRIVATE
     ${GLEW_DIR}/include
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
+    ${GLM_DIR}
     ${GLM_DIR}/glm
     ${ENTT_DIR}/src/entt
 )

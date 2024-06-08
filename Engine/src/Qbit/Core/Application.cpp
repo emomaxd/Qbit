@@ -7,6 +7,9 @@
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
 
+#include "Qbit/Renderer/Shader.h"
+#include <Platform/OpenGL/OpenGLShader.h>
+
 namespace Qbit {
 
 #define QB_BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
@@ -54,7 +57,7 @@ namespace Qbit {
 
 		unsigned int indices[] = {0, 1, 2};
 
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);		
 
 	}
 
@@ -117,6 +120,8 @@ namespace Qbit {
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			glBindVertexArray(vao);
+			OpenGLShader shader("../Engine/src/Qbit/Renderer/Shader/BasicShader.glsl");
+			shader.Bind();
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
 			for (Layer* layer : m_LayerStack)

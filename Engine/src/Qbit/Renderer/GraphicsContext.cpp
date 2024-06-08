@@ -1,7 +1,7 @@
 #include "qbpch.h"
 #include "Qbit/Renderer/GraphicsContext.h"
 
-//#include "Hazel/Renderer/Renderer.h"
+#include "Qbit/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLContext.h"
 
 
@@ -9,11 +9,11 @@ namespace Qbit {
 
 	Scope<GraphicsContext> GraphicsContext::Create(void* window)
 	{
-		//switch (Renderer::GetAPI())
-		//{
-		//case RendererAPI::API::None:    HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		//case RendererAPI::API::OpenGL:  return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
-		//}
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:    QB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:  return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
+		}
 
 		return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
 

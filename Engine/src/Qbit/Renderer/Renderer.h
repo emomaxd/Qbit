@@ -1,10 +1,11 @@
 #pragma once
 
-//#include "Qbit/Renderer/RenderCommand.h"
+#include "Qbit/Renderer/RenderCommand.h"
 
 //#include "Qbit/Renderer/OrthographicCamera.h"
 #include "Qbit/Renderer/Shader.h"
 #include "Qbit/Renderer/VertexArray.h"
+#include "Qbit/Renderer/RendererAPI.h"
 
 namespace Qbit {
 
@@ -21,7 +22,7 @@ namespace Qbit {
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
-		//static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	private:
 		struct SceneData
 		{
