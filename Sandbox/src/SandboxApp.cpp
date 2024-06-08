@@ -1,7 +1,6 @@
 #include <Qbit.h>
 #include "ExampleLayer.h"
 #include "Qbit/Core/EntryPoint.h"
-#include "Sandbox2D.h"
 
 class Sandbox : public Qbit::Application
 {
@@ -10,7 +9,6 @@ public:
         : Qbit::Application(specification)
     {
         PushLayer(new ExampleLayer());
-        PushLayer(new Sandbox2D());
     }
 
     ~Sandbox() = default;

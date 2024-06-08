@@ -1,7 +1,7 @@
 #include "qbpch.h"
 #include "Platform/Windows/WindowsWindow.h"
 
-//#include "Qbit/Core/Input.h"
+#include "Qbit/Core/Input.h"
 
 #include "Qbit/Events/ApplicationEvent.h"
 #include "Qbit/Events/MouseEvent.h"
@@ -9,7 +9,7 @@
 
 #include "Qbit/Core/Base.h"
 
-//#include "Qbit/Renderer/Renderer.h"
+#include "Qbit/Renderer/Renderer.h"
 
 #include "Platform/OpenGL/OpenGLContext.h"
 
@@ -57,7 +57,7 @@ namespace Qbit {
 		{
 			//HZ_PROFILE_SCOPE("glfwCreateWindow");
 #if defined(QB_DEBUG)
-			//if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);

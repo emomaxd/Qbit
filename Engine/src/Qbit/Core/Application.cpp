@@ -34,30 +34,7 @@ namespace Qbit {
 		//Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
-
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-		float vertices[3*3] = 
-		{-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f};
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-
-		glGenBuffers(1, &ibo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-
-		unsigned int indices[] = {0, 1, 2};
-
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);		
+		PushOverlay(m_ImGuiLayer);	
 
 	}
 
@@ -97,7 +74,7 @@ namespace Qbit {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(QB_BIND_EVENT_FN(OnWindowClose));
 
-		QB_CORE_INFO(e.ToString());
+		//QB_CORE_INFO(e.ToString());
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
@@ -114,15 +91,6 @@ namespace Qbit {
 			float time = (float)glfwGetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
-
-			// Will be moved into OpenGLRendererAPI
-			glClearColor(0.2f, 0.2f, 0.2f, 0.8f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			glBindVertexArray(vao);
-			OpenGLShader shader("../Engine/src/Qbit/Renderer/Shader/BasicShader.glsl");
-			shader.Bind();
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate(timestep);
