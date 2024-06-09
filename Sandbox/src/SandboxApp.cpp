@@ -16,7 +16,6 @@ public:
 
 Qbit::Application* Qbit::CreateApplication(Qbit::ApplicationCommandLineArgs args)
 {
-    std::cout << "Hello from sandbox!\n";
     Qbit::ApplicationSpecification spec;
     spec.Name = "Sandbox";
     spec.WorkingDirectory = "../Editor";

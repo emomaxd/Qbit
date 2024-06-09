@@ -39,7 +39,7 @@ namespace Qbit {
 
 		if (m_Rotation)
 		{
-			if (Input::IsKeyPressed(Key::Q))
+			if (Input::IsKeyPressed(Key::V))
 				m_CameraRotation += m_CameraRotationSpeed * ts;
 			if (Input::IsKeyPressed(Key::E))
 				m_CameraRotation -= m_CameraRotationSpeed * ts;
