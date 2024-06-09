@@ -22,6 +22,8 @@ private:
 	Qbit::Ref<Qbit::Shader> m_FlatColorShader;
 	Qbit::Ref<Qbit::VertexArray> m_SquareVA;
 
+	Qbit::Ref<Qbit::Shader> m_TextureShader;
+
 	Qbit::Ref<Qbit::Texture2D> m_Texture, m_ChernoLogoTexture;
 
 	Qbit::OrthographicCameraController m_CameraController;
