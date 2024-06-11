@@ -1,5 +1,7 @@
 @echo off
 
+cd ..
+
 call git submodule update --init --recursive
 
 cd Dist/BuildScripts/Windows

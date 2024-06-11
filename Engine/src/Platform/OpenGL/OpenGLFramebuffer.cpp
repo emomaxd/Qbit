@@ -76,7 +76,7 @@ namespace Qbit {
 			return false;
 		}
 
-		static GLenum HazelFBTextureFormatToGL(FramebufferTextureFormat format)
+		static GLenum QbitFBTextureFormatToGL(FramebufferTextureFormat format)
 		{
 			switch (format)
 			{
@@ -193,7 +193,7 @@ namespace Qbit {
 	{
 		if (width == 0 || height == 0 || width > s_MaxFramebufferSize || height > s_MaxFramebufferSize)
 		{
-			QB_CORE_WARN("Attempted to rezize framebuffer to {0}, {1}", width, height);
+			QB_CORE_WARN("Attempted to resize framebuffer to {0}, {1}", width, height);
 			return;
 		}
 		m_Specification.Width = width;
@@ -219,7 +219,7 @@ namespace Qbit {
 
 		auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];
 		glClearTexImage(m_ColorAttachments[attachmentIndex], 0,
-			Utils::HazelFBTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
+			Utils::QbitFBTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
 	}
 
 }

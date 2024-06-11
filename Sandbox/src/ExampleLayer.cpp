@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 ExampleLayer::ExampleLayer()
-	: Layer("ExampleLayer"), m_CameraController(1280.0f / 720.0f)
+	: Layer("ExampleLayer"), m_CameraController(1600.0f / 900.0f)
 {
 	m_VertexArray = Qbit::VertexArray::Create();
 

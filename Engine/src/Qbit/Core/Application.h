@@ -43,10 +43,9 @@ namespace Qbit {
 	{
 	public:
 		Application(const ApplicationSpecification& specification);
-		Application(const std::string& name = "OpenGL Sandbox", uint32_t width = 1280, uint32_t height = 720);
-		virtual ~Application() = default;
+		virtual ~Application();
 
-		
+		void Close();
 
 		void OnEvent(Event& e);
 
@@ -59,23 +58,25 @@ namespace Qbit {
 
 		inline static Application& Get() { return *s_Instance; }
 
-		void Run();
-
+		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
 
 	private:
+		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 	private:
 		ApplicationSpecification m_Specification;
-		std::unique_ptr<Window> m_Window;
+		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
+		bool m_Minimized = false;
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0.0f;
 	private:
 		static Application* s_Instance;
 		friend int ::main(int argc, char** argv);
-		
+
 	};
 	Application* CreateApplication(Qbit::ApplicationCommandLineArgs args);
 }

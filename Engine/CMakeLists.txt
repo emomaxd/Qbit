@@ -45,6 +45,7 @@ target_compile_definitions(Engine PRIVATE GLEW_STATIC)
 # Define QB_DEBUG for Debug configuration only
 target_compile_definitions(Engine PRIVATE 
     $<$<CONFIG:Debug>:QB_DEBUG>
+    _CRT_SECURE_NO_WARNINGS
 )
 
 # Link libraries based on the operating system
