@@ -9,7 +9,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <Platform/OpenGL/OpenGLTexture.h>
-#include <Platform/OpenGL/OpenGLShader.h>
 #include "Camera.h"
 #include "EditorCamera.h"
 
@@ -52,7 +51,7 @@ namespace Qbit {
 		s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
 
 
-		s_Data.QuadShader = Shader::Create("assets/shaders/FlatColor.glsl");
+	s_Data.QuadShader= Shader::Create("assets/shaders/FlatColor.glsl");
 
 
 		
@@ -64,9 +63,9 @@ namespace Qbit {
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data.QuadShader)->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data.QuadShader)->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data.QuadShader)->SetMat4("u_Transform", glm::mat4(1.0f));
+		s_Data.QuadShader->Bind();
+		s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+		s_Data.QuadShader->SetMat4("u_Transform", glm::mat4(1.0f));
 
 	}
 
@@ -81,8 +80,12 @@ namespace Qbit {
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data.QuadShader)->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(s_Data.QuadShader)->SetFloat3("u_Color", { color });
+		s_Data.QuadShader->Bind();
+		s_Data.QuadShader->SetFloat3("u_Color", { color });
+
+		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data.QuadShader->SetMat4("u_Transform", transform);
 
 		s_Data.QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
