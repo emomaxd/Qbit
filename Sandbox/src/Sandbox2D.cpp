@@ -9,6 +9,8 @@
 Sandbox2D::Sandbox2D()
 	: Layer("Sandbox2D"), m_CameraController(1600.0f / 900.0f), m_SquareColor({ 0.2f, 0.3f, 0.8f, 1.0f })
 {
+	m_CheckerboardTexture = Qbit::Texture2D::Create("assets/textures/Checkerboard.png");
+	m_ChernoLogoTexture = Qbit::Texture2D::Create("assets/textures/ChernoLogo.png");
 }
 
 void Sandbox2D::OnAttach()
@@ -39,6 +41,9 @@ void Sandbox2D::OnUpdate(Qbit::Timestep ts)
 		Qbit::Renderer2D::BeginScene(m_CameraController.GetCamera());
 		Qbit::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 		Qbit::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
+
+		Qbit::Renderer2D::DrawQuad({ 10.2f, -0.5f}, { 12.0f, 12.0f }, m_ChernoLogoTexture);
+		Qbit::Renderer2D::DrawQuad({ -8.2f, -0.5f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture);
 
 		Qbit::Renderer2D::EndScene();
 

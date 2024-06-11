@@ -21,6 +21,8 @@ private:
 	Qbit::Ref<Qbit::VertexArray> m_SquareVA;
 	Qbit::Ref<Qbit::Shader> m_FlatColorShader;
 
+	Qbit::Ref<Qbit::Texture2D> m_ChernoLogoTexture;
+
 	Qbit::Ref<Qbit::Texture2D> m_CheckerboardTexture;
 
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };

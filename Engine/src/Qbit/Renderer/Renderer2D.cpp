@@ -21,6 +21,7 @@ namespace Qbit {
 		Ref<VertexArray> QuadVertexArray;
 		Ref<VertexBuffer> QuadVertexBuffer;
 		Ref<Shader> QuadShader;
+		Ref<Shader> TextureShader;
 
 		Renderer2D::Statistics Stats;
 	};
@@ -33,15 +34,16 @@ namespace Qbit {
 
 		float quadVertices[5 * 4] =
 		{
-			-0.5f, -0.5f, 0.0f,
-			0.5f, -0.5f, 0.0f,
-			0.5f, 0.5f, 0.0f,
-			-0.5f, 0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f, 0.5f, 0.0f, 0.0f, 1.0f
 		};
 		s_Data.QuadVertexArray->Bind();
 		s_Data.QuadVertexBuffer = VertexBuffer::Create(quadVertices, sizeof(quadVertices));
 		s_Data.QuadVertexBuffer->SetLayout({
-			{ ShaderDataType::Float3, "a_Position"     }
+			{ ShaderDataType::Float3, "a_Position"     },
+			{ ShaderDataType::Float2, "a_TexCoord"     }
 			});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -51,9 +53,11 @@ namespace Qbit {
 		s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
 
 
-	s_Data.QuadShader= Shader::Create("assets/shaders/FlatColor.glsl");
+		s_Data.QuadShader= Shader::Create("assets/shaders/FlatColor.glsl");
+		s_Data.TextureShader = Shader::Create("assets/shaders/Texture.glsl");
 
-
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetInt("u_Texture", 0);
 		
 	}
 
@@ -65,7 +69,9 @@ namespace Qbit {
 	{
 		s_Data.QuadShader->Bind();
 		s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-		s_Data.QuadShader->SetMat4("u_Transform", glm::mat4(1.0f));
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 
 	}
 
@@ -86,6 +92,28 @@ namespace Qbit {
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		s_Data.QuadShader->SetMat4("u_Transform", transform);
+
+		s_Data.QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
+
+		s_Data.Stats.QuadCount += 1;
+		s_Data.Stats.DrawCalls += 1;
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture)
+	{
+		s_Data.TextureShader->Bind();
+
+		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data.TextureShader->SetMat4("u_Transform", transform);
+
+		texture->Bind();
 
 		s_Data.QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);
