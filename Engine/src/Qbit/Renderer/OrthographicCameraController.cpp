@@ -13,7 +13,7 @@ namespace Qbit {
 
 	void OrthographicCameraController::OnUpdate(Timestep ts)
 	{
-		//HZ_PROFILE_FUNCTION();
+		//QB_PROFILE_BEGIN_SESSION();
 
 		if (Input::IsKeyPressed(Key::A))
 		{
@@ -59,7 +59,7 @@ namespace Qbit {
 
 	void OrthographicCameraController::OnEvent(Event& e)
 	{
-		//HZ_PROFILE_FUNCTION();
+		//QB_PROFILE_BEGIN_SESSION();
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<MouseScrolledEvent>(QB_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
@@ -74,7 +74,7 @@ namespace Qbit {
 
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
-		//HZ_PROFILE_FUNCTION();
+		//QB_PROFILE_BEGIN_SESSION();
 
 		m_ZoomLevel -= e.GetYOffset() * 0.25f;
 		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
@@ -84,7 +84,7 @@ namespace Qbit {
 
 	bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& e)
 	{
-		//HZ_PROFILE_FUNCTION();
+		//QB_PROFILE_BEGIN_SESSION();
 
 		OnResize((float)e.GetWidth(), (float)e.GetHeight());
 		return false;

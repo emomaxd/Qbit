@@ -25,7 +25,7 @@ namespace Qbit {
 
 	void ImGuiLayer::OnAttach()
 	{
-		//QB_PROFILE_FUNCTION();
+		QB_PROFILE_FUNCTION();
 
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
@@ -66,7 +66,7 @@ namespace Qbit {
 
 	void ImGuiLayer::OnDetach()
 	{
-		//HZ_PROFILE_FUNCTION();
+		QB_PROFILE_FUNCTION();
 
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();

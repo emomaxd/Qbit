@@ -15,7 +15,7 @@
 #include <unordered_set>
 
 #include "Qbit/Core/Base.h"
-
+#include "Qbit/Debug/Instrumentor.h"
 #include "Qbit/Core/Log.h"
 
 

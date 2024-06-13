@@ -3,6 +3,7 @@
 // For use by Qbit applications
 
 #include "Qbit/Core/Base.h"
+#include "Qbit/Debug/Instrumentor.h"
 
 #include "Qbit/Core/Application.h"
 #include "Qbit/Core/Layer.h"

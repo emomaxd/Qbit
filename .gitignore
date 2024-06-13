@@ -9,6 +9,11 @@ imgui.ini
 CMakeCache.txt
 *.cmake
 
+# Qbit Profiling Output
+Sandbox/*.json
+Editor/*.json
+
+
 # LINUX SPECIFIED BUILD FILES
 Makefile
 

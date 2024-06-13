@@ -17,6 +17,7 @@ namespace Qbit {
 
     OpenGLShader::OpenGLShader(const std::string& filepath)
         : m_FilePath(filepath) {
+        QB_PROFILE_FUNCTION();
         std::string source = ReadFile(filepath);
         auto shaderSources = PreProcess(source);
         Compile(shaderSources);
@@ -25,6 +26,7 @@ namespace Qbit {
 
     OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
         : m_Name(name) {
+        QB_PROFILE_FUNCTION();
         std::unordered_map<GLenum, std::string> sources;
         sources[GL_VERTEX_SHADER] = vertexSrc;
         sources[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -36,6 +38,7 @@ namespace Qbit {
     }
 
     std::string OpenGLShader::ReadFile(const std::string& filepath) {
+        QB_PROFILE_FUNCTION();
         std::string result;
         std::ifstream in(filepath, std::ios::in | std::ios::binary);
         if (in) {
@@ -58,6 +61,8 @@ namespace Qbit {
     }
 
     std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source) {
+
+        QB_PROFILE_FUNCTION();
         std::unordered_map<GLenum, std::string> shaderSources;
         const char* typeToken = "#type";
         size_t typeTokenLength = strlen(typeToken);
@@ -80,6 +85,9 @@ namespace Qbit {
     }
 
     void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources) {
+
+        QB_PROFILE_FUNCTION();
+
         GLuint program = glCreateProgram();
         std::vector<GLuint> shaderIDs;
         for (auto&& [stage, source] : shaderSources) {
@@ -138,6 +146,7 @@ namespace Qbit {
     }
 
     void OpenGLShader::ExtractNameFromFilepath(const std::string& filepath) {
+        QB_PROFILE_FUNCTION();
         auto lastSlash = filepath.find_last_of("/\\");
         lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
         auto lastDot = filepath.rfind('.');
@@ -154,30 +163,37 @@ namespace Qbit {
     }
 
     void OpenGLShader::SetInt(const std::string& name, int value) {
+        QB_PROFILE_FUNCTION();
         UploadUniformInt(name, value);
     }
 
     void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t count) {
+        QB_PROFILE_FUNCTION();
         UploadUniformIntArray(name, values, count);
     }
 
     void OpenGLShader::SetFloat(const std::string& name, float value) {
+        QB_PROFILE_FUNCTION();
         UploadUniformFloat(name, value);
     }
 
     void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value) {
+        QB_PROFILE_FUNCTION();
         UploadUniformFloat2(name, value);
     }
 
     void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value) {
+        QB_PROFILE_FUNCTION();
         UploadUniformFloat3(name, value);
     }
 
     void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value) {
+        QB_PROFILE_FUNCTION();
         UploadUniformFloat4(name, value);
     }
 
     void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value) {
+        QB_PROFILE_FUNCTION();
         UploadUniformMat4(name, value);
     }
 

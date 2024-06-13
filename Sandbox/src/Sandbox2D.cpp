@@ -15,14 +15,19 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
+	QB_PROFILE_FUNCTION();
 }
 
 void Sandbox2D::OnDetach()
 {
+	QB_PROFILE_FUNCTION();
 }
 
 void Sandbox2D::OnUpdate(Qbit::Timestep ts)
 {
+
+	QB_PROFILE_FUNCTION();
+
 	// Update
 	m_CameraController.OnUpdate(ts);
 
@@ -31,19 +36,22 @@ void Sandbox2D::OnUpdate(Qbit::Timestep ts)
 	Qbit::Renderer2D::ResetStats();
 
 	{
+		QB_PROFILE_SCOPE("RendererPrep");
 		Qbit::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Qbit::RenderCommand::Clear();
 	}
 
 	{
 
-
+		QB_PROFILE_SCOPE("Renderer - Draw");
 		Qbit::Renderer2D::BeginScene(m_CameraController.GetCamera());
 		Qbit::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 		Qbit::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
 
 		Qbit::Renderer2D::DrawQuad({ 10.2f, -0.5f}, { 12.0f, 12.0f }, m_ChernoLogoTexture);
 		Qbit::Renderer2D::DrawQuad({ -8.2f, -0.5f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture);
+
+		Qbit::Renderer2D::DrawRotatedQuad({ -12.2f, -0.5f }, { 12.0f, 12.0f }, 30.0f, { 0.2f, 0.4f, 0.6f, 0.4f });
 
 		Qbit::Renderer2D::EndScene();
 
@@ -63,6 +71,7 @@ void Sandbox2D::OnUpdate(Qbit::Timestep ts)
 
 void Sandbox2D::OnImGuiRender()
 {
+	QB_PROFILE_FUNCTION();
 	
 	ImGui::Begin("Settings");
 

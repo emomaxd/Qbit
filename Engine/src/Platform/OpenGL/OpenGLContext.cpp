@@ -16,7 +16,7 @@ namespace Qbit {
 
     void OpenGLContext::Init()
     {
-        //QB_PROFILE_FUNCTION();
+        QB_PROFILE_FUNCTION();
 
         glfwMakeContextCurrent(m_WindowHandle);
         GLenum err = glewInit();
@@ -32,7 +32,7 @@ namespace Qbit {
 
     void OpenGLContext::SwapBuffers()
     {
-        //QB_PROFILE_FUNCTION();
+        QB_PROFILE_FUNCTION();
         glfwSwapBuffers(m_WindowHandle);
     }
 

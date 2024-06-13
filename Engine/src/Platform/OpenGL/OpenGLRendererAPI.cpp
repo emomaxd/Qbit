@@ -27,7 +27,7 @@ namespace Qbit {
 
 	void OpenGLRendererAPI::Init()
 	{
-		//HZ_PROFILE_FUNCTION();
+		QB_PROFILE_FUNCTION();
 
 #ifdef QB_DEBUG
 		glEnable(GL_DEBUG_OUTPUT);

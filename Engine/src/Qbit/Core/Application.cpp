@@ -20,7 +20,7 @@ namespace Qbit {
 	Application::Application(const ApplicationSpecification& specification)
 		: m_Specification(specification)
 	{
-		//HZ_PROFILE_FUNCTION();
+		QB_PROFILE_FUNCTION();
 
 		QB_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
@@ -41,17 +41,22 @@ namespace Qbit {
 
 	Application::~Application()
 	{
+		QB_PROFILE_FUNCTION();
 		Renderer::Shutdown();
 	}
 
 	void Application::PushLayer(Layer* layer)
 	{
+		QB_PROFILE_FUNCTION();
 		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
+		QB_PROFILE_FUNCTION();
 		m_LayerStack.PushOverlay(layer);
+		layer->OnAttach();
 	}
 
 	void Application::Close()
@@ -61,6 +66,7 @@ namespace Qbit {
 
 	void Application::OnEvent(Event& e)
 	{
+		QB_PROFILE_FUNCTION();
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(QB_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(QB_BIND_EVENT_FN(Application::OnWindowResize));
@@ -75,9 +81,10 @@ namespace Qbit {
 
 	void Application::Run()
 	{
+		QB_PROFILE_FUNCTION();
 		while (m_Running)
 		{
-
+			QB_PROFILE_SCOPE("RunLoop");
 			float time = Time::GetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
@@ -86,14 +93,14 @@ namespace Qbit {
 			if (!m_Minimized)
 			{
 				{
-
+					QB_PROFILE_SCOPE("LayerStack OnUpdate");
 					for (Layer* layer : m_LayerStack)
 						layer->OnUpdate(timestep);
 				}
 
 				m_ImGuiLayer->Begin();
 				{
-
+					QB_PROFILE_SCOPE("LayerStack OnImGuiRender");
 					for (Layer* layer : m_LayerStack)
 						layer->OnImGuiRender();
 				}
@@ -112,7 +119,7 @@ namespace Qbit {
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
-
+		QB_PROFILE_FUNCTION();
 		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 		{
 			m_Minimized = true;
