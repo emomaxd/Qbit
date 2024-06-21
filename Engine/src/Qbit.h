@@ -30,6 +30,7 @@
 #include "Qbit/Renderer/Renderer.h"
 #include "Qbit/Renderer/Renderer2D.h"
 #include "Qbit/Renderer/RenderCommand.h"
+#include "Qbit/Renderer/Model.h"
 
 #include "Qbit/Renderer/Buffer.h"
 #include "Qbit/Renderer/Shader.h"

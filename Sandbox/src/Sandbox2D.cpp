@@ -27,7 +27,7 @@ void Sandbox2D::OnUpdate(Qbit::Timestep ts)
 {
 
 	QB_PROFILE_FUNCTION();
-
+	
 	// Update
 	m_CameraController.OnUpdate(ts);
 
@@ -48,8 +48,11 @@ void Sandbox2D::OnUpdate(Qbit::Timestep ts)
 		Qbit::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 		Qbit::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
 
-		Qbit::Renderer2D::DrawQuad({ 10.2f, -0.5f}, { 12.0f, 12.0f }, m_ChernoLogoTexture);
+		Qbit::Renderer2D::DrawQuad({ 10.2f, -0.5f }, { 12.0f, 12.0f }, m_ChernoLogoTexture);
 		Qbit::Renderer2D::DrawQuad({ -8.2f, -0.5f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture);
+
+		Qbit::Renderer2D::DrawCircle(glm::mat4(1.0f), glm::vec4(1.0f));
+		Qbit::Renderer2D::DrawLine(glm::vec3{ 0, 0, 0 }, glm::vec3{ 1, -1, 0 }, glm::vec4{ 0.8f, 0.4f, 0.6f, 0.4f });
 
 		Qbit::Renderer2D::DrawRotatedQuad({ -12.2f, -0.5f }, { 12.0f, 12.0f }, 30.0f, { 0.2f, 0.4f, 0.6f, 0.4f });
 

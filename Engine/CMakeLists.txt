@@ -4,6 +4,7 @@ set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
 set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
 set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
+set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
 
 # Glob source files
 file(GLOB_RECURSE ENGINE_SRC
@@ -37,6 +38,7 @@ target_include_directories(Engine PRIVATE
     ${GLM_DIR}/glm
     ${GLM_DIR}
     ${ENTT_DIR}/src/entt
+    ${ASSIMP_DIR}/include
 )
 
 # Compile definitions
@@ -58,6 +60,8 @@ if(WIN32)
     target_link_directories(Engine PRIVATE 
         ${GLFW_DIR}/install/lib
         ${GLEW_DIR}/Windows/lib/Release/x64
+        ${ASSIMP_DIR}/lib/Debug/
+        ${ASSIMP_DIR}/contrib/zlib/Release
     )
     target_link_libraries(Engine PRIVATE 
         glew32s 
@@ -65,6 +69,8 @@ if(WIN32)
         opengl32 
         gdi32 
         winmm
+        assimp-vc143-mtd
+        zlibstatic
     )
 elseif(UNIX)
     target_link_directories(Engine PRIVATE 

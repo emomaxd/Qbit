@@ -5,6 +5,8 @@ set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
 set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
 set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
+set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
+
 
 file(GLOB_RECURSE SANDBOX_SOURCES "${CMAKE_SOURCE_DIR}/Sandbox/src/*.cpp")
 file(GLOB_RECURSE SANDBOX_HEADERS "${CMAKE_SOURCE_DIR}/Sandbox/src/*.hpp")
@@ -25,6 +27,7 @@ target_include_directories(Sandbox PRIVATE
     ${GLM_DIR}
     ${GLM_DIR}/glm
     ${ENTT_DIR}/src/entt
+    ${ASSIMP_DIR}/include
 )
 
 if(WIN32)
@@ -36,6 +39,8 @@ if(WIN32)
     target_link_directories(Sandbox PRIVATE 
         ${GLFW_DIR}/install/lib
         ${GLEW_DIR}/Windows/lib/Release/x64
+        ${ASSIMP_DIR}/lib/Debug/
+        ${ASSIMP_DIR}/contrib/zlib/Release
     )
     target_link_libraries(Sandbox PRIVATE 
         glew32s 
@@ -43,6 +48,8 @@ if(WIN32)
         opengl32 
         gdi32 
         winmm
+        assimp-vc143-mtd
+        zlibstatic
         Engine
     )
 elseif(UNIX)

@@ -21,6 +21,10 @@ private:
 	Qbit::Ref<Qbit::VertexArray> m_SquareVA;
 	Qbit::Ref<Qbit::Shader> m_FlatColorShader;
 
+	Qbit::Ref<Qbit::Shader> m_ModelLoadingShader;
+
+	//Qbit::Model m_Model;
+
 	Qbit::Ref<Qbit::Texture2D> m_ChernoLogoTexture;
 
 	Qbit::Ref<Qbit::Texture2D> m_CheckerboardTexture;
