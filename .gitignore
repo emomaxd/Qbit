@@ -13,7 +13,6 @@ CMakeCache.txt
 Sandbox/*.json
 Editor/*.json
 
-
 # LINUX SPECIFIED BUILD FILES
 Makefile
 

@@ -59,9 +59,9 @@ void Sandbox2D::OnUpdate(Qbit::Timestep ts)
 		Qbit::Renderer2D::EndScene();
 
 		Qbit::Renderer2D::BeginScene(m_CameraController.GetCamera());
-		for (float y = -5.0f; y < 5.0f; y += 0.5f)
+		for (float y = -5.0f; y < 5.0f; y += 0.08f)
 		{
-			for (float x = -5.0f; x < 5.0f; x += 0.5f)
+			for (float x = -5.0f; x < 5.0f; x += 0.08f)
 			{
 				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
 				Qbit::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
@@ -88,7 +88,7 @@ void Sandbox2D::OnImGuiRender()
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 
 	float fps = ImGui::GetIO().Framerate;
-	ImGui::Text("FPS: %.1f", fps);
+	ImGui::Text("FPS: %.1f    %.2f ms", fps, 1000 * 1.0f / fps);
 
 	ImGui::End();
 	
