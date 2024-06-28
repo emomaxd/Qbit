@@ -541,6 +541,14 @@ namespace Qbit {
 		DrawLine(lineVertices[3], lineVertices[0], color, entityID);
 	}
 
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	{
+		if (src.Texture)
+			DrawQuad(transform, src.Texture, src.TilingFactor, src.Color, entityID);
+		else
+			DrawQuad(transform, src.Color, entityID);
+	}
+
 	float Renderer2D::GetLineWidth()
 	{
 		return s_Data.LineWidth;

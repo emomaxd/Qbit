@@ -1,7 +1,7 @@
 #pragma once
 
 //#include "SceneCamera.h"
-//#include "Qbit/Core/UUID.h"
+#include "Qbit/Core/UUID.h"
 #include "Qbit/Renderer/Texture.h"
 //#include "Qbit/Renderer/Font.h"
 
@@ -10,12 +10,13 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+#include "SceneCamera.h"
 
 namespace Qbit {
 
 	struct IDComponent
 	{
-		//UUID ID;
+		UUID ID;
 
 		IDComponent() = default;
 		IDComponent(const IDComponent&) = default;
@@ -76,7 +77,7 @@ namespace Qbit {
 
 	struct CameraComponent
 	{
-		//SceneCamera Camera;
+		SceneCamera Camera;
 		bool Primary = true; // TODO: think about moving to Scene
 		bool FixedAspectRatio = false;
 

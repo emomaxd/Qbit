@@ -24,6 +24,16 @@ namespace Qbit {
 		fbSpec.Width = 1600;
 		fbSpec.Height = 900;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
+
+		m_EditorScene = CreateRef<Scene>();
+		m_ActiveScene = m_EditorScene;
+
+
+		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+
+		auto& a = m_ActiveScene->CreateEntity("1");
+		
+		a.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f));
 	}
 
 	void EditorLayer::OnDetach()
@@ -50,30 +60,6 @@ namespace Qbit {
 
 		// Clear our entity ID attachment to -1
 		m_Framebuffer->ClearAttachment(1, -1);
-
-		Qbit::Renderer2D::BeginScene(m_CameraController.GetCamera());
-		Qbit::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-		Qbit::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
-
-		Qbit::Renderer2D::DrawQuad({ -8.2f, -0.5f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture);
-
-		Qbit::Renderer2D::DrawCircle(glm::mat4(1.0f), glm::vec4(1.0f));
-		Qbit::Renderer2D::DrawLine(glm::vec3{ 0, 0, 0 }, glm::vec3{ 1, -1, 0 }, glm::vec4{ 0.8f, 0.4f, 0.6f, 0.4f });
-
-		Qbit::Renderer2D::DrawRotatedQuad({ -12.2f, -0.5f }, { 12.0f, 12.0f }, 30.0f, { 0.2f, 0.4f, 0.6f, 0.4f });
-
-		Qbit::Renderer2D::EndScene();
-
-		Qbit::Renderer2D::BeginScene(m_CameraController.GetCamera());
-		for (float y = -5.0f; y < 5.0f; y += 0.08f)
-		{
-			for (float x = -5.0f; x < 5.0f; x += 0.08f)
-			{
-				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-				Qbit::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-			}
-		}
-		Qbit::Renderer2D::EndScene();
 	
 
 		switch (m_SceneState)
@@ -85,22 +71,24 @@ namespace Qbit {
 
 				m_EditorCamera.OnUpdate(ts);
 
-				//m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
 				break;
 			}
 			case SceneState::Simulate:
 			{
 				m_EditorCamera.OnUpdate(ts);
 
-				//m_ActiveScene->OnUpdateSimulation(ts, m_EditorCamera);
+				m_ActiveScene->OnUpdateSimulation(ts, m_EditorCamera);
 				break;
 			}
 			case SceneState::Play:
 			{
-				//m_ActiveScene->OnUpdateRuntime(ts);
+				m_ActiveScene->OnUpdateRuntime(ts);
 				break;
 			}
 		}
+
+		OnOverlayRender();
 		m_Framebuffer->Unbind();
 	}
 

@@ -19,8 +19,8 @@
 
 #include "Qbit/ImGui/ImGuiLayer.h"
 
-//#include "Qbit/Scene/Scene.h"
-//#include "Qbit/Scene/Entity.h"
+#include "Qbit/Scene/Scene.h"
+#include "Qbit/Scene/Entity.h"
 //#include "Qbit/Scene/ScriptableEntity.h"
 #include "Qbit/Scene/Components.h"
 

@@ -56,8 +56,8 @@ namespace Qbit {
 		Ref<Shader> m_FlatColorShader;
 		Ref<Framebuffer> m_Framebuffer;
 
-		//Ref<Scene> m_ActiveScene;
-		//Ref<Scene> m_EditorScene;
+		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_EditorScene;
 		std::filesystem::path m_EditorScenePath;
 		//Entity m_SquareEntity;
 		//Entity m_CameraEntity;
