@@ -5,6 +5,7 @@
 #include "Components.h"
 #include "Qbit/Renderer/Renderer2D.h"
 
+#include "Qbit/Scene/ScriptableEntity.h"
 #include <glm/glm.hpp>
 
 #include "Entity.h"
@@ -143,7 +144,18 @@ namespace Qbit {
 		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
 			
+			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+			{
+					// TODO: Move to Scene::OnScenePlay
+					if (!nsc.Instance)
+					{
+						nsc.Instance = nsc.InstantiateScript();
+						nsc.Instance->m_Entity = Entity{ entity, this };
+						nsc.Instance->OnCreate();
+					}
 
+				nsc.Instance->OnUpdate(ts);
+			});
 			
 		}
 

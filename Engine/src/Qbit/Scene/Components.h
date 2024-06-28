@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "SceneCamera.h"
+#include "SceneCamera.h"
 #include "Qbit/Core/UUID.h"
 #include "Qbit/Renderer/Texture.h"
 //#include "Qbit/Renderer/Font.h"
@@ -10,7 +10,6 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-#include "SceneCamera.h"
 
 namespace Qbit {
 
@@ -131,7 +130,7 @@ namespace Qbit {
 		glm::vec2 Offset = { 0.0f, 0.0f };
 		glm::vec2 Size = { 0.5f, 0.5f };
 
-		// TODO(Yan): move into physics material in the future maybe
+		//move into physics material in the future maybe
 		float Density = 1.0f;
 		float Friction = 0.5f;
 		float Restitution = 0.0f;
@@ -149,7 +148,7 @@ namespace Qbit {
 		glm::vec2 Offset = { 0.0f, 0.0f };
 		float Radius = 0.5f;
 
-		// TODO(Yan): move into physics material in the future maybe
+		//move into physics material in the future maybe
 		float Density = 1.0f;
 		float Friction = 0.5f;
 		float Restitution = 0.0f;
