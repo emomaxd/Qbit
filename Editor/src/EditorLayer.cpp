@@ -28,10 +28,11 @@ namespace Qbit {
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;
 
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
-		auto& a = m_ActiveScene->CreateEntity("1");
+		auto& a = m_ActiveScene->CreateEntity("WhiteSquare");
 		
 		a.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f));
 	}
@@ -162,7 +163,7 @@ namespace Qbit {
 			ImGui::EndMenuBar();
 		}
 
-		
+		m_SceneHierarchyPanel.OnImGuiRender();
 
 		ImGui::Begin("Viewport");
 
@@ -219,11 +220,22 @@ namespace Qbit {
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
+		if (e.GetMouseButton() == Mouse::ButtonLeft)
+		{
+			if (m_ViewportHovered /* && !ImGuizmo::IsOver()*/ && !Input::IsKeyPressed(Key::LeftAlt))
+				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+		}
 		return false;
 	}
 
 	void EditorLayer::OnOverlayRender()
 	{
+		// Draw selected entity outline 
+		if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
+		{
+			const TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
+			Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+		}
 	}
 
 	void EditorLayer::NewProject()
@@ -265,14 +277,17 @@ namespace Qbit {
 
 	void EditorLayer::OnScenePlay()
 	{
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnSceneSimulate()
 	{
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnScenePause()

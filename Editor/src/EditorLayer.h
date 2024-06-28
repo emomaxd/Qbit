@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Qbit.h"
-//#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
 //#include "Panels/ContentBrowserPanel.h"
 
 #include "Qbit/Renderer/EditorCamera.h"
@@ -37,7 +37,7 @@ namespace Qbit {
 		void SaveScene();
 		void SaveSceneAs();
 
-		//void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
+		void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 
 		void OnScenePlay();
 		void OnSceneSimulate();
@@ -59,11 +59,11 @@ namespace Qbit {
 		Ref<Scene> m_ActiveScene;
 		Ref<Scene> m_EditorScene;
 		std::filesystem::path m_EditorScenePath;
-		//Entity m_SquareEntity;
-		//Entity m_CameraEntity;
-		//Entity m_SecondCamera;
+		Entity m_SquareEntity;
+		Entity m_CameraEntity;
+		Entity m_SecondCamera;
 
-		//Entity m_HoveredEntity;
+		Entity m_HoveredEntity;
 
 		bool m_PrimaryCamera = true;
 
@@ -88,7 +88,7 @@ namespace Qbit {
 		SceneState m_SceneState = SceneState::Edit;
 
 		// Panels
-		//SceneHierarchyPanel m_SceneHierarchyPanel;
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 		//Scope<ContentBrowserPanel> m_ContentBrowserPanel;
 
 		// Editor resources
