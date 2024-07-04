@@ -2,7 +2,7 @@
 *.exe
 *.o
 *.out
-imgui.ini
+#imgui.ini
 
 # CMAKE BUILD FILES
 /CMakeFiles
