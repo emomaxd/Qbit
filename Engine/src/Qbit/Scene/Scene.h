@@ -74,7 +74,7 @@ namespace Qbit {
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
 
 		friend class Entity;
-		//friend class SceneSerializer;
+		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 	};
 

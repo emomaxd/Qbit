@@ -6,6 +6,8 @@ set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
 set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
 set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
+set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
+
 
 # Include subdirectories
 file(GLOB_RECURSE CORE_SOURCES "*.cpp" "*.cxx" "*.cc" "*.hpp" ".h")
@@ -26,6 +28,7 @@ target_include_directories(Editor PRIVATE
     ${GLM_DIR}/glm
     ${ENTT_DIR}/src/entt
     ${ASSIMP_DIR}/include
+    ${IMGUIZMO_DIR}
 )
 
 if(WIN32)

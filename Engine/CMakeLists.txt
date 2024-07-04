@@ -5,6 +5,8 @@ set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
 set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
 set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
+set(YAML_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/yaml-cpp")
+set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
 
 # Glob source files
 file(GLOB_RECURSE ENGINE_SRC
@@ -17,12 +19,23 @@ file(GLOB IMGUI_SRC
     "${IMGUI_DIR}/backends/imgui_impl_glfw.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
 )
+file(GLOB YAML_SRC
+    "${YAML_DIR}/src/*.cpp"
+    "${YAML_DIR}/src/*.h"
+    "${YAML_DIR}/include/*.h"
+)
+file(GLOB IMGUIZMO_SRC
+    "${IMGUIZMO_DIR}/*.cpp"
+    "${IMGUIZMO_DIR}/*.h"
+)
 
 
 # Create Engine library
 add_library(Engine 
     ${ENGINE_SRC}
     ${IMGUI_SRC}
+    ${YAML_SRC}
+    ${IMGUIZMO_SRC}
 )
 
 # Include directories
@@ -39,10 +52,12 @@ target_include_directories(Engine PRIVATE
     ${GLM_DIR}
     ${ENTT_DIR}/src/entt
     ${ASSIMP_DIR}/include
+    ${YAML_DIR}/include
+    ${IMGUIZMO_DIR}
 )
 
 # Compile definitions
-target_compile_definitions(Engine PRIVATE GLEW_STATIC)
+target_compile_definitions(Engine PRIVATE GLEW_STATIC YAML_CPP_STATIC_DEFINE)
 
 # Define QB_DEBUG for Debug configuration only
 target_compile_definitions(Engine PRIVATE 

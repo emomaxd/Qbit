@@ -181,6 +181,7 @@ namespace Qbit {
 		{
 			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
+
 			// Draw sprites
 			{
 				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
@@ -308,8 +309,8 @@ namespace Qbit {
 
 	void Scene::OnPhysics2DStop()
 	{
-		delete m_PhysicsWorld;
-		m_PhysicsWorld = nullptr;
+		//delete m_PhysicsWorld;
+		//m_PhysicsWorld = nullptr;
 	}
 
 	void Scene::RenderScene(EditorCamera& camera)

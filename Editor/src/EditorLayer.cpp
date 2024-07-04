@@ -2,6 +2,15 @@
 
 #include <imgui/imgui.h>
 
+#include "Qbit/Scene/SceneSerializer.h"
+
+#include "Qbit/Utils/PlatformUtils.h"
+
+#include "ImGuizmo.h"
+#include <gtc/type_ptr.hpp>
+
+#include "Qbit/Math/Math.h"
+
 namespace Qbit {
 
 	EditorLayer::EditorLayer()
@@ -29,15 +38,27 @@ namespace Qbit {
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
+		m_EditorScenePath = std::filesystem::path();
+
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
+#if 0
 		auto& c = m_ActiveScene->CreateEntity("MainCamera");
 
 		c.AddComponent<CameraComponent>();
 
 		auto& a = m_ActiveScene->CreateEntity("WhiteSquare");
-		
+
 		a.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f));
+
+		SpriteRendererComponent spr;
+		spr.Color = glm::vec4(1.0f);
+		spr.Texture = m_CheckerboardTexture;
+		spr.TilingFactor = 1.0f;
+		
+		auto& b = m_ActiveScene->CreateEntity("TexturedSquare");
+
+		b.AddComponent<SpriteRendererComponent>(spr);
 
 		class Move : public ScriptableEntity {
 			virtual void OnCreate() {}
@@ -59,6 +80,8 @@ namespace Qbit {
 		};
 
 		a.AddComponent<NativeScriptComponent>().Bind<Move>();
+#endif
+
 	}
 
 	void EditorLayer::OnDetach()
@@ -114,6 +137,20 @@ namespace Qbit {
 				m_ActiveScene->OnUpdateRuntime(ts);
 				break;
 			}
+		}
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+		my = viewportSize.y - my;
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 
 		OnOverlayRender();
@@ -179,11 +216,25 @@ namespace Qbit {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				// Disabling fullscreen would allow the window to be moved to the front of other windows,
-				// which we can't undo at the moment without finer window depth/z control.
+				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+					OpenProject();
 
-				if (ImGui::MenuItem("Exit", NULL, false, show != NULL))
-					Qbit::Application::Get().Close();
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+					NewScene();
+
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+					SaveScene();
+
+				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Exit"))
+					Application::Get().Close();
+
 				ImGui::EndMenu();
 			}
 
@@ -193,11 +244,16 @@ namespace Qbit {
 		m_SceneHierarchyPanel.OnImGuiRender();
 
 		ImGui::Begin("Viewport");
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -205,6 +261,57 @@ namespace Qbit {
 
 		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+
+		// Gizmos
+		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+		if (selectedEntity && m_GizmoType != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
+
+			// Camera
+
+			// Runtime camera from entity
+			// auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			// const glm::mat4& cameraProjection = camera.GetProjection();
+			// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+			// Editor camera
+			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
+			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+
+			// Entity transform
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			glm::mat4 transform = tc.GetTransform();
+
+			// Snapping
+			bool snap = Input::IsKeyPressed(Key::LeftControl);
+			float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+			// Snap to 45 degrees for rotation
+			if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+				snapValue = 45.0f;
+
+			float snapValues[3] = { snapValue, snapValue, snapValue };
+
+			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+				(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+				nullptr, snap ? snapValues : nullptr);
+
+			if (ImGuizmo::IsUsing())
+			{
+				glm::vec3 translation, rotation, scale;
+				Math::DecomposeTransform(transform, translation, rotation, scale);
+
+				glm::vec3 deltaRotation = rotation - tc.Rotation;
+				tc.Translation = translation;
+				tc.Rotation += deltaRotation;
+				tc.Scale = scale;
+			}
+		}
 
 
 		ImGui::End();
@@ -246,6 +353,98 @@ namespace Qbit {
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
+		// Shortcuts
+		if (e.IsRepeat())
+			return false;
+
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+		switch (e.GetKeyCode())
+		{
+		case Key::N:
+		{
+			if (control)
+				NewScene();
+
+			break;
+		}
+		case Key::O:
+		{
+			if (control)
+				OpenProject();
+
+			break;
+		}
+		case Key::S:
+		{
+			if (control)
+			{
+				if (shift)
+					SaveSceneAs();
+				else
+					SaveScene();
+			}
+
+			break;
+		}
+
+		// Scene Commands
+		case Key::D:
+		{
+			if (control)
+				OnDuplicateEntity();
+
+			break;
+		}
+		// Gizmos
+		case Key::Q:
+		{
+			if (!ImGuizmo::IsUsing())
+				m_GizmoType = -1;
+			break;
+		}
+		case Key::W:
+		{
+			if (!ImGuizmo::IsUsing())
+				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		}
+		case Key::E:
+		{
+			if (!ImGuizmo::IsUsing())
+				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+			break;
+		}
+		case Key::R:
+		{
+			if (control)
+			{
+				//ScriptEngine::ReloadAssembly();
+			}
+			else
+			{
+				if (!ImGuizmo::IsUsing())
+					m_GizmoType = ImGuizmo::OPERATION::SCALE;
+			}
+			break;
+		}
+
+		case Key::Delete:
+		{
+			if (Application::Get().GetImGuiLayer()->GetActiveWidgetID() == 0)
+			{
+				Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+				if (selectedEntity)
+				{
+					m_SceneHierarchyPanel.SetSelectedEntity({});
+					m_ActiveScene->DestroyEntity(selectedEntity);
+				}
+			}
+			break;
+		}
+		}
+
 		return false;
 	}
 
@@ -253,7 +452,7 @@ namespace Qbit {
 	{
 		if (e.GetMouseButton() == Mouse::ButtonLeft)
 		{
-			if (m_ViewportHovered /* && !ImGuizmo::IsOver()*/ && !Input::IsKeyPressed(Key::LeftAlt))
+			if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
 				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 		}
 		return false;
@@ -291,35 +490,86 @@ namespace Qbit {
 
 	bool EditorLayer::OpenProject()
 	{
-		return false;
+		// Currently using scenes as projects the extension will be changed to .qproj
+		std::string filepath = FileDialogs::OpenFile("Qbit Project (*.qbit)\0*.qbit\0");
+		if (filepath.empty())
+			return false;
+
+		OpenProject(filepath);
+		return true;
 	}
 
 	void EditorLayer::OpenProject(const std::filesystem::path& path)
 	{
+		OpenScene(path);
 	}
 
 	void EditorLayer::SaveProject()
 	{
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize("assets/scenes/example.qbit");
 	}
 
 	void EditorLayer::NewScene()
 	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		m_EditorScenePath = std::filesystem::path();
 	}
 
 	void EditorLayer::OpenScene()
 	{
+		std::string filepath = FileDialogs::OpenFile("Qbit Scene (*.qbit)\0*.qbit\0");
+		if (!filepath.empty())
+			OpenScene(filepath);
 	}
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
+		if (m_SceneState != SceneState::Edit)
+			OnSceneStop();
+
+		if (path.extension().string() != ".qbit")
+		{
+			QB_WARN("Could not load {0} - not a scene file", path.filename().string());
+			return;
+		}
+
+		Ref<Scene> newScene = CreateRef<Scene>();
+		SceneSerializer serializer(newScene);
+		if (serializer.Deserialize(path.string()))
+		{
+			m_EditorScene = newScene;
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+
+			m_ActiveScene = m_EditorScene;
+			m_EditorScenePath = path;
+		}
 	}
 
 	void EditorLayer::SaveScene()
 	{
+		if (!m_EditorScenePath.empty())
+			SerializeScene(m_ActiveScene, m_EditorScenePath);
+		else
+			SaveSceneAs();
 	}
 
 	void EditorLayer::SaveSceneAs()
 	{
+		std::string filepath = FileDialogs::SaveFile("Qbit Scene (*.qbit)\0*.qbit\0");
+		if (!filepath.empty())
+		{
+			SerializeScene(m_ActiveScene, filepath);
+			m_EditorScenePath = filepath;
+		}
+	}
+
+	void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path)
+	{
+		SceneSerializer serializer(scene);
+		serializer.Serialize(path.string());
 	}
 
 	void EditorLayer::OnScenePlay()

@@ -34,18 +34,6 @@ Qbit's project structure is designed to promote clarity and organization:
 - **High Readability**: Codebase is structured and documented for readability, facilitating comprehension and collaboration.
 - **Memory Safety**: Qbit prioritizes memory safety to prevent common programming errors and improve stability.
 
-## Contributing
-
-Contributions to Qbit are welcome! Whether you're a beginner looking to learn or an experienced developer wanting to enhance the engine, feel free to fork the repository and submit pull requests.
-
-## License
-
-Qbit is licensed under the [MIT License](LICENSE), allowing for free use and modification.
-
-## Acknowledgments
-
-Qbit draws inspiration from various game engines and learning resources, including the [Hazel](https://github.com/TheCherno/Hazel) Engine by TheCherno.
-
 ## Follow the progress : [Trello](https://trello.com/b/8og3yTb4/engine)
 
 ![Alt Text](Dist/GithubResources/QbitEditor.png)
