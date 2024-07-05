@@ -6,6 +6,8 @@
 
 #include "Qbit/Utils/PlatformUtils.h"
 
+#include "Qbit/Project/Project.h"
+
 #include "ImGuizmo.h"
 #include <gtc/type_ptr.hpp>
 
@@ -38,49 +40,30 @@ namespace Qbit {
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-		m_EditorScenePath = std::filesystem::path();
+		//OpenProject("SandboxProject/Sandbox.qproj");
 
+		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
+		if (commandLineArgs.Count > 1)
+		{
+			auto projectFilePath = commandLineArgs[1];
+			OpenProject(projectFilePath);
+		}
+		else
+		{
+			//if (!OpenProject())
+				//Application::Get().Close();
+				//NewProject();
+		}
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+		//m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
 
-#if 0
-		auto& c = m_ActiveScene->CreateEntity("MainCamera");
+		m_ProjectManager.SetCreateProjectCallback([this](const std::string& path) {
+			NewProject(path);
+			m_ProjectManager.SetProjectSelected();
+		});	
+		m_ProjectManager.SetOpenProjectCallback([this](const std::string& filepath) { OpenProject(filepath); m_ProjectManager.SetProjectSelected(); });
 
-		c.AddComponent<CameraComponent>();
-
-		auto& a = m_ActiveScene->CreateEntity("WhiteSquare");
-
-		a.AddComponent<SpriteRendererComponent>(glm::vec4(1.0f));
-
-		SpriteRendererComponent spr;
-		spr.Color = glm::vec4(1.0f);
-		spr.Texture = m_CheckerboardTexture;
-		spr.TilingFactor = 1.0f;
-		
-		auto& b = m_ActiveScene->CreateEntity("TexturedSquare");
-
-		b.AddComponent<SpriteRendererComponent>(spr);
-
-		class Move : public ScriptableEntity {
-			virtual void OnCreate() {}
-			virtual void OnDestroy() {}
-			virtual void OnUpdate(Timestep ts) 
-			{
-				auto& transform = GetComponent<TransformComponent>().Translation;
-				float speed = 5.0f;
-				if (Input::IsKeyPressed(Key::A))
-					transform.x -= speed * ts;
-				if (Input::IsKeyPressed(Key::D))
-					transform.x += speed * ts;
-				if (Input::IsKeyPressed(Key::W))
-					transform.y += speed * ts;
-				if (Input::IsKeyPressed(Key::S))
-					transform.y -= speed * ts;
-			}
-
-		};
-
-		a.AddComponent<NativeScriptComponent>().Bind<Move>();
-#endif
+		Renderer2D::SetLineWidth(4.0f);
 
 	}
 
@@ -160,6 +143,15 @@ namespace Qbit {
 	void EditorLayer::OnImGuiRender()
 	{
 
+		
+
+		if (!m_ProjectManager.IsProjectSelected())
+		{
+			m_ProjectManager.OnImGuiRender();
+			return;
+		}
+			
+
 		// Dockspace settings
 		static bool show = true;
 		static bool opt_fullscreen = true;
@@ -216,8 +208,14 @@ namespace Qbit {
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				//if (ImGui::MenuItem("New Project"))
+					//NewProject();
+				
 				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
 					OpenProject();
+
+				//if (ImGui::MenuItem("Save Project..."))
+					//SaveProject();
 
 				ImGui::Separator();
 
@@ -242,6 +240,7 @@ namespace Qbit {
 		}
 
 		m_SceneHierarchyPanel.OnImGuiRender();
+		m_ContentBrowserPanel->OnImGuiRender();
 
 		ImGui::Begin("Viewport");
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
@@ -262,6 +261,15 @@ namespace Qbit {
 		uint64_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				OpenScene(path);
+			}
+			ImGui::EndDragDropTarget();
+		}
 
 		// Gizmos
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -274,15 +282,21 @@ namespace Qbit {
 
 			// Camera
 
-			// Runtime camera from entity
-			// auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			// const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			// const glm::mat4& cameraProjection = camera.GetProjection();
-			// glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
-
-			// Editor camera
 			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
 			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+
+			// Runtime camera from entity
+			if (m_SceneState == SceneState::Play)
+			{
+				auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+				const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+				const_cast<glm::mat4&>(cameraProjection) = camera.GetProjection();
+				cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+			}
+			
+
+
+			
 
 			// Entity transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
@@ -480,18 +494,64 @@ namespace Qbit {
 		if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
 		{
 			const TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
-			Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+			Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 		}
+		Renderer2D::EndScene();
 	}
 
-	void EditorLayer::NewProject()
+	void EditorLayer::NewProject(const std::string& path)
 	{
+		namespace fs = std::filesystem;
+
+		// Determine the base directory and the project file name
+		fs::path projectPath = path;
+		fs::path projectDir = projectPath.parent_path();
+		fs::path projectName = projectPath.filename();
+
+		// Create the project directory if it doesn't exist
+		if (!fs::exists(projectDir)) {
+			fs::create_directories(projectDir);
+		}
+
+		ProjectConfig config;
+		config.Name = "Untitled";
+		config.AssetDirectory = "Assets";
+		config.StartScene = "Scenes\\Untitled.qbit";
+
+		auto& proj = Project::New(config);
+
+		proj->SetProjectDirectory(projectDir);
+
+		Project::SaveActive(projectDir / projectName);
+
+		// Create the Assets folder and its subfolders
+		fs::path assetsDir = projectDir / "Assets";
+		fs::create_directories(assetsDir / "Scenes");
+		fs::create_directories(assetsDir / "Scripts");
+		fs::create_directories(assetsDir / "Textures");
+
+
+		Ref<Scene> newScene = CreateRef<Scene>();
+		m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+
+
+		SceneSerializer serializer(newScene);
+		auto& scenePath = (assetsDir / config.StartScene);
+		serializer.Serialize(scenePath.string());
+		
+		
+		m_EditorScene = newScene;
+		m_SceneHierarchyPanel.SetContext(m_EditorScene);
+
+		m_ActiveScene = m_EditorScene;
+		m_EditorScenePath = scenePath;
+		
 	}
 
 	bool EditorLayer::OpenProject()
 	{
 		// Currently using scenes as projects the extension will be changed to .qproj
-		std::string filepath = FileDialogs::OpenFile("Qbit Project (*.qbit)\0*.qbit\0");
+		std::string filepath = FileDialogs::OpenFile("Qbit Project (*.qproj)\0*.qproj\0");
 		if (filepath.empty())
 			return false;
 
@@ -501,13 +561,31 @@ namespace Qbit {
 
 	void EditorLayer::OpenProject(const std::filesystem::path& path)
 	{
-		OpenScene(path);
+		if (Project::Load(path))
+		{
+			//ScriptEngine::Init();
+
+			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+			OpenScene(startScenePath);
+			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+
+		}
 	}
 
 	void EditorLayer::SaveProject()
 	{
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize("assets/scenes/example.qbit");
+		std::filesystem::path filepath = FileDialogs::SaveFile("Qbit Project (*.qproj)\0*.qproj\0");
+		if (!filepath.empty())
+		{
+			auto& name = filepath.filename().string();
+			auto& proj = Project::GetActive();
+			auto& config = proj->GetConfig();
+			config.Name = name;
+
+			std::filesystem::remove(std::filesystem::current_path() / "Untitled/");
+			Project::SaveActive(std::filesystem::current_path() / name / name);
+		}
+		
 	}
 
 	void EditorLayer::NewScene()
@@ -516,7 +594,21 @@ namespace Qbit {
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 		m_EditorScenePath = std::filesystem::path();
+
+		static int counter = 1;
+		std::filesystem::path path = Project::GetAssetDirectory() / "Scenes" / ("Untitled" + std::to_string(counter) + ".qbit");
+
+		while (std::filesystem::exists(path)) {
+			counter++;
+			path = Project::GetAssetDirectory() / "Scenes" / ("Untitled" + std::to_string(counter) + ".qbit");
+		}
+
+		m_EditorScenePath = path;
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize(m_EditorScenePath.string());
 	}
+
 
 	void EditorLayer::OpenScene()
 	{

@@ -1,0 +1,5 @@
+Project:
+  Name: Untitled
+  StartScene: Scenes\Untitled.qbit
+  AssetDirectory: Assets
+  ScriptModulePath: ""

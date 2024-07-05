@@ -2,7 +2,8 @@
 
 #include "Qbit.h"
 #include "Panels/SceneHierarchyPanel.h"
-//#include "Panels/ContentBrowserPanel.h"
+#include "Panels/ContentBrowserPanel.h"
+#include "Panels/ProjectManager.h"
 
 #include "Qbit/Renderer/EditorCamera.h"
 
@@ -26,7 +27,7 @@ namespace Qbit {
 
 		void OnOverlayRender();
 
-		void NewProject();
+		void NewProject(const std::string& path);
 		bool OpenProject();
 		void OpenProject(const std::filesystem::path& path);
 		void SaveProject();
@@ -86,7 +87,8 @@ namespace Qbit {
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
-		//Scope<ContentBrowserPanel> m_ContentBrowserPanel;
+		Scope<ContentBrowserPanel> m_ContentBrowserPanel;
+		ProjectManager m_ProjectManager;
 
 		// Editor resources
 		Ref<Texture2D> m_IconPlay, m_IconPause, m_IconStep, m_IconSimulate, m_IconStop;

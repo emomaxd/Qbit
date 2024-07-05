@@ -37,9 +37,6 @@ Qbit's project structure is designed to promote clarity and organization:
 ## Follow the progress : [Trello](https://trello.com/b/8og3yTb4/engine)
 
 ![Alt Text](Dist/GithubResources/QbitEditor2.png)
-![Alt Text](Dist/GithubResources/QbRotate.png)
-![Alt Text](Dist/GithubResources/QbRotateDiff.png)
-![Alt Text](Dist/GithubResources/QbScale.png)
 ![Alt Text](Dist/GithubResources/cascaded_shadow_map.gif)
 ![Alt Text](Dist/GithubResources/lighting_demo4-diffuse_map.gif)
 ![Alt Text](Dist/GithubResources/lighting_demo3-diffuse_map-specular_map.gif)

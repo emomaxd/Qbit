@@ -42,9 +42,10 @@ namespace Qbit {
 
 		static Ref<Project> GetActive() { return s_ActiveProject; }
 
-		static Ref<Project> New();
+		static Ref<Project> New(const ProjectConfig& config);
 		static Ref<Project> Load(const std::filesystem::path& path);
 		static bool SaveActive(const std::filesystem::path& path);
+		void SetProjectDirectory(const std::filesystem::path& path);
 	private:
 		ProjectConfig m_Config;
 		std::filesystem::path m_ProjectDirectory;
