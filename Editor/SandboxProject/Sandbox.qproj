@@ -1,5 +1,5 @@
 Project:
   Name: Sandbox
-  StartScene: "Scenes/PinkCube.qbit"
+  StartScene: "Scenes/Physics2D.qbit"
   AssetDirectory: "Assets"
   ScriptModulePath: "Scripts/Binaries/Sandbox.dll"

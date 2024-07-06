@@ -20,15 +20,19 @@
 
 namespace Qbit {
 
+	Ref<Texture> SceneHierarchyPanel::m_CheckerBoardTexture = nullptr;
+
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context)
 	{
 		SetContext(context);
+		//m_CheckerBoardTexture = Texture2D::Create("assets/textures/CheckerBoard.png");
 	}
 
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
 		m_SelectionContext = {};
+		m_CheckerBoardTexture = Texture2D::Create("assets/textures/CheckerBoard.png");
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -326,9 +330,33 @@ namespace Qbit {
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 		{
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-			ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+				if (component.Texture)
+				{
+					ImGui::Image(
+						(void*)(intptr_t)component.Texture->GetRendererID(),
+						ImVec2(50.0f, 50.0f),
+						ImVec2(0.0f, 1.0f), // bottom-left
+						ImVec2(1.0f, 0.0f)  // top-right
+					);
+				}
+				else
+				{
+					ImGui::Image(
+						(void*)(intptr_t)SceneHierarchyPanel::m_CheckerBoardTexture->GetRendererID(),
+						ImVec2(50.0f, 50.0f),
+						ImVec2(0.0f, 1.0f), // bottom-left
+						ImVec2(1.0f, 0.0f)  // top-right
+					);
+				}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Texture", ImVec2(100.0f, 0.0f)))
+			{
+				// Handle texture selection or open a file dialog
+			}
+
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -342,6 +370,12 @@ namespace Qbit {
 						QB_WARN("Could not load texture {0}", texturePath.filename().string());
 				}
 				ImGui::EndDragDropTarget();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("X"))
+			{
+				component.Texture = nullptr;
 			}
 
 			ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);

@@ -18,6 +18,8 @@ namespace Qbit {
 
 		Entity GetSelectedEntity() const { return m_SelectionContext; }
 		void SetSelectedEntity(Entity entity);
+		static Ref<Texture> m_CheckerBoardTexture;
+		//static Ref<Texture> GetCheckerBoardTexture() { return m_CheckerBoardTexture; }
 	private:
 		template<typename T>
 		void DisplayAddComponentEntry(const std::string& entryName);
@@ -27,6 +29,7 @@ namespace Qbit {
 	private:
 		Ref<Scene> m_Context;
 		Entity m_SelectionContext;
+		
 	};
 
 }

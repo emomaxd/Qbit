@@ -7,6 +7,7 @@ set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
 set(YAML_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/yaml-cpp")
 set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
+set(BOX2D_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/Box2D")
 
 # Glob source files
 file(GLOB_RECURSE ENGINE_SRC
@@ -29,6 +30,11 @@ file(GLOB IMGUIZMO_SRC
     "${IMGUIZMO_DIR}/*.h"
 )
 
+file (GLOB BOX2D_SRC
+    "${BOX2D_DIR}/src/*/*.cpp"
+    "${BOX2D_DIR}/include/*.h"
+)
+
 
 # Create Engine library
 add_library(Engine 
@@ -36,6 +42,7 @@ add_library(Engine
     ${IMGUI_SRC}
     ${YAML_SRC}
     ${IMGUIZMO_SRC}
+    ${BOX2D_SRC}
 )
 
 # Include directories
@@ -54,6 +61,7 @@ target_include_directories(Engine PRIVATE
     ${ASSIMP_DIR}/include
     ${YAML_DIR}/include
     ${IMGUIZMO_DIR}
+    ${BOX2D_DIR}/include
 )
 
 # Compile definitions

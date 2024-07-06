@@ -12,6 +12,15 @@ namespace Qbit {
 		ContentBrowserPanel();
 
 		void OnImGuiRender();
+
+	private:
+
+		std::unordered_map<std::string, Ref<Texture2D>> m_TextureCache;
+
+		Ref<Texture2D> GetTextureForFile(const std::string& filepath);
+		bool IsTextureFile(const std::string& filepath);
+		Ref<Texture2D> LoadTexture(const std::string& filepath);
+
 	private:
 		std::filesystem::path m_BaseDirectory;
 		std::filesystem::path m_CurrentDirectory;
