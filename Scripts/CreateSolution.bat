@@ -8,14 +8,10 @@ call git submodule update --init --recursive
 
 :: Navigate to Assimp vendor directory
 cd Engine/vendor/assimp
-
+    
 :: Configure and build Assimp in release mode
 call cmake -DASSIMP_BUILD_ZLIB=ON -DBUILD_SHARED_LIBS=OFF CMakeLists.txt
 call cmake --build .
-
-:: Copy the generated release DLL to the appropriate directory
-:: Note: Adjust the path if the output directory is different
-::copy bin\Release\assimp-vc143-mt.dll ..\..\..\Engine
 
 :: Navigate back to the root directory
 cd ..

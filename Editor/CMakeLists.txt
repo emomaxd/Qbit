@@ -41,7 +41,7 @@ if(WIN32)
         ${GLFW_DIR}/install/lib
         ${GLEW_DIR}/Windows/lib/Release/x64
         ${ASSIMP_DIR}/lib/Debug/
-        ${ASSIMP_DIR}/contrib/zlib/Release
+        ${ASSIMP_DIR}/contrib/zlib/Debug
     )
     target_link_libraries(Editor PRIVATE 
         glew32s 
@@ -50,7 +50,7 @@ if(WIN32)
         gdi32 
         winmm
         assimp-vc143-mtd
-        zlibstatic
+        zlibstaticd
         Engine
     )
 elseif(UNIX)
