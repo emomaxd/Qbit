@@ -7,6 +7,8 @@ set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
 set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
 set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
+set(MONO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/mono")
+
 
 
 # Include subdirectories
@@ -29,6 +31,7 @@ target_include_directories(Editor PRIVATE
     ${ENTT_DIR}/src/entt
     ${ASSIMP_DIR}/include
     ${IMGUIZMO_DIR}
+    ${MONO_DIR}/include
 )
 
 if(WIN32)
@@ -42,6 +45,8 @@ if(WIN32)
         ${GLEW_DIR}/Windows/lib/Release/x64
         ${ASSIMP_DIR}/lib/Debug/
         ${ASSIMP_DIR}/contrib/zlib/Debug
+        ${MONO_DIR}/lib/Release
+
     )
     target_link_libraries(Editor PRIVATE 
         glew32s 
@@ -51,6 +56,11 @@ if(WIN32)
         winmm
         assimp-vc143-mtd
         zlibstaticd
+        libmono-static-sgen
+        Ws2_32
+        Winmm
+        Version
+        Bcrypt
         Engine
     )
 elseif(UNIX)

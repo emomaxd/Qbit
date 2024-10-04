@@ -1,0 +1,8 @@
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Qbit-ScriptCore\bin\Release\Qbit-ScriptCore.dll
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Qbit-ScriptCore\bin\Release\Qbit-ScriptCore.pdb
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Qbit-ScriptCore\obj\Release\Qbit-ScriptCore.csproj.AssemblyReference.cache
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Qbit-ScriptCore\obj\Release\Qbit-ScriptCore.csproj.CoreCompileInputs.cache
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Qbit-ScriptCore\obj\Release\Qbit-ScriptCore.dll
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Qbit-ScriptCore\obj\Release\Qbit-ScriptCore.pdb
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Editor\Resources\Scripts\Qbit-ScriptCore.dll
+C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Editor\Resources\Scripts\Qbit-ScriptCore.pdb

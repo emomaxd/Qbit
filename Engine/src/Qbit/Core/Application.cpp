@@ -13,6 +13,8 @@
 
 #include "Qbit/Renderer/Renderer.h"
 
+#include "Qbit/Scripting/ScriptEngine.h"
+
 namespace Qbit {
 
 	Application* Application::s_Instance = nullptr;
@@ -33,6 +35,7 @@ namespace Qbit {
 		m_Window->SetEventCallback(QB_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
+		ScriptEngine::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -42,6 +45,7 @@ namespace Qbit {
 	Application::~Application()
 	{
 		QB_PROFILE_FUNCTION();
+		ScriptEngine::Shutdown();
 		Renderer::Shutdown();
 	}
 

@@ -8,6 +8,7 @@ set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
 set(YAML_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/yaml-cpp")
 set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
 set(BOX2D_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/Box2D")
+set(MONO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/mono")
 
 # Glob source files
 file(GLOB_RECURSE ENGINE_SRC
@@ -62,6 +63,7 @@ target_include_directories(Engine PRIVATE
     ${YAML_DIR}/include
     ${IMGUIZMO_DIR}
     ${BOX2D_DIR}/include
+    ${MONO_DIR}/include
 )
 
 # Compile definitions
@@ -85,6 +87,7 @@ if(WIN32)
         ${GLEW_DIR}/Windows/lib/Release/x64
         ${ASSIMP_DIR}/lib/Debug/
         ${ASSIMP_DIR}/contrib/zlib/Debug
+        ${MONO_DIR}/lib/Release
     )
     target_link_libraries(Engine PRIVATE 
         glew32s 
@@ -94,6 +97,7 @@ if(WIN32)
         winmm
         assimp-vc143-mtd
         zlibstaticd
+        libmono-static-sgen
     )
 elseif(UNIX)
     target_link_directories(Engine PRIVATE 
