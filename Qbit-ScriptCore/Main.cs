@@ -1,36 +1,42 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Qbit
 {
-    public class Main
+    public static class InternalCalls
+    {
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void NativeLog(string text, int parameter);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_GetTranslation(ulong entityID, out Vector3 translation);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_SetTranslation(ulong entityID, ref Vector3 translation);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static bool Input_IsKeyDown(KeyCode keycode);
+    }
+    public class Entity
     {
 
-        public float FloatVar { get; set; }
+        protected Entity() { ID = 0; }
 
-        public Main()
+        internal Entity(ulong id)
         {
-            Console.WriteLine("Main Constructor!");
+            ID = id;
         }
 
-        public void PrintMessage()
+        public readonly ulong ID;
+
+        public Vector3 Translation
         {
-            Console.WriteLine("Hello World from C#!");
+
+            get { InternalCalls.Entity_GetTranslation(ID, out Vector3 translation); return translation; }
+            set { InternalCalls.Entity_SetTranslation(ID, ref value); }
         }
 
-        public void PrintInt(int value)
-        {
-            Console.WriteLine($"C# says: {value}");
-        }
-
-        public void PrintInts(int value1, int value2)
-        {
-            Console.WriteLine($"C# says: {value1} and {value2}");
-        }
-
-        public void PrintCustomMessage(string message)
-        {
-            Console.WriteLine($"C# says: {message}");
-        }
+        
 
     }
 }

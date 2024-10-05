@@ -1,6 +1,8 @@
 #include "SceneHierarchyPanel.h"
 #include "Qbit/Scene/Components.h"
 
+#include "Qbit/Scripting/ScriptEngine.h"
+
 #include "Qbit/UI/UI.h"
 
 #include <imgui/imgui.h>
@@ -326,6 +328,23 @@ namespace Qbit {
 			}
 		});
 
+
+		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
+			{
+				bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+				static char buffer[64];
+				strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
+
+				UI::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
+
+				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
+					component.ClassName = buffer;
+					return;
+				}
+				
+			});
 		
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)

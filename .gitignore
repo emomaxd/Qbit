@@ -28,6 +28,8 @@ Makefile
 /build
 /Release
 /Debug
+*Qbit-ScriptCore/bin/
+*Qbit-ScriptCore/obj/
 
 # ! SUS !
 token.txt

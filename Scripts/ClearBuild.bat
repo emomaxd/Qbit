@@ -8,7 +8,7 @@ set "dirs=.\ .\Engine .\Editor .\Sandbox"
 
 REM Files and directories to delete
 set "vs_files=*.sln *.vcxproj *.vcxproj.filters *.vcxproj.user"
-set "vs_dirs=.vs Debug Release x64 .\Engine\vendor\assimp\code\Debug .\Engine\Release .\Engine\MinSizeRel .\Engine\RelWithDebInfo .\Engine\vendor\glfw\install .\Engine\Engine.dir .\Editor\Editor.dir .\Sandbox\Sandbox.dir .\Sandbox\MinSizeRel .\Sandbox\Release .\Sandbox\Debug"
+set "vs_dirs=.vs Debug Release x64 .\Qbit-ScriptCore\bin .\Qbit-ScriptCore\obj .\Engine\vendor\assimp\code\Debug .\Engine\Release .\Engine\MinSizeRel .\Engine\RelWithDebInfo .\Engine\vendor\glfw\install .\Engine\Engine.dir .\Editor\Editor.dir .\Sandbox\Sandbox.dir .\Sandbox\MinSizeRel .\Sandbox\Release .\Sandbox\Debug"
 set "cmake_files=CMakeCache.txt cmake_install.cmake Sandbox\*.json"
 set "cmake_dirs=CMakeFiles"
 

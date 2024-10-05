@@ -11,6 +11,8 @@
 
 #include "Entity.h"
 
+#include "Qbit/Scripting/ScriptEngine.h"
+
 // Box2D
 #include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
@@ -125,7 +127,17 @@ namespace Qbit {
 
 		OnPhysics2DStart();
 
-		
+		/* Scripting */
+		{
+			ScriptEngine::OnRuntimeStart(this);
+
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::OnCreateEntity(entity);
+			}
+		}
 	}
 
 	void Scene::OnRuntimeStop()
@@ -134,7 +146,7 @@ namespace Qbit {
 
 		OnPhysics2DStop();
 
-		
+		ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::OnSimulationStart()
@@ -151,6 +163,14 @@ namespace Qbit {
 	{
 		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
+
+			// C# Entity OnUpdate
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::OnUpdateEntity(entity, ts);
+			}
 			
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 			{
@@ -164,6 +184,7 @@ namespace Qbit {
 
 				nsc.Instance->OnUpdate(ts);
 			});
+
 
 			// Physics
 			{
