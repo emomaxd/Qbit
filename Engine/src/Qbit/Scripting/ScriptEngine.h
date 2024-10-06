@@ -10,6 +10,8 @@ extern "C" {
 	typedef struct _MonoObject MonoObject;
 	typedef struct _MonoMethod MonoMethod;
 	typedef struct _MonoAssembly MonoAssembly;
+	typedef struct _MonoImage MonoImage;
+	typedef struct _MonoString MonoString;
 }
 
 
@@ -104,6 +106,12 @@ namespace Qbit {
 		static bool EntityClassExists(const std::string& fullClassName);
 		static std::unordered_map<std::string, Ref<ScriptClass>> GetEntityClasses();
 
+		static MonoImage* GetCoreAssemblyImage();
+
+		static MonoObject* GetManagedInstance(UUID uuid);
+
+		static MonoString* CreateString(const char* string);
+
 	private:
 		static void InitMono();
 		static void ShutdownMono();
@@ -112,5 +120,6 @@ namespace Qbit {
 		static void LoadAssemblyClasses(MonoAssembly* assembly);
 
 		friend class ScriptClass;
+		friend class ScriptGlue;
 	};
 }

@@ -117,11 +117,11 @@ namespace Qbit {
 		LoadAssembly("Resources/Scripts/Qbit-ScriptCore.dll");
 		LoadAssemblyClasses(s_Data->CoreAssembly);
 
+		ScriptGlue::RegisterComponents();
+
 		Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 
 		s_Data->EntityClass = ScriptClass("Qbit", "Entity");
-
-		//MonoObject* instance = s_Data->EntityClass.Instantiate();
 
 	}
 	void ScriptEngine::Shutdown()
@@ -259,6 +259,22 @@ namespace Qbit {
 	std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetEntityClasses()
 	{
 		return s_Data->EntityClasses;
+	}
+
+	MonoImage* ScriptEngine::GetCoreAssemblyImage()
+	{
+		return s_Data->CoreAssemblyImage;
+	}
+
+	MonoObject* ScriptEngine::GetManagedInstance(UUID uuid)
+	{
+		QB_CORE_ASSERT(s_Data->EntityInstances.find(uuid) != s_Data->EntityInstances.end());
+		return s_Data->EntityInstances.at(uuid)->GetManagedObject();
+	}
+
+	MonoString* ScriptEngine::CreateString(const char* string)
+	{
+		return mono_string_new(s_Data->AppDomain, string);
 	}
 
 	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className)

@@ -7,7 +7,7 @@
     <ProjectGuid>{108058D7-6BC5-4E3E-99FD-22A69FB5ECF4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Qbit_ScriptCore</RootNamespace>
+    <RootNamespace>Qbit</RootNamespace>
     <AssemblyName>Qbit-ScriptCore</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,9 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="InternalCalls.cs" />
     <Compile Include="KeyCode.cs" />
-    <Compile Include="Main.cs" />
+    <Compile Include="Entity.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vector2.cs" />

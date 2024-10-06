@@ -5,7 +5,7 @@
 #imgui.ini
 
 # CMAKE BUILD FILES
-/CMakeFiles
+**/CMakeFiles
 CMakeCache.txt
 *.cmake
 
@@ -21,19 +21,18 @@ Makefile
 *.vcxproj.filters
 *.vcxproj.user
 *.sln
-/x64
+*/x64
 /Physics.dir
+/Sandbox/Sandbox.dir
+/Engine/Engine.dir
+/Editor/Editor.dir
 /.vs
 /game.dir
 /build
-/Release
-/Debug
+*/Release
+*/Debug
 *Qbit-ScriptCore/bin/
 *Qbit-ScriptCore/obj/
-
-# ! SUS !
-token.txt
-github_url.txt
 
 # VSCODE
 /.vscode
