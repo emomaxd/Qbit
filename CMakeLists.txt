@@ -14,6 +14,8 @@ set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 add_subdirectory(Engine)
 add_subdirectory(Editor)
 add_subdirectory(Sandbox)
+add_subdirectory(Qbit-ScriptCore)
+add_subdirectory(Editor/SandboxProject/Assets/Scripts)
 
 # Set Engine as the startup project
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Editor)

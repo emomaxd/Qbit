@@ -34,5 +34,13 @@ Makefile
 *Qbit-ScriptCore/bin/
 *Qbit-ScriptCore/obj/
 
+*.csproj
+
+*.vs/
+
+/Editor/SandboxProject/Assets/Scripts/obj
+/Editor/SandboxProject/Assets/Scripts/Binaries
+/Editor/Resources/Scripts
+
 # VSCODE
 /.vscode
