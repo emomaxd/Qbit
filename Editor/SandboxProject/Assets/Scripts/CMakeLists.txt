@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.8)
 project(SandboxProject LANGUAGES CSharp)
 
 # Automatically add all .cs files in the src directory to the project
-file(GLOB_RECURSE CS_FILES "${CMAKE_SOURCE_DIR}/Editor/SandboxProject/Assets/Scripts/*.cs")
+file(GLOB_RECURSE CS_FILES "${CMAKE_SOURCE_DIR}/Editor/SandboxProject/Assets/Scripts/Source/*.cs")
 
 # Define the C# class library
 add_library(SandboxProject SHARED ${CS_FILES})
