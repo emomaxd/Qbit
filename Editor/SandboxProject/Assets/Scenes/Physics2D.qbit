@@ -103,11 +103,15 @@ Entities:
     TagComponent:
       Tag: Player
     TransformComponent:
-      Translation: [0.166033223, 0.757751286, 0.0225147791]
+      Translation: [0.18063587, 0.757751286, 0.0225147791]
       Rotation: [0, 0, -0.235084534]
       Scale: [0.361159712, 0.375572056, 0.848135769]
     ScriptComponent:
       ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: speed
+          Type: Float
+          Data: 2
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
       TilingFactor: 1
