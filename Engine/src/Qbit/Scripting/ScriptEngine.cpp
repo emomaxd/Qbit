@@ -16,7 +16,6 @@
 
 namespace Qbit {
 
-
 	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap =
 	{
 		{ "System.Single", ScriptFieldType::Float },
@@ -37,7 +36,6 @@ namespace Qbit {
 
 		{ "Qbit.Entity", ScriptFieldType::Entity },
 	};
-
 
 	namespace Utils {
 
@@ -125,9 +123,9 @@ namespace Qbit {
 
 			return it->second;
 		}
-
 	}
 
+#pragma region ScriptEngine
 	struct ScriptEngineData
 	{
 		MonoDomain* RootDomain = nullptr;
@@ -167,6 +165,7 @@ namespace Qbit {
 		s_Data->EntityClass = ScriptClass("Qbit", "Entity", true);
 
 	}
+
 	void ScriptEngine::Shutdown()
 	{
 		ShutdownMono();
@@ -202,16 +201,6 @@ namespace Qbit {
 		s_Data->SceneContext = nullptr;
 		
 		s_Data->EntityInstances.clear();
-	}
-
-
-
-	Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name)
-	{
-		if (s_Data->EntityClasses.find(name) == s_Data->EntityClasses.end())
-			return nullptr;
-
-		return s_Data->EntityClasses.at(name);
 	}
 
 	void ScriptEngine::InitMono()
@@ -342,6 +331,14 @@ namespace Qbit {
 		}
 	}
 
+	Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name)
+	{
+		if (s_Data->EntityClasses.find(name) == s_Data->EntityClasses.end())
+			return nullptr;
+
+		return s_Data->EntityClasses.at(name);
+	}
+
 	Scene* ScriptEngine::GetSceneContext()
 	{
 		return s_Data->SceneContext;
@@ -384,7 +381,9 @@ namespace Qbit {
 	{
 		return mono_string_new(s_Data->AppDomain, string);
 	}
+#pragma endregion
 
+#pragma region ScriptClass
 	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore)
 		: m_ClassNamespace(classNamespace), m_ClassName(className)
 	{
@@ -406,8 +405,9 @@ namespace Qbit {
 		MonoObject* exception = nullptr;
 		return mono_runtime_invoke(method, instance, params, &exception);
 	}
+#pragma endregion
 
-
+#pragma region ScriptInstance
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
 		: m_ScriptClass(scriptClass)
 	{
@@ -462,5 +462,6 @@ namespace Qbit {
 		mono_field_set_value(m_Instance, field.ClassField, (void*)value);
 		return true;
 	}
+#pragma endregion
 
 }

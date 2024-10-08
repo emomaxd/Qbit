@@ -1,6 +1,5 @@
 project(Sandbox)
 
-# Define directories for third-party libraries
 set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
@@ -9,14 +8,11 @@ set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
 set(MONO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/mono")
 
-# Glob source and header files
 file(GLOB_RECURSE SANDBOX_SOURCES "${CMAKE_SOURCE_DIR}/Sandbox/src/*.cpp")
 file(GLOB_RECURSE SANDBOX_HEADERS "${CMAKE_SOURCE_DIR}/Sandbox/src/*.hpp" "${CMAKE_SOURCE_DIR}/Sandbox/src/*.h")
 
-# Create the Sandbox executable
 add_executable(Sandbox ${SANDBOX_SOURCES} ${SANDBOX_HEADERS})
 
-# Include directories
 target_include_directories(Sandbox PRIVATE 
     ${CMAKE_SOURCE_DIR}/Engine
     ${CMAKE_SOURCE_DIR}/Engine/src
@@ -33,12 +29,18 @@ target_include_directories(Sandbox PRIVATE
     ${MONO_DIR}/include
 )
 
+target_compile_definitions(Sandbox PRIVATE 
+    $<$<CONFIG:Debug>:QB_DEBUG>
+    $<$<CONFIG:Release>:QB_RELEASE>
+    GLEW_STATIC
+    YAML_CPP_STATIC_DEFINE
+    _CRT_SECURE_NO_WARNINGS
+)
+
 if(WIN32)
-    # Use precompiled headers
     target_precompile_headers(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
     target_compile_definitions(Sandbox PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
-    # Link directories for Debug and Release configurations
     target_link_directories(Sandbox PRIVATE 
         $<$<CONFIG:Debug>:${GLFW_DIR}/build/src/Debug>
         $<$<CONFIG:Release>:${GLFW_DIR}/build/src/Release>
@@ -56,7 +58,6 @@ if(WIN32)
         $<$<CONFIG:Debug>:${MONO_DIR}/lib/Debug>
     )
 
-    # Link libraries based on the configuration
     target_link_libraries(Sandbox PRIVATE 
         opengl32 
         gdi32 
@@ -67,20 +68,16 @@ if(WIN32)
         Bcrypt 
         Engine 
 
-        # GLEW and GLFW
         glew32s
         $<$<CONFIG:Debug>:glfw3>
         $<$<CONFIG:Release>:glfw3>
 
-        # Assimp (Debug or Release)
         $<$<CONFIG:Debug>:assimp-vc143-mtd>
         $<$<CONFIG:Release>:assimp-vc143-mt>
 
-        # Zlib for Assimp (Debug or Release)
         $<$<CONFIG:Debug>:zlibstaticd>
         $<$<CONFIG:Release>:zlibstatic>
 
-        # Mono (Debug or Release)
         $<$<CONFIG:Debug>:libmono-static-sgen>
         $<$<CONFIG:Release>:libmono-static-sgen>
     )
@@ -88,6 +85,5 @@ else()
     message(FATAL_ERROR "Unsupported operating system. This configuration is for Windows only.")
 endif()
 
-# Enable "Show All Files" option for Visual Studio projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET Sandbox PROPERTY VS_SOLUTION_SHOW_ALL_FILES ON)

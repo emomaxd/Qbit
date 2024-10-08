@@ -1,6 +1,5 @@
 project(Editor)
 
-# Define directories for third-party libraries
 set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
@@ -10,13 +9,10 @@ set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
 set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
 set(MONO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/mono")
 
-# Include all source files
 file(GLOB_RECURSE CORE_SOURCES "*.cpp" "*.cxx" "*.cc" "*.hpp" "*.h")
 
-# Create the Editor executable
 add_executable(Editor ${CORE_SOURCES})
 
-# Include directories
 target_include_directories(Editor PRIVATE 
     ${CMAKE_SOURCE_DIR}/Engine
     ${CMAKE_SOURCE_DIR}/Engine/src
@@ -34,12 +30,18 @@ target_include_directories(Editor PRIVATE
     ${MONO_DIR}/include
 )
 
+target_compile_definitions(Editor PRIVATE 
+    $<$<CONFIG:Debug>:QB_DEBUG>
+    $<$<CONFIG:Release>:QB_RELEASE>
+    GLEW_STATIC
+    YAML_CPP_STATIC_DEFINE
+    _CRT_SECURE_NO_WARNINGS
+)
+
 if(WIN32)
-    # Use precompiled headers
     target_precompile_headers(Editor PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
     target_compile_definitions(Editor PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
-    # Link directories for Debug and Release configurations
     target_link_directories(Editor PRIVATE 
         $<$<CONFIG:Debug>:${GLFW_DIR}/build/src/Debug>
         $<$<CONFIG:Release>:${GLFW_DIR}/build/src/Release>
@@ -59,7 +61,6 @@ if(WIN32)
 
     )
 
-    # Link libraries based on the configuration
     target_link_libraries(Editor PRIVATE 
         opengl32 
         gdi32 
@@ -70,20 +71,16 @@ if(WIN32)
         Bcrypt 
         Engine 
 
-        # GLEW and GLFW
         glew32s
         $<$<CONFIG:Debug>:glfw3>
         $<$<CONFIG:Release>:glfw3>
 
-        # Assimp (Debug or Release)
         $<$<CONFIG:Debug>:assimp-vc143-mtd>
         $<$<CONFIG:Release>:assimp-vc143-mt>
 
-        # Zlib for Assimp (Debug or Release)
         $<$<CONFIG:Debug>:zlibstaticd>
         $<$<CONFIG:Release>:zlibstatic>
 
-        # Mono (Debug or Release)
         $<$<CONFIG:Debug>:libmono-static-sgen>
         $<$<CONFIG:Release>:libmono-static-sgen>
     )
@@ -91,6 +88,5 @@ else()
     message(FATAL_ERROR "Unsupported operating system. This configuration is for Windows only.")
 endif()
 
-# Enable "Show All Files" option for Visual Studio projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET Editor PROPERTY VS_SOLUTION_SHOW_ALL_FILES ON)

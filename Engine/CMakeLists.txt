@@ -1,4 +1,3 @@
-# Define directories for third-party libraries
 set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
@@ -10,7 +9,6 @@ set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
 set(BOX2D_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/Box2D")
 set(MONO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/mono")
 
-# Glob source files
 file(GLOB_RECURSE ENGINE_SRC
     "${CMAKE_SOURCE_DIR}/Engine/src/*.cpp"
     "${CMAKE_SOURCE_DIR}/Engine/src/*.hpp"
@@ -35,7 +33,6 @@ file(GLOB BOX2D_SRC
     "${BOX2D_DIR}/include/*.h"
 )
 
-# Create Engine library
 add_library(Engine 
     ${ENGINE_SRC}
     ${IMGUI_SRC}
@@ -44,7 +41,6 @@ add_library(Engine
     ${BOX2D_SRC}
 )
 
-# Include directories
 target_include_directories(Engine PRIVATE 
     ${CMAKE_SOURCE_DIR}/Engine
     ${CMAKE_SOURCE_DIR}/Engine/src
@@ -64,24 +60,19 @@ target_include_directories(Engine PRIVATE
     ${MONO_DIR}/include
 )
 
-# Compile definitions
-target_compile_definitions(Engine PRIVATE GLEW_STATIC YAML_CPP_STATIC_DEFINE)
-
-# Define QB_DEBUG for Debug configuration only
 target_compile_definitions(Engine PRIVATE 
     $<$<CONFIG:Debug>:QB_DEBUG>
+    $<$<CONFIG:Release>:QB_RELEASE>
+    GLEW_STATIC
+    YAML_CPP_STATIC_DEFINE
     _CRT_SECURE_NO_WARNINGS
 )
 
-# Set up library directories and linking for Windows only
 if(WIN32)
-    # Use precompiled headers
     target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
 
-    # Set compile definitions for Windows-specific configurations
     target_compile_definitions(Engine PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
-    # Link directories for Debug and Release configurations separately
     target_link_directories(Engine PRIVATE 
         $<$<CONFIG:Debug>:${GLFW_DIR}/build/src/Debug>
         $<$<CONFIG:Release>:${GLFW_DIR}/build/src/Release>
@@ -99,27 +90,20 @@ if(WIN32)
         $<$<CONFIG:Release>:${MONO_DIR}/lib/Release>
     )
 
-    # Link libraries based on the configuration
     target_link_libraries(Engine PRIVATE 
-        # Static OpenGL and Windows-specific libraries
         opengl32 gdi32 winmm
 
-        # GLEW (static library)
         glew32s
 
-        # GLFW (Debug or Release)
         $<$<CONFIG:Debug>:glfw3>
         $<$<CONFIG:Release>:glfw3>
 
-        # Assimp (Debug or Release)
         $<$<CONFIG:Debug>:assimp-vc143-mtd>
         $<$<CONFIG:Release>:assimp-vc143-mt>
 
-        # Zlib for Assimp (Debug or Release)
         $<$<CONFIG:Debug>:zlibstaticd>
         $<$<CONFIG:Release>:zlibstatic>
 
-        # Mono (Debug or Release)
         $<$<CONFIG:Debug>:libmono-static-sgen>
         $<$<CONFIG:Release>:libmono-static-sgen>
     )

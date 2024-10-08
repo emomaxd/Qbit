@@ -3,13 +3,6 @@ project(Qbit)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Define directories for third-party libraries
-set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
-set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
-set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/imgui")
-set(ENTT_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/entt")
-set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
-
 # Include the Engine directory
 add_subdirectory(Engine)
 add_subdirectory(Editor)
@@ -22,3 +15,5 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT E
 
 # Remove ALL_BUILD and ZERO_CHECK targets
 set(CMAKE_SUPPRESS_REGENERATION true)
+
+set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE STRING "" FORCE)

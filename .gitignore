@@ -2,11 +2,11 @@
 *.exe
 *.o
 *.out
-#imgui.ini
+*.pdb
 
 # CMAKE BUILD FILES
 **/CMakeFiles
-CMakeCache.txt
+**/CMakeCache.txt
 *.cmake
 
 # Qbit Profiling Output
@@ -14,33 +14,33 @@ Sandbox/*.json
 Editor/*.json
 
 # LINUX SPECIFIED BUILD FILES
-Makefile
+**/Makefile
 
-# WINDOWS SPECIFIED BUILD FILES
+# VISUAL STUDIO FILES
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
 *.sln
-*/x64
-/Physics.dir
-/Sandbox/Sandbox.dir
-/Engine/Engine.dir
-/Editor/Editor.dir
-/.vs
-/game.dir
-/build
-*/Release
-*/Debug
-*Qbit-ScriptCore/bin/
-*Qbit-ScriptCore/obj/
-
 *.csproj
 
-*.vs/
+# VISUAL STUDIO DIRECTORIES
+**/.vs/
+**/obj/
+**/x64/
+**/*.dir/
+**/Debug/
+**/Release/ 
 
-/Editor/SandboxProject/Assets/Scripts/obj
-/Editor/SandboxProject/Assets/Scripts/Binaries
-/Editor/Resources/Scripts
+# LOGS
+*.log
+*.recipe
+*.tlog
 
 # VSCODE
 /.vscode
+
+# DEVELOPING PURPOSES
+SandboxProject.dll
+Editor/Resources/**/*.dll
+
+# NOTE: Editor/SandboxProject/Assets/Scripts/Binaries does include Qbit-ScriptCore.dll for temporarily, the plan is to copy that dll while creating a new project.
