@@ -52,6 +52,7 @@ target_include_directories(Engine PRIVATE
     ${GLM_DIR}
     ${ENTT_DIR}/src/entt
     ${ASSIMP_DIR}/include
+    ${ASSIMP_DIR}/build/include
     ${YAML_DIR}/include
     ${IMGUIZMO_DIR}
     ${BOX2D_DIR}/include

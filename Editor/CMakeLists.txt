@@ -26,6 +26,7 @@ target_include_directories(Editor PRIVATE
     ${GLM_DIR}/glm
     ${ENTT_DIR}/src/entt
     ${ASSIMP_DIR}/include
+    ${ASSIMP_DIR}/build/include
     ${IMGUIZMO_DIR}
     ${MONO_DIR}/include
 )
