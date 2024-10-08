@@ -38,6 +38,8 @@ target_compile_definitions(Editor PRIVATE
     _CRT_SECURE_NO_WARNINGS
 )
 
+target_link_options(Editor PRIVATE /NODEFAULTLIB:LIBCMT)
+
 if(WIN32)
     target_precompile_headers(Editor PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
     target_compile_definitions(Editor PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)

@@ -47,7 +47,7 @@ namespace Qbit {
 		}
 		catch (YAML::ParserException e)
 		{
-			//QB_CORE_ERROR("Failed to load project file '{0}'\n     {1}", filepath, e.what());
+			QB_CORE_ERROR("Failed to load project file '{}'\n     {}", filepath.string(), e.what());
 			return false;
 		}
 

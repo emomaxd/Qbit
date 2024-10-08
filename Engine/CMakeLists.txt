@@ -16,8 +16,6 @@ file(GLOB_RECURSE ENGINE_SRC
 )
 file(GLOB IMGUI_SRC
     "${IMGUI_DIR}/*.cpp"
-    "${IMGUI_DIR}/backends/imgui_impl_glfw.cpp"
-    "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
 )
 file(GLOB YAML_SRC
     "${YAML_DIR}/src/*.cpp"
