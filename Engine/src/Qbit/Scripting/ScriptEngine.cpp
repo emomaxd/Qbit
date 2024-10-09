@@ -137,11 +137,20 @@ namespace Qbit {
 		MonoAssembly* AppAssembly = nullptr;
 		MonoImage* AppAssemblyImage = nullptr;
 
+		std::filesystem::path CoreAssemblyFilepath;
+		std::filesystem::path AppAssemblyFilepath;
+
 		ScriptClass EntityClass;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
+
+#ifdef QB_DEBUG
+		bool EnableDebugging = true;
+#else
+		bool EnableDebugging = false;
+#endif
 
 		Scene* SceneContext = nullptr;
 	};
@@ -177,6 +186,7 @@ namespace Qbit {
 		s_Data->AppDomain = mono_domain_create_appdomain("QbitScriptRuntime", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 
+		s_Data->CoreAssemblyFilepath = filepath;
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
 
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
@@ -185,10 +195,26 @@ namespace Qbit {
 
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
-
+		s_Data->AppAssemblyFilepath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
+	}
+
+	void ScriptEngine::ReloadAssembly()
+	{
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_Data->AppDomain);
+
+		LoadAssembly(s_Data->CoreAssemblyFilepath);
+		LoadAppAssembly(s_Data->AppAssemblyFilepath);
+		LoadAssemblyClasses();
+
+		ScriptGlue::RegisterComponents();
+
+		// Retrieve and instantiate class
+		s_Data->EntityClass = ScriptClass("Qbit", "Entity", true);
 	}
 
 	void ScriptEngine::OnRuntimeStart(Scene* scene)
