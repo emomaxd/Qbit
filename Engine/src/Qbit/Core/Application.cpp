@@ -13,6 +13,8 @@
 
 #include "Qbit/Renderer/Renderer.h"
 
+#include "Qbit/Scripting/ScriptEngine.h"
+
 namespace Qbit {
 
 	Application* Application::s_Instance = nullptr;
@@ -33,6 +35,7 @@ namespace Qbit {
 		m_Window->SetEventCallback(QB_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
+		ScriptEngine::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -42,6 +45,7 @@ namespace Qbit {
 	Application::~Application()
 	{
 		QB_PROFILE_FUNCTION();
+		ScriptEngine::Shutdown();
 		Renderer::Shutdown();
 	}
 
@@ -79,6 +83,13 @@ namespace Qbit {
 		}
 	}
 
+	void Application::SubmitToMainThread(const std::function<void()>& function)
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		m_MainThreadQueue.emplace_back(function);
+	}
+
 	void Application::Run()
 	{
 		QB_PROFILE_FUNCTION();
@@ -89,6 +100,7 @@ namespace Qbit {
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
+			ExecuteMainThreadQueue();
 			
 			if (!m_Minimized)
 			{
@@ -130,6 +142,16 @@ namespace Qbit {
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
+	}
+
+	void Application::ExecuteMainThreadQueue()
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		for (auto& func : m_MainThreadQueue)
+			func();
+
+		m_MainThreadQueue.clear();
 	}
 
 }

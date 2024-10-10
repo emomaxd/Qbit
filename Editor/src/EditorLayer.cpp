@@ -4,6 +4,8 @@
 
 #include "Qbit/Scene/SceneSerializer.h"
 
+#include "Qbit/Scripting/ScriptEngine.h"
+
 #include "Qbit/Utils/PlatformUtils.h"
 
 #include "Qbit/Project/Project.h"
@@ -235,6 +237,15 @@ namespace Qbit {
 
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("Script"))
+			{
+				if (ImGui::MenuItem("ReloadScript"))
+				{
+					ScriptEngine::ReloadAssembly();
+				}
+				ImGui::EndMenu();
+			}
+
 
 			ImGui::EndMenuBar();
 		}
@@ -260,7 +271,7 @@ namespace Qbit {
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
 
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
