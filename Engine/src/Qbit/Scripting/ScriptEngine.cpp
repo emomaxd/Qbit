@@ -8,8 +8,11 @@
 #include "mono/metadata/mono-debug.h"
 #include "mono/metadata/threads.h"
 
+#include "filewatch/FileWatch.h"
+
 #include "ScriptGlue.h"
 
+#include "Qbit/Core/Application.h"
 #include "Qbit/Scene/Entity.h"
 
 #include <unordered_map>
@@ -18,25 +21,25 @@ namespace Qbit {
 
 	static std::unordered_map<std::string, ScriptFieldType> s_ScriptFieldTypeMap =
 	{
-		{ "System.Single", ScriptFieldType::Float },
-		{ "System.Double", ScriptFieldType::Double },
-		{ "System.Boolean", ScriptFieldType::Bool },
-		{ "System.Char", ScriptFieldType::Char },
-		{ "System.Int16", ScriptFieldType::Short },
-		{ "System.Int32", ScriptFieldType::Int },
-		{ "System.Int64", ScriptFieldType::Long },
-		{ "System.Byte", ScriptFieldType::Byte },
-		{ "System.UInt16", ScriptFieldType::UShort },
-		{ "System.UInt32", ScriptFieldType::UInt },
-		{ "System.UInt64", ScriptFieldType::ULong },
+		{ "System.Single",  ScriptFieldType::Float   },
+		{ "System.Double",  ScriptFieldType::Double  },
+		{ "System.Boolean", ScriptFieldType::Bool    },
+		{ "System.Char",    ScriptFieldType::Char    },
+		{ "System.Int16",   ScriptFieldType::Short   },
+		{ "System.Int32",   ScriptFieldType::Int     },
+		{ "System.Int64",   ScriptFieldType::Long    },
+		{ "System.Byte",    ScriptFieldType::Byte    },
+		{ "System.UInt16",  ScriptFieldType::UShort  },
+		{ "System.UInt32",  ScriptFieldType::UInt    },
+		{ "System.UInt64",  ScriptFieldType::ULong   },
 
-		{ "Qbit.Vector2", ScriptFieldType::Vector2 },
-		{ "Qbit.Vector3", ScriptFieldType::Vector3 },
-		{ "Qbit.Vector4", ScriptFieldType::Vector4 },
+		{ "Qbit.Vector2",   ScriptFieldType::Vector2 },
+		{ "Qbit.Vector3",   ScriptFieldType::Vector3 },
+		{ "Qbit.Vector4",   ScriptFieldType::Vector4 },
 
-		{ "Qbit.Entity", ScriptFieldType::Entity },
+		{ "Qbit.Entity",    ScriptFieldType::Entity  },
 	};
-
+#pragma region Utils
 	namespace Utils {
 
 		static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
@@ -124,6 +127,7 @@ namespace Qbit {
 			return it->second;
 		}
 	}
+#pragma endregion
 
 #pragma region ScriptEngine
 	struct ScriptEngineData
@@ -146,6 +150,9 @@ namespace Qbit {
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
+		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
+		bool AssemblyReloadPending = false;
+
 #ifdef QB_DEBUG
 		bool EnableDebugging = true;
 #else
@@ -156,6 +163,20 @@ namespace Qbit {
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
+
+	static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
+	{
+		if (!s_Data->AssemblyReloadPending && change_type == filewatch::Event::modified)
+		{
+			s_Data->AssemblyReloadPending = true;
+
+			Application::Get().SubmitToMainThread([]()
+				{
+					s_Data->AppAssemblyFileWatcher.reset();
+					ScriptEngine::ReloadAssembly();
+				});
+		}
+	}
 
 	void ScriptEngine::Init()
 	{
@@ -172,6 +193,16 @@ namespace Qbit {
 		Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
 		s_Data->EntityClass = ScriptClass("Qbit", "Entity", true);
+
+		filewatch::FileWatch<std::string>* watch = new filewatch::FileWatch<std::string>(
+			
+			"SandboxProject/Assets/Scripts/Binaries",
+			
+			[](const std::string& path, const filewatch::Event change_type)
+			{
+				std::cout << path << std::endl;
+			}
+		);
 
 	}
 
@@ -199,6 +230,9 @@ namespace Qbit {
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
+
+		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
+		s_Data->AssemblyReloadPending = false;
 	}
 
 	void ScriptEngine::ReloadAssembly()
