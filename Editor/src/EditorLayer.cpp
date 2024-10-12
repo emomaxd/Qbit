@@ -65,7 +65,7 @@ namespace Qbit {
 		});	
 		m_ProjectManager.SetOpenProjectCallback([this](const std::string& filepath) { OpenProject(filepath); m_ProjectManager.SetProjectSelected(); });
 
-		Renderer2D::SetLineWidth(4.0f);
+		//Renderer2D::SetLineWidth(4.0f); /* !!! Deprecated function !!! */
 
 	}
 
@@ -144,16 +144,12 @@ namespace Qbit {
 
 	void EditorLayer::OnImGuiRender()
 	{
-
-		
-
 		if (!m_ProjectManager.IsProjectSelected())
 		{
 			m_ProjectManager.OnImGuiRender();
 			return;
 		}
 			
-
 		// Dockspace settings
 		static bool show = true;
 		static bool opt_fullscreen = true;
@@ -211,10 +207,15 @@ namespace Qbit {
 			if (ImGui::BeginMenu("File"))
 			{
 				//if (ImGui::MenuItem("New Project"))
-					//NewProject();
-				
-				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
-					OpenProject();
+				{
+					//std::string filepath = FileDialogs::SaveFile("Qbit Project (*.qproj)\0*.qproj\0");
+					//NewProject(filepath);
+				}
+
+				//if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+				{
+					//OpenProject();
+				}
 
 				//if (ImGui::MenuItem("Save Project..."))
 					//SaveProject();
@@ -557,6 +558,33 @@ namespace Qbit {
 		Renderer2D::EndScene();
 	}
 
+	static void createCMakeFile(const std::filesystem::path& path, const std::string& projectName) {
+		// Open a file output stream
+		std::ofstream cmakeFile(path);
+
+		if (!cmakeFile) {
+			std::cerr << "Error creating CMakeLists.txt" << std::endl;
+			return;
+		}
+
+		// Write the CMake configuration to the file
+		cmakeFile << "cmake_minimum_required(VERSION 3.8)\n\n";
+		cmakeFile << "project(" << projectName << " LANGUAGES CSharp)\n\n";
+		cmakeFile << "file(GLOB_RECURSE CS_FILES \"${CMAKE_CURRENT_SOURCE_DIR}/Assets/Scripts/*.cs\")\n\n";
+		cmakeFile << "add_library(" << projectName << " SHARED ${CS_FILES})\n\n";
+		cmakeFile << "cmake_path(GET CMAKE_CURRENT_SOURCE_DIR PARENT_PATH current_parent)\n";
+		cmakeFile << "cmake_path(GET current_parent PARENT_PATH project_dir)\n\n";
+		cmakeFile << "set_property(TARGET " << projectName << " PROPERTY \n";
+		cmakeFile << "    VS_DOTNET_REFERENCE_Qbit-ScriptCore \"${CMAKE_CURRENT_SOURCE_DIR}/Library/Qbit-ScriptCore.dll\")\n\n";
+		cmakeFile << "set_target_properties(" << projectName << " PROPERTIES \n";
+		cmakeFile << "    RUNTIME_OUTPUT_DIRECTORY_DEBUG \"${CMAKE_CURRENT_SOURCE_DIR}/Library\"\n";
+		cmakeFile << "    RUNTIME_OUTPUT_DIRECTORY_RELEASE \"${CMAKE_CURRENT_SOURCE_DIR}/Library/\")\n";
+
+		// Close the file
+		cmakeFile.close();
+		std::cout << "CMakeLists.txt generated successfully for project: " << projectName << std::endl;
+	}
+
 	void EditorLayer::NewProject(const std::string& path)
 	{
 		namespace fs = std::filesystem;
@@ -564,7 +592,8 @@ namespace Qbit {
 		// Determine the base directory and the project file name
 		fs::path projectPath = path;
 		fs::path projectDir = projectPath.parent_path();
-		fs::path projectName = projectPath.filename();
+		fs::path projectName = projectPath.stem();
+		fs::path assetsDir = projectDir / "Assets";
 
 		// Create the project directory if it doesn't exist
 		if (!fs::exists(projectDir)) {
@@ -572,38 +601,60 @@ namespace Qbit {
 		}
 
 		ProjectConfig config;
-		config.Name = "Untitled";
+		config.Name = projectName.string();
 		config.AssetDirectory = "Assets";
-		config.StartScene = "Scenes\\Untitled.qbit";
+		config.StartScene = projectDir / "Assets" / "Scenes" / (projectName.filename().string() + ".qbit");
+		config.ScriptModulePath = projectDir / "Library" / (projectName.filename().string() + ".dll");
+		config.LibraryDirectory = "Library";
+
+		// Create necessary folders
+		{
+			fs::create_directories(projectDir / config.LibraryDirectory);
+
+			// Create the Assets folder and its subfolders
+			fs::create_directories(assetsDir / "Scenes");
+			fs::create_directories(assetsDir / "Scripts");
+			fs::create_directories(assetsDir / "Textures");
+		}
+
+		// Copy Qbit-ScriptCore into Library/
+		{
+			const std::string coreDllName = "Qbit-ScriptCore.dll";
+			fs::path coreDllPath = fs::current_path() / "Resources" / "Scripts" / coreDllName;
+			fs::path copyTo = projectDir / config.LibraryDirectory / coreDllName;
+			fs::copy_file(coreDllPath, copyTo);
+		}
+
+		// Create CMakeFiles.txt file - for C# script
+		{
+			createCMakeFile(projectDir / "CMakeLists.txt", projectName.string());
+		}
 
 		auto& proj = Project::New(config);
 
 		proj->SetProjectDirectory(projectDir);
 
-		Project::SaveActive(projectDir / projectName);
+		Project::SaveActive(projectDir / (projectName.string() + ".qproj"));
 
-		// Create the Assets folder and its subfolders
-		fs::path assetsDir = projectDir / "Assets";
-		fs::create_directories(assetsDir / "Scenes");
-		fs::create_directories(assetsDir / "Scripts");
-		fs::create_directories(assetsDir / "Textures");
+		ScriptEngine::Init();
 
-
-		Ref<Scene> newScene = CreateRef<Scene>();
-		m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+		// Scene setup
+		{
+			Ref<Scene> newScene = CreateRef<Scene>();
+			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
 
 
-		SceneSerializer serializer(newScene);
-		auto& scenePath = (assetsDir / config.StartScene);
-		serializer.Serialize(scenePath.string());
-		
-		
-		m_EditorScene = newScene;
-		m_SceneHierarchyPanel.SetContext(m_EditorScene);
+			SceneSerializer serializer(newScene);
+			auto& scenePath = (assetsDir / config.StartScene);
+			serializer.Serialize(scenePath.string());
 
-		m_ActiveScene = m_EditorScene;
-		m_EditorScenePath = scenePath;
-		
+
+			m_EditorScene = newScene;
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+
+			m_ActiveScene = m_EditorScene;
+			m_EditorScenePath = scenePath;
+		}
 	}
 
 	bool EditorLayer::OpenProject()
@@ -621,10 +672,11 @@ namespace Qbit {
 	{
 		if (Project::Load(path))
 		{
-			//ScriptEngine::Init();
+			ScriptEngine::Init();
 
 			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
 			OpenScene(startScenePath);
+			auto curr = std::filesystem::current_path();
 			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
 
 		}
@@ -640,7 +692,7 @@ namespace Qbit {
 			auto& config = proj->GetConfig();
 			config.Name = name;
 
-			std::filesystem::remove(std::filesystem::current_path() / "Untitled/");
+			//std::filesystem::remove(std::filesystem::current_path() / "Untitled/");
 			Project::SaveActive(std::filesystem::current_path() / name / name);
 		}
 		

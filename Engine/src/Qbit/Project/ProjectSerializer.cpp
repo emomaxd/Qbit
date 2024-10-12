@@ -25,6 +25,7 @@ namespace Qbit {
 				out << YAML::Key << "StartScene" << YAML::Value << config.StartScene.string();
 				out << YAML::Key << "AssetDirectory" << YAML::Value << config.AssetDirectory.string();
 				out << YAML::Key << "ScriptModulePath" << YAML::Value << config.ScriptModulePath.string();
+				out << YAML::Key << "LibraryDirectory" << YAML::Value << config.LibraryDirectory.string();
 				out << YAML::EndMap; // Project
 			}
 			out << YAML::EndMap; // Root
@@ -59,6 +60,7 @@ namespace Qbit {
 		config.StartScene = projectNode["StartScene"].as<std::string>();
 		config.AssetDirectory = projectNode["AssetDirectory"].as<std::string>();
 		config.ScriptModulePath = projectNode["ScriptModulePath"].as<std::string>();
+		config.LibraryDirectory = projectNode["LibraryDirectory"].as<std::string>();
 		return true;
 	}
 

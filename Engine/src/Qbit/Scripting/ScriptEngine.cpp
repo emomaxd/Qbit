@@ -15,6 +15,7 @@
 #include "Qbit/Core/Application.h"
 #include "Qbit/Scene/Entity.h"
 #include "Qbit/Core/FileSystem.h"
+#include "Qbit/Project/Project.h"
 
 #include <unordered_map>
 
@@ -185,21 +186,40 @@ namespace Qbit {
 			s_Data->AssemblyReloadPending = true;
 
 			Application::Get().SubmitToMainThread([]()
-				{
-					s_Data->AppAssemblyFileWatcher.reset();
-					ScriptEngine::ReloadAssembly();
-				});
+			{
+				s_Data->AppAssemblyFileWatcher.reset();
+				ScriptEngine::ReloadAssembly();
+			});
 		}
 	}
 
 	void ScriptEngine::Init()
 	{
+		if (ScriptEngine::s_HasLoaded)
+		{
+			ScriptEngine::Shutdown();
+		}
+
 		s_Data = new ScriptEngineData();
 
 		InitMono();
 		ScriptGlue::RegisterFunctions();
-		LoadAssembly("Resources/Scripts/Qbit-ScriptCore.dll");
-		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/SandboxProject.dll");
+		std::filesystem::path dir = Project::GetLibraryDirectory() / "Qbit-ScriptCore.dll";
+		bool status = LoadAssembly(dir);
+		if (!status)
+		{
+			QB_CORE_ERROR("[ScriptEngine] Could not load Qbit-ScriptCore assembly.");
+			return;
+		}
+		
+		auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+		status = LoadAppAssembly(scriptModulePath);
+		if (!status)
+		{
+			QB_CORE_ERROR("[ScriptEngine] Could not load app assembly.");
+			return;
+		}
+		
 		LoadAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();
@@ -208,45 +228,52 @@ namespace Qbit {
 
 		s_Data->EntityClass = ScriptClass("Qbit", "Entity", true);
 
-		filewatch::FileWatch<std::string>* watch = new filewatch::FileWatch<std::string>(
-			
-			"SandboxProject/Assets/Scripts/Binaries",
-			
-			[](const std::string& path, const filewatch::Event change_type)
-			{
-				std::cout << path << std::endl;
-			}
-		);
-
+		ScriptEngine::s_HasLoaded = true;
 	}
 
 	void ScriptEngine::Shutdown()
 	{
 		ShutdownMono();
 		delete s_Data;
+		ScriptEngine::s_HasLoaded = false;
 	}
 
-	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppDomain = mono_domain_create_appdomain("QbitScriptRuntime", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 
 		s_Data->CoreAssemblyFilepath = filepath;
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+		if (s_Data->CoreAssembly == nullptr)
+			return false;
 
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 
+		return true;
 	}
 
-	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+	void ScriptEngine::SetupFileWatch(const std::filesystem::path& filepath)
+	{
+		auto& path = filepath.parent_path();
+		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>((path).string(), std::regex(".*\\.dll"),
+			OnAppAssemblyFileSystemEvent);
+	}
+
+	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppAssemblyFilepath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+		SetupFileWatch(filepath);
+
+		if (s_Data->AppAssembly == nullptr)
+			return false;
 
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 
-		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
 		s_Data->AssemblyReloadPending = false;
+		
+		return true;
 	}
 
 	void ScriptEngine::ReloadAssembly()

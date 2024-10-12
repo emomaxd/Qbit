@@ -14,7 +14,9 @@ namespace Qbit {
 		std::filesystem::path StartScene;
 
 		std::filesystem::path AssetDirectory;
-		std::filesystem::path ScriptModulePath;
+		std::filesystem::path ScriptModulePath; /* App assembly */
+
+		std::filesystem::path LibraryDirectory; /* Core C# libraries */
 	};
 
 	class Project
@@ -22,20 +24,26 @@ namespace Qbit {
 	public:
 		static const std::filesystem::path& GetProjectDirectory()
 		{
-			//QB_CORE_ASSERT(s_ActiveProject);
+			QB_CORE_ASSERT(s_ActiveProject);
 			return s_ActiveProject->m_ProjectDirectory;
 		}
 
 		static std::filesystem::path GetAssetDirectory()
 		{
-			//QB_CORE_ASSERT(s_ActiveProject);
+			QB_CORE_ASSERT(s_ActiveProject);
 			return GetProjectDirectory() / s_ActiveProject->m_Config.AssetDirectory;
 		}
 
 		static std::filesystem::path GetAssetFileSystemPath(const std::filesystem::path& path)
 		{
-			//QB_CORE_ASSERT(s_ActiveProject);
+			QB_CORE_ASSERT(s_ActiveProject);
 			return GetAssetDirectory() / path;
+		}
+
+		static std::filesystem::path GetLibraryDirectory()
+		{
+			QB_CORE_ASSERT(s_ActiveProject);
+			return GetProjectDirectory() / s_ActiveProject->m_Config.LibraryDirectory;
 		}
 
 		ProjectConfig& GetConfig() { return m_Config; }
@@ -46,6 +54,7 @@ namespace Qbit {
 		static Ref<Project> Load(const std::filesystem::path& path);
 		static bool SaveActive(const std::filesystem::path& path);
 		void SetProjectDirectory(const std::filesystem::path& path);
+
 	private:
 		ProjectConfig m_Config;
 		std::filesystem::path m_ProjectDirectory;
