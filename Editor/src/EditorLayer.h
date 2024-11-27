@@ -79,6 +79,8 @@ namespace Qbit {
 
 		bool m_ShowPhysicsColliders = false;
 
+		bool m_ShowPopup = false;
+
 		enum class SceneState
 		{
 			Edit = 0, Play = 1, Simulate = 2

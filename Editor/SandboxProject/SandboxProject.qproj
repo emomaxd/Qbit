@@ -1,0 +1,6 @@
+Project:
+  Name: SandboxProject
+  StartScene: C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Editor\SandboxProject\Assets\Scenes\Physics2D.qbit
+  AssetDirectory: Assets
+  ScriptModulePath: C:\Users\emomaxd\Desktop\CODE\CP\Qbit\Editor\SandboxProject\Library\SandboxProject.dll
+  LibraryDirectory: Library

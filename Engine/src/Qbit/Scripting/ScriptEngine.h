@@ -144,8 +144,8 @@ namespace Qbit {
 		static void Init();
 		static void Shutdown();
 
-		static void LoadAssembly(const std::filesystem::path& filepath);
-		static void LoadAppAssembly(const std::filesystem::path& filepath);
+		static bool LoadAssembly(const std::filesystem::path& filepath);
+		static bool LoadAppAssembly(const std::filesystem::path& filepath);
 
 		static void ReloadAssembly();
 
@@ -173,11 +173,16 @@ namespace Qbit {
 		static void InitMono();
 		static void ShutdownMono();
 
+		static void SetupFileWatch(const std::filesystem::path& filepath);
+
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
 		static void LoadAssemblyClasses();
 
 		friend class ScriptClass;
 		friend class ScriptGlue;
+
+	private:
+		static inline bool s_HasLoaded = false;
 	};
 
 
