@@ -10,6 +10,8 @@
 
 #include "Qbit/Project/Project.h"
 
+#include "Qbit/Renderer/Font.h"
+
 #include "ImGuizmo.h"
 #include <gtc/type_ptr.hpp>
 
@@ -20,6 +22,7 @@ namespace Qbit {
 	EditorLayer::EditorLayer()
 		: Layer("EditorLayer"), m_CameraController(1600.0f / 900.0f)
 	{
+		Font font("assets/fonts/opensans/OpenSans-Bold.ttf");
 	}
 
 	void EditorLayer::OnAttach()

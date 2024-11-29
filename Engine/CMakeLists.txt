@@ -8,6 +8,7 @@ set(YAML_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/yaml-cpp")
 set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
 set(BOX2D_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/Box2D")
 set(MONO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/mono")
+set(MSDF_ATLAS_GEN_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/msdf-atlas-gen")
 
 file(GLOB_RECURSE ENGINE_SRC
     "${CMAKE_SOURCE_DIR}/Engine/src/*.cpp"
@@ -57,6 +58,9 @@ target_include_directories(Engine PRIVATE
     ${IMGUIZMO_DIR}
     ${BOX2D_DIR}/include
     ${MONO_DIR}/include
+    ${MSDF_ATLAS_GEN_DIR}/include
+    ${MSDF_ATLAS_GEN_DIR}/msdf-atlas-gen
+    ${MSDF_ATLAS_GEN_DIR}/msdfgen
 )
 
 target_compile_definitions(Engine PRIVATE 
@@ -73,6 +77,9 @@ if(WIN32)
     target_compile_definitions(Engine PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
     target_link_directories(Engine PRIVATE 
+
+        ${MSDF_ATLAS_GEN_DIR}
+
         $<$<CONFIG:Debug>:${GLFW_DIR}/build/src/Debug>
         $<$<CONFIG:Release>:${GLFW_DIR}/build/src/Release>
         
@@ -93,6 +100,18 @@ if(WIN32)
         opengl32 gdi32 winmm
 
         glew32s
+        
+        freetype
+        libpng16
+
+        $<$<CONFIG:Debug>:msdfgen-cored>
+        $<$<CONFIG:Release>:msdfgen-core>
+
+        $<$<CONFIG:Debug>:msdfgen-extd>
+        $<$<CONFIG:Release>:msdfgen-ext>
+
+        $<$<CONFIG:Debug>:msdf-atlas-gend>
+        $<$<CONFIG:Release>:msdf-atlas-gen>
 
         $<$<CONFIG:Debug>:glfw3>
         $<$<CONFIG:Release>:glfw3>

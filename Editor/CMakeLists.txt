@@ -8,6 +8,7 @@ set(GLM_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glm")
 set(ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/assimp")
 set(IMGUIZMO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/ImGuizmo")
 set(MONO_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/mono")
+set(MSDF_ATLAS_GEN_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/msdf-atlas-gen")
 
 file(GLOB_RECURSE CORE_SOURCES "*.cpp" "*.cxx" "*.cc" "*.hpp" "*.h")
 
@@ -29,6 +30,9 @@ target_include_directories(Editor PRIVATE
     ${ASSIMP_DIR}/build/include
     ${IMGUIZMO_DIR}
     ${MONO_DIR}/include
+    ${MSDF_ATLAS_GEN_DIR}/include
+    ${MSDF_ATLAS_GEN_DIR}/msdf-atlas-gen
+    ${MSDF_ATLAS_GEN_DIR}/msdfgen
 )
 
 target_compile_definitions(Editor PRIVATE 
@@ -46,6 +50,9 @@ if(WIN32)
     target_compile_definitions(Editor PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
     target_link_directories(Editor PRIVATE 
+
+        ${MSDF_ATLAS_GEN_DIR}
+
         $<$<CONFIG:Debug>:${GLFW_DIR}/build/src/Debug>
         $<$<CONFIG:Release>:${GLFW_DIR}/build/src/Release>
 
@@ -72,7 +79,18 @@ if(WIN32)
         Winmm 
         Version 
         Bcrypt 
+        freetype
+        libpng16
         Engine 
+
+        $<$<CONFIG:Debug>:msdfgen-cored>
+        $<$<CONFIG:Release>:msdfgen-core>
+
+        $<$<CONFIG:Debug>:msdfgen-extd>
+        $<$<CONFIG:Release>:msdfgen-ext>
+
+        $<$<CONFIG:Debug>:msdf-atlas-gend>
+        $<$<CONFIG:Release>:msdf-atlas-gen>
 
         glew32s
         $<$<CONFIG:Debug>:glfw3>
