@@ -23,9 +23,9 @@ namespace Qbit {
         QB_CORE_ASSERT(err == GLEW_OK, "Failed to initialize GLEW!");
         
         QB_CORE_INFO("OpenGL Info:");
-        QB_CORE_INFO("  Vendor: {0}", *glGetString(GL_VENDOR));
-        QB_CORE_INFO("  Renderer: {0}",*glGetString(GL_RENDERER));
-        QB_CORE_INFO("  Version: {0}", *glGetString(GL_VERSION));
+        QB_CORE_INFO("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));
+        QB_CORE_INFO("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
+        QB_CORE_INFO("  Version: {0}", (const char*)glGetString(GL_VERSION));
 
         QB_CORE_ASSERT(GLEW_VERSION_4_5, "Qbit requires at least OpenGL version 4.5!");
     }

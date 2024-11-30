@@ -32,6 +32,14 @@ namespace Qbit {
         }
 	}
 
+    Font::~Font()
+    {
 
+    }
+
+    Ref<Font> Font::GetDefault()
+    {
+        return Ref<Font>();
+    }
 
 }

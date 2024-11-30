@@ -332,8 +332,12 @@ namespace Qbit {
 
 	void ScriptEngine::ShutdownMono()
 	{
-		mono_domain_set(mono_get_root_domain(), false);
-
+		MonoDomain* root = mono_get_root_domain();
+		if (!root) return; /* If root is nullptr, then mono never been initialized */
+		
+		QB_CORE_ASSERT(root);
+		mono_domain_set(root, false);
+		
 		mono_domain_unload(s_Data->AppDomain);
 		s_Data->AppDomain = nullptr;
 
