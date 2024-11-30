@@ -103,6 +103,7 @@ if(WIN32)
         
         freetype
         libpng16
+        skia.dll.lib
 
         $<$<CONFIG:Debug>:msdfgen-cored>
         $<$<CONFIG:Release>:msdfgen-core>

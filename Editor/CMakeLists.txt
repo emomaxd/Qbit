@@ -79,8 +79,11 @@ if(WIN32)
         Winmm 
         Version 
         Bcrypt 
+
+        skia.dll.lib
         freetype
         libpng16
+        
         Engine 
 
         $<$<CONFIG:Debug>:msdfgen-cored>
