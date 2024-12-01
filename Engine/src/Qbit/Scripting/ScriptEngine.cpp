@@ -212,7 +212,7 @@ namespace Qbit {
 			return;
 		}
 		
-		auto scriptModulePath = Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath;
+		auto scriptModulePath = Project::GetName() / Project::GetActive()->GetConfig().ScriptModulePath;
 		status = LoadAppAssembly(scriptModulePath);
 		if (!status)
 		{
@@ -255,7 +255,7 @@ namespace Qbit {
 
 	void ScriptEngine::SetupFileWatch(const std::filesystem::path& filepath)
 	{
-		auto& path = filepath.parent_path();
+		auto& path = std::filesystem::absolute(filepath.parent_path());
 		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>((path).string(), std::regex(".*\\.dll"),
 			OnAppAssemblyFileSystemEvent);
 	}

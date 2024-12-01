@@ -22,6 +22,13 @@ namespace Qbit {
 	class Project
 	{
 	public:
+
+		static const std::string GetName()
+		{
+			QB_CORE_ASSERT(s_ActiveProject);
+			return s_ActiveProject->m_Config.Name;
+		}
+
 		static const std::filesystem::path& GetProjectDirectory()
 		{
 			QB_CORE_ASSERT(s_ActiveProject);
