@@ -56,11 +56,11 @@ namespace Qbit {
         file << "using System;\n";
         file << "using Qbit;\n\n";
         file << "namespace " << namespaceName << "\n{\n";
-        file << "    class " << className << ": Entity\n{\n";
+        file << "    class " << className << ": Entity\n    {\n";
         file << "        public void OnCreate()\n        {\n";
         file << "            Console.WriteLine(\"OnCreate runs once when the game has started!\");\n        }\n\n";
         file << "        public void OnUpdate(float ts)\n        {\n";
-        file << "            Console.WriteLine(\"OnUpdate runs in each frame.\");\n }\n";
+        file << "            Console.WriteLine(\"OnUpdate runs in each frame.\");\n        }\n";
         file << "    }\n}\n";
 
         file.close();

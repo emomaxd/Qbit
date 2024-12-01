@@ -10,6 +10,8 @@
 
 #include "Qbit/Project/Project.h"
 
+#include "Qbit/Renderer/Font.h"
+
 #include "ImGuizmo.h"
 #include <gtc/type_ptr.hpp>
 
@@ -603,8 +605,10 @@ namespace Qbit {
 		ProjectConfig config;
 		config.Name = projectName.string();
 		config.AssetDirectory = "Assets";
-		config.StartScene = projectDir / "Assets" / "Scenes" / (projectName.filename().string() + ".qbit");
-		config.ScriptModulePath = projectDir / "Library" / (projectName.filename().string() + ".dll");
+		config.StartScene = (projectName.filename().string() + ".qbit");
+		//config.StartScene = projectDir / "Assets" / "Scenes" / (projectName.filename().string() + ".qbit");
+		config.ScriptModulePath = std::filesystem::path("Library") / (projectName.filename().string() + ".dll");
+		//config.ScriptModulePath = projectDir / "Library" / (projectName.filename().string() + ".dll");
 		config.LibraryDirectory = "Library";
 
 		// Create necessary folders
@@ -645,7 +649,7 @@ namespace Qbit {
 
 
 			SceneSerializer serializer(newScene);
-			auto& scenePath = (assetsDir / config.StartScene);
+			auto& scenePath = (assetsDir / "Scenes" / config.StartScene);
 			serializer.Serialize(scenePath.string());
 
 
@@ -674,7 +678,7 @@ namespace Qbit {
 		{
 			ScriptEngine::Init();
 
-			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+			auto startScenePath = Project::GetAssetFileSystemPath("Scenes" / Project::GetActive()->GetConfig().StartScene);
 			OpenScene(startScenePath);
 			auto curr = std::filesystem::current_path();
 			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();

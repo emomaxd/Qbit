@@ -2,7 +2,13 @@
 *.exe
 *.o
 *.out
-*.pdb
+
+build/
+
+# 
+Editor/*.dll
+Editor/*.pdb
+#
 
 # CMAKE BUILD FILES
 **/CMakeFiles

@@ -376,9 +376,12 @@ namespace Qbit {
 
 	void SceneSerializer::Serialize(const std::string& filepath)
 	{
+		std::filesystem::path path = filepath;
+		std::string filename = path.stem().string();
+
 		YAML::Emitter out;
 		out << YAML::BeginMap;
-		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+		out << YAML::Key << "Scene" << YAML::Value << filename;
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
 		for (auto entity : m_Scene->m_Registry.view<entt::entity>())
