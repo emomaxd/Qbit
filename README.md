@@ -7,7 +7,7 @@ Qbit is a lightweight game engine designed for learning purposes. It's built wit
 ### Windows:
 
 1. Run `Setup.bat` to build 3rd party libraries.
-2. Run `CreateSolution.bat` to generate the Visual Studio Solution.
+2. Run `CreateSolution.bat` or `CreateSolutionBuild.bat` to generate the Visual Studio Solution in root(1) or build(2) directory.
 3. After running the script:
     - Open `Qbit.sln`
     - Run the project.

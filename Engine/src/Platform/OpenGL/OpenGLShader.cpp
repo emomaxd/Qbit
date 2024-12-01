@@ -2,6 +2,7 @@
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include "Qbit/Core/Log.h"
+#include <Qbit/Debug/Instrumentor.h>
 
 namespace Qbit {
 
