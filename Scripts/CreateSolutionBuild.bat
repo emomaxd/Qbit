@@ -13,18 +13,22 @@ set SOURCE_DIR=%CD%\Editor
 set DEST_DIR=%CD%\build\Editor
 
 rem Debugging: Print the source and destination directories
-echo Source Directory: %SOURCE_DIR%\bin
+echo Source Directory: %SOURCE_DIR%
 echo Destination Directory: %DEST_DIR%
 
 rem Check if the destination directory exists, create it if not
 if not exist "%DEST_DIR%" (
     mkdir "%DEST_DIR%"
+    mkdir "%DEST_DIR%\mono"
+    mkdir "%DEST_DIR%\Resources"
+    mkdir "%DEST_DIR%\assets"
+    mkdir "%DEST_DIR%\bin"
 )
 
 rem Copy .dll and .pdb files from Editor\bin to build\Editor
 echo Copying .dll and .pdb files...
-xcopy /s /y /d "%SOURCE_DIR%\bin\*.dll" "%DEST_DIR%\"
-xcopy /s /y /d "%SOURCE_DIR%\bin\*.pdb" "%DEST_DIR%\"
+xcopy /s /y /d "%SOURCE_DIR%\bin\*.dll" "%DEST_DIR%\bin\"
+xcopy /s /y /d "%SOURCE_DIR%\bin\*.pdb" "%DEST_DIR%\bin\"
 
 rem Copy the assets directory from Editor to build\Editor
 echo Copying assets directory...
@@ -40,11 +44,10 @@ xcopy /s /y "%SOURCE_DIR%\mono" "%DEST_DIR%\mono"
 
 rem Copy the imgui.ini file from Editor to build\Editor
 echo Copying imgui.ini file...
-xcopy /y "%SOURCE_DIR%\imgui.ini" "%DEST_DIR%\imgui.ini"
+echo F|xcopy /F /y "%SOURCE_DIR%\imgui.ini" "%DEST_DIR%\imgui.ini"
 
 rem End of copy operations
 echo File copy operation completed.
-pause
 
 :: Change to the build directory
 cd build
