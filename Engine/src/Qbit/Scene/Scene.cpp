@@ -263,7 +263,7 @@ namespace Qbit {
 				{
 					auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
-					//Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+					Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
 				}
 			}
 
@@ -367,7 +367,7 @@ namespace Qbit {
 
 	Entity Scene::GetEntityByUUID(UUID uuid)
 	{
-		// TODO(Yan): Maybe should be assert
+		// TODO: Maybe should be assert
 		if (m_EntityMap.find(uuid) != m_EntityMap.end())
 			return { m_EntityMap.at(uuid), this };
 
@@ -468,7 +468,7 @@ namespace Qbit {
 			{
 				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
-				//Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+				Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
 			}
 		}
 
