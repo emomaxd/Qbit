@@ -1,5 +1,3 @@
-project(Editor)
-
 # Vendor directories
 set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")
@@ -13,6 +11,13 @@ set(MSDF_ATLAS_GEN_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/msdf-atlas-gen")
 
 # Gather all source files
 file(GLOB_RECURSE CORE_SOURCES "*.cpp" "*.cxx" "*.cc" "*.hpp" "*.h")
+
+# Find the Vulkan SDK
+find_package(Vulkan REQUIRED)
+get_filename_component(VULKAN_LIB_DIR ${Vulkan_LIBRARIES} DIRECTORY)
+
+# Add Vulkan include directories
+include_directories(${Vulkan_INCLUDE_DIRS})
 
 # Group files based on folder structure
 foreach(FILE ${CORE_SOURCES})
@@ -61,6 +66,14 @@ target_compile_definitions(Editor PRIVATE
     GLEW_STATIC
     YAML_CPP_STATIC_DEFINE
     _CRT_SECURE_NO_WARNINGS
+    $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>  # Debug mode
+    $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0> # Release mode
+)
+
+# Set runtime library to avoid mismatches (MD for Release, MDd for Debug)
+target_compile_options(Editor PRIVATE 
+    $<$<CONFIG:Debug>:/MDd>   # Debug mode: Multi-threaded Debug DLL
+    $<$<CONFIG:Release>:/MD>   # Release mode: Multi-threaded DLL
 )
 
 # Link options
@@ -83,6 +96,7 @@ if(WIN32)
         $<$<CONFIG:Release>:${GLEW_DIR}/Windows/lib/Release/x64>
         $<$<CONFIG:Release>:${MONO_DIR}/lib/Release>
         $<$<CONFIG:Debug>:${MONO_DIR}/lib/Debug>
+        ${VULKAN_LIB_DIR}
     )
 
     target_link_libraries(Editor PRIVATE 
@@ -96,6 +110,33 @@ if(WIN32)
         skia.dll.lib
         freetype
         libpng16
+        
+        vulkan-1
+        
+        # SPIRV-Tools Debug and Release libraries
+        $<$<CONFIG:Debug>:SPIRV-Toolsd>
+        $<$<CONFIG:Release>:SPIRV-Tools>
+        $<$<CONFIG:Debug>:SPIRV-Tools-optd>
+        $<$<CONFIG:Release>:SPIRV-Tools-opt>
+        $<$<CONFIG:Debug>:SPIRV>
+        $<$<CONFIG:Release>:SPIRV>
+        
+        # SPIRV-Cross Debug and Release libraries
+        $<$<CONFIG:Debug>:spirv-cross-cored>
+        $<$<CONFIG:Release>:spirv-cross-core>
+        $<$<CONFIG:Debug>:spirv-cross-glsld>
+        $<$<CONFIG:Release>:spirv-cross-glsl>
+        
+        # GLSLang Debug and Release libraries
+        $<$<CONFIG:Debug>:glslangd>
+        $<$<CONFIG:Release>:glslang>
+
+        # ShaderC Debug and Release libraries
+        $<$<CONFIG:Debug>:shadercd>
+        $<$<CONFIG:Release>:shaderc>
+        $<$<CONFIG:Debug>:shaderc_utild>
+        $<$<CONFIG:Release>:shaderc_util>
+
         Engine 
         $<$<CONFIG:Debug>:msdfgen-cored>
         $<$<CONFIG:Release>:msdfgen-core>

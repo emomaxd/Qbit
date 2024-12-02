@@ -5,6 +5,8 @@
 
 build/
 
+Editor/assets/cache
+
 # 
 Editor/*.dll
 Editor/*.pdb

@@ -1,0 +1,14 @@
+Scene: q
+Entities:
+  - Entity: 15444960785775966423
+    TagComponent:
+      Tag: Text
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    TextComponent:
+      TextString: Sample Text!
+      Color: [1, 1, 1, 1]
+      Kerning: 0
+      LineSpacing: 0

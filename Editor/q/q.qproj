@@ -1,0 +1,6 @@
+Project:
+  Name: q
+  StartScene: q.qbit
+  AssetDirectory: Assets
+  ScriptModulePath: Library\q.dll
+  LibraryDirectory: Library

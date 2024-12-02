@@ -50,6 +50,16 @@ add_library(Engine
     ${BOX2D_SRC}
 )
 
+# Find the Vulkan SDK
+find_package(Vulkan REQUIRED)
+get_filename_component(VULKAN_LIB_DIR ${Vulkan_LIBRARIES} DIRECTORY)
+
+# Optionally, print out the Vulkan library directory for debugging purposes
+# message(STATUS "Vulkan library directory: ${VULKAN_LIB_DIR}")
+
+# Add Vulkan include directories
+include_directories(${Vulkan_INCLUDE_DIRS})
+
 # Automatically group files into logical folders in Visual Studio
 foreach(FILE ${ENGINE_SRC} ${IMGUI_SRC} ${YAML_SRC} ${IMGUIZMO_SRC} ${BOX2D_SRC})
     # Get the relative path from the root source directory
@@ -116,6 +126,7 @@ if(WIN32)
         $<$<CONFIG:Release>:${ASSIMP_DIR}/contrib/zlib/Release>
         $<$<CONFIG:Debug>:${MONO_DIR}/lib/Debug>
         $<$<CONFIG:Release>:${MONO_DIR}/lib/Release>
+        ${VULKAN_LIB_DIR}
     )
 
     target_link_libraries(Engine PRIVATE 
@@ -124,6 +135,33 @@ if(WIN32)
         freetype
         libpng16
         skia.dll.lib
+        
+        vulkan-1
+        
+        # SPIRV-Tools Debug and Release libraries
+        $<$<CONFIG:Debug>:SPIRV-Toolsd>
+        $<$<CONFIG:Release>:SPIRV-Tools>
+        $<$<CONFIG:Debug>:SPIRV-Tools-optd>
+        $<$<CONFIG:Release>:SPIRV-Tools-opt>
+        $<$<CONFIG:Debug>:SPIRV>
+        $<$<CONFIG:Release>:SPIRV>
+        
+        # SPIRV-Cross Debug and Release libraries
+        $<$<CONFIG:Debug>:spirv-cross-cored>
+        $<$<CONFIG:Release>:spirv-cross-core>
+        $<$<CONFIG:Debug>:spirv-cross-glsld>
+        $<$<CONFIG:Release>:spirv-cross-glsl>
+        
+        # GLSLang Debug and Release libraries
+        $<$<CONFIG:Debug>:glslangd>
+        $<$<CONFIG:Release>:glslang>
+
+        # ShaderC Debug and Release libraries
+        $<$<CONFIG:Debug>:shadercd>
+        $<$<CONFIG:Release>:shaderc>
+        $<$<CONFIG:Debug>:shaderc_utild>
+        $<$<CONFIG:Release>:shaderc_util>
+
         $<$<CONFIG:Debug>:msdfgen-cored>
         $<$<CONFIG:Release>:msdfgen-core>
         $<$<CONFIG:Debug>:msdfgen-extd>
