@@ -5,6 +5,7 @@
 namespace Qbit {
 
 	Scope<Renderer::SceneData> Renderer::s_SceneData = CreateScope<Renderer::SceneData>();
+	Ref<ShaderLibrary> Renderer::s_ShaderLibrary = CreateRef<ShaderLibrary>();
 
 	void Renderer::Init()
 	{

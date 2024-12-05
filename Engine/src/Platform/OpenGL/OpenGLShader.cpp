@@ -53,7 +53,7 @@ namespace Qbit {
 		static const char* GetCacheDirectory()
 		{
 			// TODO: make sure the assets directory is valid
-			return "assets/cache/shader/opengl";
+			return "assets/cache/shader";
 		}
 
 		static void CreateCacheDirectoryIfNeeded()
@@ -202,7 +202,7 @@ namespace Qbit {
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
+		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory() + std::string("/vulkan");
 
 		auto& shaderData = m_VulkanSPIRV;
 		shaderData.clear();
@@ -259,7 +259,7 @@ namespace Qbit {
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
+		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory() + std::string("/opengl");
 
 		shaderData.clear();
 		m_OpenGLSourceCode.clear();

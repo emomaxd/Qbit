@@ -60,6 +60,9 @@ namespace Qbit {
 			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
+			if (Renderer::GetAPI() == RendererAPI::API::Vulkan)
+				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // We are using Vulkan
+
 			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 			++s_GLFWWindowCount;
 		}
@@ -184,9 +187,9 @@ namespace Qbit {
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		QB_PROFILE_FUNCTION();
-		if (enabled)
+		if (enabled && Renderer::GetAPI() == RendererAPI::API::OpenGL)
 			glfwSwapInterval(1);
-		else
+		else if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 			glfwSwapInterval(0);
 
 		m_Data.VSync = enabled;

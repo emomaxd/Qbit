@@ -1,4 +1,6 @@
 #include "qbpch.h"
+
+#include "Qbit/Renderer/Renderer.h"
 #include "Qbit/Renderer/Renderer2D.h"
 
 #include "Qbit/Renderer/VertexArray.h"
@@ -10,6 +12,9 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <Platform/Vulkan/VulkanShader.h>
+#include <Platform/OpenGL/OpenGLShader.h>
 
 
 namespace Qbit {
@@ -128,7 +133,8 @@ namespace Qbit {
 	void Renderer2D::Init()
 	{
 		QB_PROFILE_FUNCTION();
-
+		VulkanShader shader("assets/shaders/Renderer2D_Quad.glsl");
+		//OpenGLShader shader("assets/shaders/VulkanTest.glsl");
 		s_Data.QuadVertexArray = VertexArray::Create();
 
 		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
@@ -218,6 +224,12 @@ namespace Qbit {
 		s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
 		s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
 		s_Data.TextShader = Shader::Create("assets/shaders/Renderer2D_Text.glsl");
+
+		Ref<ShaderLibrary> shaderLibrary = Renderer::GetShaderLibrary();
+		shaderLibrary->Add(s_Data.QuadShader);
+		shaderLibrary->Add(s_Data.CircleShader);
+		shaderLibrary->Add(s_Data.LineShader);
+		shaderLibrary->Add(s_Data.TextShader);
 
 		// Set first texture slot to 0
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;

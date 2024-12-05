@@ -3,7 +3,7 @@
 #include "Qbit/Core/Window.h"
 #include "Qbit/Renderer/GraphicsContext.h"
 
-#include <GL/glew.h>
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 namespace Qbit {
@@ -25,6 +25,7 @@ namespace Qbit {
 		bool IsVSync() const override;
 
 		virtual void* GetNativeWindow() const { return m_Window; }
+		virtual GraphicsContext& GetGraphicsContext() { return *m_Context; }
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
@@ -35,8 +36,8 @@ namespace Qbit {
 		struct WindowData
 		{
 			std::string Title;
-			unsigned int Width, Height;
-			bool VSync;
+			unsigned int Width = 0, Height = 0;
+			bool VSync = false;
 
 			EventCallbackFn EventCallback;
 		};

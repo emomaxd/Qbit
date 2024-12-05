@@ -3,6 +3,7 @@
 #include "Qbit/Core/Base.h"
 #include "Qbit/Events/Event.h"
 #include "qbpch.h"
+#include <Qbit/Renderer/GraphicsContext.h>
 
 namespace Qbit {
 
@@ -41,6 +42,7 @@ namespace Qbit {
 		virtual bool IsVSync() const = 0;
 
 		virtual void* GetNativeWindow() const = 0;
+		virtual GraphicsContext& GetGraphicsContext() = 0;
 
 		static Scope<Window> Create(const WindowProps& props = WindowProps());
 	};
