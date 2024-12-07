@@ -7,6 +7,9 @@ build/
 
 Editor/assets/cache
 
+*/RelWithDebInfo/
+*/MinSizeRel/
+
 # 
 Editor/*.dll
 Editor/*.pdb

@@ -6,6 +6,8 @@
 
 #include "Platform/Vulkan/VulkanShader.h"
 
+#include "Qbit/Events/Event.h"
+
 #include <iostream>
 #include <vector>
 
@@ -132,29 +134,22 @@ namespace Qbit {
     VulkanContext::~VulkanContext()
     {
 
-        vkDestroySemaphore(m_Device, m_ImageAvailableSemaphore, nullptr);
-        vkDestroySemaphore(m_Device, m_RenderFinishedSemaphore, nullptr);
-        vkDestroyFence(m_Device, m_InFlightFence, nullptr);
+        CleanupSwapChain();
+
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            vkDestroySemaphore(m_Device, m_RenderFinishedSemaphores[i], nullptr);
+            vkDestroySemaphore(m_Device, m_ImageAvailableSemaphores[i], nullptr);
+            vkDestroyFence(m_Device, m_InFlightFences[i], nullptr);
+        }
 
         vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
-
-        for (auto framebuffer : m_SwapChainFramebuffers)
-        {
-            vkDestroyFramebuffer(m_Device, framebuffer, nullptr);
-        }
 
         vkDestroyPipeline(m_Device, m_GraphicsPipeline, nullptr);
 
         vkDestroyPipelineLayout(m_Device, m_PipelineLayout, nullptr);
 
         vkDestroyRenderPass(m_Device, m_RenderPass, nullptr);
-
-        for (auto imageView : m_SwapChainImageViews)
-        {
-            vkDestroyImageView(m_Device, imageView, nullptr);
-        }
-
-        vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
 
         vkDestroyDevice(m_Device, nullptr);
 
@@ -590,24 +585,10 @@ namespace Qbit {
         inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-        // Viewport & scissor data
-        m_Viewport.x = 0.0f;
-        m_Viewport.y = 0.0f;
-        m_Viewport.width = (float)m_SwapChainExtent.width;
-        m_Viewport.height = (float)m_SwapChainExtent.height;
-        m_Viewport.minDepth = 0.0f;
-        m_Viewport.maxDepth = 1.0f;
-        
-        m_Scissor.offset = { 0, 0 };
-        m_Scissor.extent = m_SwapChainExtent;
-
-        // ViewportInfo
         VkPipelineViewportStateCreateInfo viewportState{};
         viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         viewportState.viewportCount = 1;
-        viewportState.pViewports = &m_Viewport;
         viewportState.scissorCount = 1;
-        viewportState.pScissors = &m_Scissor;
 
         // Rasterizer
         VkPipelineRasterizationStateCreateInfo rasterizer{};
@@ -745,13 +726,19 @@ namespace Qbit {
             QB_CORE_ASSERT(false);
         }
 
+
+        /* =======================================================*/
+
+        /* COMMAND BUFFERS */
+        m_CommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = m_CommandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
+        allocInfo.commandBufferCount = (uint32_t)m_CommandBuffers.size();
 
-        if (vkAllocateCommandBuffers(m_Device, &allocInfo, &m_CommandBuffer) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(m_Device, &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS)
         {
             QB_CORE_ERROR("Failed to allocate command buffers!");
             QB_CORE_ASSERT(false);
@@ -763,7 +750,7 @@ namespace Qbit {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(m_CommandBuffer, &beginInfo) != VK_SUCCESS)
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
         {
             QB_CORE_ERROR("Failed to begin recording command buffer!");
             QB_CORE_ASSERT(false);
@@ -811,6 +798,12 @@ namespace Qbit {
 
     void VulkanContext::CreateSemaphores()
     {
+        /* CREATES SYNC OBJECTS */
+
+        m_ImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        m_RenderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        m_InFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -818,43 +811,59 @@ namespace Qbit {
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        if(vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
-            vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS ||
-            vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFence) != VK_SUCCESS) {
-            QB_CORE_ERROR("Failed to create semaphores!");
-            QB_CORE_ASSERT(false);
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+            if (vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(m_Device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(m_Device, &fenceInfo, nullptr, &m_InFlightFences[i]) != VK_SUCCESS) {
+
+                QB_CORE_ERROR("Failed to create synchronization objects for a frame!");
+                QB_CORE_ASSERT(false);
+            }
         }
     }
 
     void VulkanContext::DrawFrame()
     {
-        vkWaitForFences(m_Device, 1, &m_InFlightFence, VK_TRUE, UINT64_MAX);
-        vkResetFences(m_Device, 1, &m_InFlightFence);
+        vkWaitForFences(m_Device, 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(m_Device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex);
 
-        vkResetCommandBuffer(m_CommandBuffer, 0);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            RecreateSwapChain();
+            return;
+        }
+        else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            QB_CORE_ERROR("Failed to acquire swap chain image!");
+            QB_CORE_ASSERT(false);
+        }
 
-        RecordCommandBuffer(m_CommandBuffer, imageIndex);
+        // Only reset the fence if we are submitting work
+        vkResetFences(m_Device, 1, &m_InFlightFences[m_CurrentFrame]);
+
+        vkResetCommandBuffer(m_CommandBuffers[m_CurrentFrame], 0);
+
+        RecordCommandBuffer(m_CommandBuffers[m_CurrentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore };
+        VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphores[m_CurrentFrame] };
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_CommandBuffer;
+        submitInfo.pCommandBuffers = &m_CommandBuffers[m_CurrentFrame];
 
-        VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore };
+        VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphores[m_CurrentFrame] };
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFence) != VK_SUCCESS)
+        if (vkQueueSubmit(m_GraphicsQueue, 1, &submitInfo, m_InFlightFences[m_CurrentFrame]) != VK_SUCCESS)
         {
             QB_CORE_ERROR("Failed to submit draw command buffer!");
             QB_CORE_ASSERT(false);
@@ -872,15 +881,62 @@ namespace Qbit {
         presentInfo.pImageIndices = &imageIndex;
         presentInfo.pResults = nullptr; // Optional
 
-        vkQueuePresentKHR(m_PresentQueue, &presentInfo);
+        result = vkQueuePresentKHR(m_PresentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_FramebufferResized)
+        {
+            RecreateSwapChain();
+        }
+        else if (result != VK_SUCCESS)
+        {
+            QB_CORE_ERROR("Failed to present swap chain image!");
+            QB_CORE_ASSERT(false);
+        }
+
+        m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
 #pragma endregion
 
-#pragma region SwapBuffers
+#pragma region OTHER
     void VulkanContext::SwapBuffers()
     {
         glfwSwapBuffers(m_WindowHandle);
+    }
+    void VulkanContext::RecreateSwapChain()
+    {
+        int width = 0, height = 0;
+        glfwGetFramebufferSize(m_WindowHandle, &width, &height);
+        while (width == 0 || height == 0)
+        {
+            glfwGetFramebufferSize(m_WindowHandle, &width, &height);
+            glfwWaitEvents();
+        }
+
+        vkDeviceWaitIdle(m_Device);
+
+        CleanupSwapChain();
+
+        CreateSwapChain();
+        CreateImageViews();
+        CreateFramebuffers();
+    }
+    void VulkanContext::CleanupSwapChain()
+    {
+        for (size_t i = 0; i < m_SwapChainFramebuffers.size(); i++) {
+            vkDestroyFramebuffer(m_Device, m_SwapChainFramebuffers[i], nullptr);
+        }
+
+        for (size_t i = 0; i < m_SwapChainImageViews.size(); i++) {
+            vkDestroyImageView(m_Device, m_SwapChainImageViews[i], nullptr);
+        }
+
+        vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
+    }
+
+    void VulkanContext::OnWindowResize(int width, int height)
+    {
+        m_FramebufferResized = true;
     }
 #pragma endregion
 

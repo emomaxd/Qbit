@@ -30,6 +30,14 @@ namespace Qbit {
         void Init();
         void SwapBuffers();
         VkDevice& GetDevice() { return m_Device; }
+        void RecreateSwapChain();
+        void SetResized(bool enable) { m_FramebufferResized = true; }
+
+    private:
+        void CleanupSwapChain();
+
+    private:
+        void OnWindowResize(int width, int height);
 
     private: /* Setup */
         void CreateInstance();
@@ -61,6 +69,7 @@ namespace Qbit {
 
     private:
         void DrawFrame(); // Tester function for early vulkan testing
+        
 
     private:
         GLFWwindow* m_WindowHandle;
@@ -81,9 +90,6 @@ namespace Qbit {
         VkExtent2D m_SwapChainExtent;
         std::vector<VkImageView> m_SwapChainImageViews;
 
-        VkViewport m_Viewport;
-        VkRect2D m_Scissor;
-
         VkRenderPass m_RenderPass;
         VkPipelineLayout m_PipelineLayout;
         VkPipeline m_GraphicsPipeline;
@@ -91,11 +97,11 @@ namespace Qbit {
         std::vector<VkFramebuffer> m_SwapChainFramebuffers;
 
         VkCommandPool m_CommandPool;
-        VkCommandBuffer m_CommandBuffer;
+        std::vector<VkCommandBuffer> m_CommandBuffers;
 
-        VkSemaphore m_ImageAvailableSemaphore;
-        VkSemaphore m_RenderFinishedSemaphore;
-        VkFence m_InFlightFence;
+        std::vector<VkSemaphore> m_ImageAvailableSemaphores;
+        std::vector<VkSemaphore> m_RenderFinishedSemaphores;
+        std::vector<VkFence> m_InFlightFences;
 
     private:
 #ifdef QB_DEBUG
@@ -103,6 +109,14 @@ namespace Qbit {
 #else
         const bool ENABLE_VALIDATION_LAYERS = false;
 #endif
+
+        const size_t MAX_FRAMES_IN_FLIGHT = 2;
+
+        uint32_t m_CurrentFrame = 0;
+
+        bool m_FramebufferResized = false;
+
+        const float ASPECT_RATIO = 1.778f;
 
         const std::vector<const char*> m_ValidationLayers =
         {

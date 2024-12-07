@@ -1,6 +1,9 @@
 #include "qbpch.h"
 
 #include "Platform/Vulkan/VulkanRendererAPI.h"
+#include "Platform/Vulkan/VulkanContext.h"
+
+#include "Qbit/Core/Application.h"
 
 namespace Qbit {
 
@@ -17,6 +20,8 @@ namespace Qbit {
 
 	void VulkanRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
+		VulkanContext& context = (VulkanContext&)Application::Get().GetWindow().GetGraphicsContext();
+		context.SetResized(true);
 	}
 
 	void VulkanRendererAPI::SetClearColor(const glm::vec4& color)
