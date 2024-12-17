@@ -4,6 +4,7 @@
 #include "Qbit/Renderer/Renderer.h"
 
 #include "Platform/OpenGL/OpenGLBuffer.h"
+#include "Platform/Vulkan/VulkanBuffer.h"
 
 namespace Qbit {
 

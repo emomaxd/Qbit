@@ -1,6 +1,8 @@
-# Qbit
+# Qbit [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/emomaxd/Qbit/blob/master/LICENSE)
 
-Qbit is a lightweight game engine designed for learning purposes. It's built with a mission to achieve high performance, modularity, readability, and memory safety. Qbit aims to provide a clear and structured codebase for understanding game engine development concepts.
+![Qbit](Embeds/qbit-logo.png?raw=true "Qbit")
+
+Qbit is a lightweight game engine. It's built with a mission to achieve high performance, modularity, readability, and memory safety. Qbit aims to provide a clear and structured codebase for understanding game engine development concepts.
 
 ## Dependencies
 
