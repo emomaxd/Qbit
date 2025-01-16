@@ -133,7 +133,7 @@ namespace Qbit {
 	void Renderer2D::Init()
 	{
 		QB_PROFILE_FUNCTION();
-		VulkanShader shader("assets/shaders/Renderer2D_Quad.glsl");
+		//VulkanShader shader("assets/shaders/VulkanTest.glsl");
 		//OpenGLShader shader("assets/shaders/VulkanTest.glsl");
 		s_Data.QuadVertexArray = VertexArray::Create();
 

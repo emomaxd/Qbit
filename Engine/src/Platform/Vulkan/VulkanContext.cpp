@@ -220,7 +220,7 @@ namespace Qbit {
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.pEngineName = "Qbit";
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        appInfo.apiVersion = VK_API_VERSION_1_2;
 
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -545,8 +545,9 @@ namespace Qbit {
 
     void VulkanContext::CreateGraphicsPipeline()
     {
-        auto vertShaderCode = Util::ReadFile("assets/cache/shader/vulkan/VulkanTest.glsl.cached_vulkan.vert");
-        auto fragShaderCode = Util::ReadFile("assets/cache/shader/vulkan/VulkanTest.glsl.cached_vulkan.frag");
+        // Initial modules
+        auto vertShaderCode = Util::ReadFile("assets/shaders/VulkanTest.glsl.cached_vulkan.vert");
+        auto fragShaderCode = Util::ReadFile("assets/shaders/VulkanTest.glsl.cached_vulkan.frag");
 
         VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);

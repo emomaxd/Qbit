@@ -3,6 +3,7 @@
 
 #include "Qbit/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
+#include "Platform/Vulkan/VulkanShader.h"
 
 namespace Qbit {
 
@@ -12,6 +13,7 @@ namespace Qbit {
 		{
 		case RendererAPI::API::None:    QB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
+		case RendererAPI::API::Vulkan:  return CreateRef<VulkanShader>(filepath);
 		}
 
 		QB_CORE_ASSERT(false, "Unknown RendererAPI!");
