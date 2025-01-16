@@ -29,6 +29,7 @@ namespace Qbit {
 
         void Init();
         void SwapBuffers();
+        VkPhysicalDevice& GetPhysicalDevice() { return m_PhysicalDevice; }
         VkDevice& GetDevice() { return m_Device; }
         void RecreateSwapChain();
         void SetResized(bool enable) { m_FramebufferResized = true; }

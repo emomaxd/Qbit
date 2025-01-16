@@ -2,6 +2,8 @@
 
 #include "Qbit/Renderer/Buffer.h"
 
+#include <vulkan/vulkan.h>
+
 namespace Qbit {
 
 	class VulkanVertexBuffer : public VertexBuffer
@@ -19,7 +21,9 @@ namespace Qbit {
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 	private:
-		uint32_t m_RendererID;
+		VkDevice m_Device;
+		VkBuffer m_VertexBuffer;
+		VkDeviceMemory m_VertexBufferMemory;
 		BufferLayout m_Layout;
 	};
 
