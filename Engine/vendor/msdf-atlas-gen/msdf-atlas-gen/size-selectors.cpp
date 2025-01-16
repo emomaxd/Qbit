@@ -15,7 +15,7 @@ SquareSizeSelector<MULTIPLE>::SquareSizeSelector(int minArea) : lowerBound(0), u
 template <int MULTIPLE>
 void SquareSizeSelector<MULTIPLE>::updateCurrent() {
     if (upperBound < 0)
-        current = 5*lowerBound/4+16/MULTIPLE+1;
+        current = 5*lowerBound/4+16/MULTIPLE;
     else
         current = lowerBound+(upperBound-lowerBound)/2;
 }
@@ -27,14 +27,14 @@ bool SquareSizeSelector<MULTIPLE>::operator()(int &width, int &height) const {
 }
 
 template <int MULTIPLE>
-SquareSizeSelector<MULTIPLE> &SquareSizeSelector<MULTIPLE>::operator++() {
+SquareSizeSelector<MULTIPLE> & SquareSizeSelector<MULTIPLE>::operator++() {
     lowerBound = current+1;
     updateCurrent();
     return *this;
 }
 
 template <int MULTIPLE>
-SquareSizeSelector<MULTIPLE> &SquareSizeSelector<MULTIPLE>::operator--() {
+SquareSizeSelector<MULTIPLE> & SquareSizeSelector<MULTIPLE>::operator--() {
     upperBound = current;
     updateCurrent();
     return *this;
@@ -54,12 +54,12 @@ bool SquarePowerOfTwoSizeSelector::operator()(int &width, int &height) const {
     return side > 0;
 }
 
-SquarePowerOfTwoSizeSelector &SquarePowerOfTwoSizeSelector::operator++() {
+SquarePowerOfTwoSizeSelector & SquarePowerOfTwoSizeSelector::operator++() {
     side <<= 1;
     return *this;
 }
 
-SquarePowerOfTwoSizeSelector &SquarePowerOfTwoSizeSelector::operator--() {
+SquarePowerOfTwoSizeSelector & SquarePowerOfTwoSizeSelector::operator--() {
     side = 0;
     return *this;
 }
@@ -74,7 +74,7 @@ bool PowerOfTwoSizeSelector::operator()(int &width, int &height) const {
     return w > 0 && h > 0;
 }
 
-PowerOfTwoSizeSelector &PowerOfTwoSizeSelector::operator++() {
+PowerOfTwoSizeSelector & PowerOfTwoSizeSelector::operator++() {
     if (w == h)
         w <<= 1;
     else
@@ -82,7 +82,7 @@ PowerOfTwoSizeSelector &PowerOfTwoSizeSelector::operator++() {
     return *this;
 }
 
-PowerOfTwoSizeSelector &PowerOfTwoSizeSelector::operator--() {
+PowerOfTwoSizeSelector & PowerOfTwoSizeSelector::operator--() {
     w = 0, h = 0;
     return *this;
 }

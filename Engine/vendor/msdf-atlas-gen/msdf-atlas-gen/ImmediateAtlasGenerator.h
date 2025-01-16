@@ -20,8 +20,6 @@ class ImmediateAtlasGenerator {
 public:
     ImmediateAtlasGenerator();
     ImmediateAtlasGenerator(int width, int height);
-    template <typename... ARGS>
-    ImmediateAtlasGenerator(int width, int height, ARGS... storageArgs);
     void generate(const GlyphGeometry *glyphs, int count);
     void rearrange(int width, int height, const Remap *remapping, int count);
     void resize(int width, int height);
@@ -30,9 +28,7 @@ public:
     /// Sets the number of threads to be run by generate
     void setThreadCount(int threadCount);
     /// Allows access to the underlying AtlasStorage
-    const AtlasStorage &atlasStorage() const;
-    /// Returns the layout of the contained glyphs as a list of GlyphBoxes
-    const std::vector<GlyphBox> &getLayout() const;
+    const AtlasStorage & atlasStorage() const;
 
 private:
     AtlasStorage storage;

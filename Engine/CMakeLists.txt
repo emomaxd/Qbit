@@ -41,6 +41,8 @@ file(GLOB BOX2D_SRC
     "${BOX2D_DIR}/include/*.h"
 )
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/msdf-atlas-gen)
+
 # Combine all sources
 add_library(Engine 
     ${ENGINE_SRC}
@@ -110,7 +112,7 @@ target_compile_definitions(Engine PRIVATE
 
 # Platform-specific configurations for Windows
 if(WIN32)
-    target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
+    #target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
 
     target_compile_definitions(Engine PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
@@ -132,12 +134,9 @@ if(WIN32)
     target_link_libraries(Engine PRIVATE 
         opengl32 gdi32 winmm
         glew32s
-        freetype
-        libpng16
-        skia.dll.lib
         
         vulkan-1
-        
+        msdf-atlas-gen
         # SPIRV-Tools Debug and Release libraries
         $<$<CONFIG:Debug>:SPIRV-Toolsd>
         $<$<CONFIG:Release>:SPIRV-Tools>
@@ -162,12 +161,7 @@ if(WIN32)
         $<$<CONFIG:Debug>:shaderc_utild>
         $<$<CONFIG:Release>:shaderc_util>
 
-        $<$<CONFIG:Debug>:msdfgen-cored>
-        $<$<CONFIG:Release>:msdfgen-core>
-        $<$<CONFIG:Debug>:msdfgen-extd>
-        $<$<CONFIG:Release>:msdfgen-ext>
-        $<$<CONFIG:Debug>:msdf-atlas-gend>
-        $<$<CONFIG:Release>:msdf-atlas-gen>
+        
         $<$<CONFIG:Debug>:glfw3>
         $<$<CONFIG:Release>:glfw3>
         $<$<CONFIG:Debug>:assimp-vc143-mtd>

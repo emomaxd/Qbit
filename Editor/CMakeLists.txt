@@ -54,9 +54,6 @@ target_include_directories(Editor PRIVATE
     ${ASSIMP_DIR}/build/include
     ${IMGUIZMO_DIR}
     ${MONO_DIR}/include
-    ${MSDF_ATLAS_GEN_DIR}/include
-    ${MSDF_ATLAS_GEN_DIR}/msdf-atlas-gen
-    ${MSDF_ATLAS_GEN_DIR}/msdfgen
 )
 
 # Compile definitions
@@ -77,11 +74,11 @@ target_compile_options(Editor PRIVATE
 )
 
 # Link options
-target_link_options(Editor PRIVATE /NODEFAULTLIB:LIBCMT)
+#target_link_options(Editor PRIVATE /NODEFAULTLIB:LIBCMT)
 
 # Platform-specific configuration
 if(WIN32)
-    target_precompile_headers(Editor PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
+    #target_precompile_headers(Editor PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
     target_compile_definitions(Editor PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
     target_link_directories(Editor PRIVATE 
@@ -107,10 +104,8 @@ if(WIN32)
         Winmm 
         Version 
         Bcrypt 
-        skia.dll.lib
-        freetype
-        libpng16
-        
+        Engine 
+
         vulkan-1
         
         # SPIRV-Tools Debug and Release libraries
@@ -137,13 +132,7 @@ if(WIN32)
         $<$<CONFIG:Debug>:shaderc_utild>
         $<$<CONFIG:Release>:shaderc_util>
 
-        Engine 
-        $<$<CONFIG:Debug>:msdfgen-cored>
-        $<$<CONFIG:Release>:msdfgen-core>
-        $<$<CONFIG:Debug>:msdfgen-extd>
-        $<$<CONFIG:Release>:msdfgen-ext>
-        $<$<CONFIG:Debug>:msdf-atlas-gend>
-        $<$<CONFIG:Release>:msdf-atlas-gen>
+        
         glew32s
         $<$<CONFIG:Debug>:glfw3>
         $<$<CONFIG:Release>:glfw3>

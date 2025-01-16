@@ -6,25 +6,25 @@
 
 namespace msdf_atlas {
 
-static const char *const shadronFillGlyphMask = R"(
-template <ATLAS, RANGE, ZERO_DIST, COLOR>
+static const char * const shadronFillGlyphMask = R"(
+template <ATLAS, RANGE, COLOR>
 glsl vec4 fillGlyph(vec2 texCoord) {
     float fill = texture((ATLAS), texCoord).r;
     return vec4(vec3(COLOR), fill);
 }
 )";
 
-static const char *const shadronFillGlyphSdf = R"(
-template <ATLAS, RANGE, ZERO_DIST, COLOR>
+static const char * const shadronFillGlyphSdf = R"(
+template <ATLAS, RANGE, COLOR>
 glsl vec4 fillGlyph(vec2 texCoord) {
     vec3 s = texture((ATLAS), texCoord).rgb;
-    float sd = dot(vec2(RANGE), 0.5/fwidth(texCoord))*(median(s.r, s.g, s.b)-ZERO_DIST);
+    float sd = dot(vec2(RANGE), 0.5/fwidth(texCoord))*(median(s.r, s.g, s.b)-0.5);
     float fill = clamp(sd+0.5, 0.0, 1.0);
     return vec4(vec3(COLOR), fill);
 }
 )";
 
-static const char *const shadronPreviewPreamble = R"(
+static const char * const shadronPreviewPreamble = R"(
 #include <median>
 
 glsl struct GlyphVertex {
@@ -43,11 +43,11 @@ glsl vec4 projectVertex(out vec2 texCoord, in GlyphVertex vertex) {
     return vec4(coord, 0.0, 1.0);
 }
 %s
-#define PREVIEW_IMAGE(NAME, ATLAS, RANGE, ZERO_DIST, COLOR, VERTEX_LIST, TEXT_SIZE, DIMENSIONS) model image NAME : \
+#define PREVIEW_IMAGE(NAME, ATLAS, RANGE, COLOR, VERTEX_LIST, TEXT_SIZE, DIMENSIONS) model image NAME : \
     vertex_data(GlyphVertex), \
     fragment_data(vec2), \
     vertex(projectVertex<TEXT_SIZE>, triangles, VERTEX_LIST), \
-    fragment(fillGlyph<ATLAS, RANGE, ZERO_DIST, COLOR>), \
+    fragment(fillGlyph<ATLAS, RANGE, COLOR>), \
     depth(false), \
     blend(transparency), \
     background(vec4(vec3(COLOR), 0.0)), \
@@ -77,24 +77,7 @@ static std::string relativizePath(const char *base, const char *target) {
     return output;
 }
 
-static std::string escapeString(const std::string &str) {
-    std::string output;
-    for (int i = 0; i < (int) str.size(); ++i) {
-        switch (str[i]) {
-            case '"':
-                output += "\\\"";
-                break;
-            case '\\':
-                output += "\\\\";
-                break;
-            default:
-                output.push_back(str[i]);
-        }
-    }
-    return output;
-}
-
-bool generateShadronPreview(const FontGeometry *fonts, int fontCount, ImageType atlasType, int atlasWidth, int atlasHeight, msdfgen::Range pxRange, const unicode_t *text, const char *imageFilename, bool fullRange, const char *outputFilename) {
+bool generateShadronPreview(const FontGeometry *fonts, int fontCount, ImageType atlasType, int atlasWidth, int atlasHeight, double pxRange, const unicode_t *text, const char *imageFilename, bool fullRange, const char *outputFilename) {
     if (fontCount <= 0)
         return false;
     double texelWidth = 1./atlasWidth;
@@ -105,13 +88,11 @@ bool generateShadronPreview(const FontGeometry *fonts, int fontCount, ImageType 
         return false;
     fprintf(file, shadronPreviewPreamble, atlasType == ImageType::HARD_MASK || atlasType == ImageType::SOFT_MASK ? shadronFillGlyphMask : shadronFillGlyphSdf);
     if (imageFilename)
-        fprintf(file, "image Atlas = file(\"%s\")", escapeString(relativizePath(outputFilename, imageFilename)).c_str());
+        fprintf(file, "image Atlas = file(\"%s\")", relativizePath(outputFilename, imageFilename).c_str());
     else
         fprintf(file, "image Atlas = file()");
     fprintf(file, " : %sfilter(%s), map(repeat);\n", fullRange ? "full_range(true), " : "", atlasType == ImageType::HARD_MASK ? "nearest" : "linear");
-    double pxRangeWidth = pxRange.upper-pxRange.lower;
-    fprintf(file, "const vec2 txRange = vec2(%.9g, %.9g);\n", pxRangeWidth*texelWidth, pxRangeWidth*texelHeight);
-    fprintf(file, "const float zeroDistanceValue = %.9g;\n\n", -pxRange.lower/(pxRange.upper-pxRange.lower));
+    fprintf(file, "const vec2 txRange = vec2(%.9g, %.9g);\n\n", pxRange*texelWidth, pxRange*texelHeight);
     {
         msdfgen::FontMetrics fontMetrics = fonts->getMetrics();
         for (int i = 1; i < fontCount; ++i) {
@@ -165,7 +146,7 @@ bool generateShadronPreview(const FontGeometry *fonts, int fontCount, ImageType 
         fputs("};\n", file);
         fprintf(file, "const vec2 textSize = vec2(%.9g, %.9g);\n\n", textWidth, -y);
     }
-    fputs("PREVIEW_IMAGE(Preview, Atlas, txRange, zeroDistanceValue, vec3(1.0), textQuadVertices, textSize, ivec2(1200, 400));\n", file);
+    fputs("PREVIEW_IMAGE(Preview, Atlas, txRange, vec3(1.0), textQuadVertices, textSize, ivec2(1200, 400));\n", file);
     fputs("export png(Preview, \"preview.png\");\n", file);
     fclose(file);
     return anyGlyphs;
