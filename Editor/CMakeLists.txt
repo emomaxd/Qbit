@@ -1,3 +1,5 @@
+project(Editor)
+
 # Vendor directories
 set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glfw")

@@ -14,6 +14,7 @@
 #include "Qbit/Renderer/Renderer.h"
 
 #include "Qbit/Scripting/ScriptEngine.h"
+#include <Platform/Vulkan/VulkanContext.h>
 
 namespace Qbit {
 
@@ -31,8 +32,76 @@ namespace Qbit {
 		if (!m_Specification.WorkingDirectory.empty())
 			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
-		m_Window = Window::Create(WindowProps(m_Specification.Name));
+		m_Window = Window::Create(WindowProps(m_Specification.Name)); /* Window initializes the Graphics Context. */
 		m_Window->SetEventCallback(QB_BIND_EVENT_FN(Application::OnEvent));
+
+		
+		/*
+		* 
+		* 
+		* The next scope exists only for VULKAN testing purposes,
+		* when we are done with initial integration of vulkan
+		* it will be gone.
+		* 
+		* 
+		*/
+
+		// Get the current graphics context from the window
+		auto& context = m_Window->GetGraphicsContext();
+		auto& vkContext = (VulkanContext&)context;
+
+		// Proceed only if Vulkan is the active renderer API
+		if (Renderer::GetAPI() == RendererAPI::API::Vulkan)
+		{
+			
+
+			auto shader = Shader::Create("assets/shaders/VulkanTest.glsl");
+			auto vertexArray = VertexArray::Create();
+
+
+			float vertices[3 * 3 * 4] = {
+				// Positions       // Colors (RGBA)
+				0.0f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f,   // Top vertex (red)
+			   -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f,   // Bottom-left vertex (green)
+				0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f    // Bottom-right vertex (blue)
+			};
+
+			auto vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
+			vertexBuffer->SetLayout({
+				{ ShaderDataType::Float3, "a_Position"     },
+				{ ShaderDataType::Float4, "a_Color"        },
+				});
+			vertexArray->AddVertexBuffer(vertexBuffer);
+
+			// Create graphics pipeline only when Vulkan context is ready
+			vkContext.CreateGraphicsPipeline(shader, vertexArray);
+
+
+			float colorOffset = 0.0f;
+
+			while (true)
+			{
+				glfwPollEvents();
+
+				for (int i = 0; i < 3; ++i)
+				{
+					float timeFactor = colorOffset * 0.2f;
+
+					vertices[i * 7 + 3] = (sin(timeFactor + i * 0.8f) * 0.5f) + 0.5f; // R
+					vertices[i * 7 + 4] = (cos(timeFactor + i * 0.6f) * 0.5f) + 0.5f; // G
+					vertices[i * 7 + 5] = (sin(timeFactor + i * 0.4f) * cos(timeFactor + i * 0.7f) * 0.5f) + 0.5f; // B
+				}
+
+
+				colorOffset += 0.005f;
+
+				vertexBuffer->SetData(vertices, sizeof(vertices));
+
+				// Render the frame
+				vkContext.DrawFrame(vertexArray);
+			}
+
+		}
 
 		Renderer::Init();
 

@@ -1,4 +1,4 @@
-project(Editor)
+project(Engine)
 
 # Vendor directories
 set(GLEW_DIR "${CMAKE_SOURCE_DIR}/Engine/vendor/glew")
@@ -50,6 +50,11 @@ add_library(Engine
     ${YAML_SRC}
     ${IMGUIZMO_SRC}
     ${BOX2D_SRC}
+)
+
+target_compile_options(Engine PRIVATE 
+    $<$<CONFIG:Debug>:/MDd>   # Debug mode: Multi-threaded Debug DLL
+    $<$<CONFIG:Release>:/MD>   # Release mode: Multi-threaded DLL
 )
 
 # Find the Vulkan SDK
@@ -112,9 +117,14 @@ target_compile_definitions(Engine PRIVATE
 
 # Platform-specific configurations for Windows
 if(WIN32)
-    #target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
+    target_precompile_headers(Engine PRIVATE "${CMAKE_SOURCE_DIR}/Engine/src/qbpch.h")
 
-    target_compile_definitions(Engine PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
+    target_compile_definitions(Engine PRIVATE 
+        QB_PLATFORM_WINDOWS
+        GLFW_INCLUDE_NONE
+        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>  # Debug mode
+        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0> # Release mode
+    )
 
     target_link_directories(Engine PRIVATE 
         ${MSDF_ATLAS_GEN_DIR}

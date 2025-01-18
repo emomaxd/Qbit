@@ -74,6 +74,7 @@ namespace Qbit {
 	{
 		QB_PROFILE_FUNCTION();
 
+		
 		{ /* Getting device from window. */
 			Application& instance = Application::Get();
 
@@ -84,7 +85,6 @@ namespace Qbit {
 			m_Device = context.GetDevice();
 			QB_CORE_ASSERT(m_Device != VK_NULL_HANDLE);
 		} /* Device is needed for shader creation. */
-
 
 		Utils::CreateCacheDirectoryIfNeeded();
 
@@ -112,6 +112,18 @@ namespace Qbit {
 		sources[VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT] = vertexSrc;
 		sources[VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT] = fragmentSrc;
 
+		{ /* Getting device from window. */
+			Application& instance = Application::Get();
+
+			Window& window = instance.GetWindow();
+
+			VulkanContext& context = (VulkanContext&)window.GetGraphicsContext();
+
+			m_Device = context.GetDevice();
+			QB_CORE_ASSERT(m_Device != VK_NULL_HANDLE);
+		} /* Device is needed for shader creation. */
+
+
 		CompileOrGetVulkanBinaries(sources);
 		CreateProgram();
 	}
@@ -124,6 +136,7 @@ namespace Qbit {
 
 	void VulkanShader::Bind() const
 	{
+		// Should re-create graphics pipeline !!!
 	}
 
 	void VulkanShader::Unbind() const

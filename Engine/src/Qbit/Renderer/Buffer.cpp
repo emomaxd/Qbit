@@ -14,6 +14,7 @@ namespace Qbit {
 		{
 		case RendererAPI::API::None:    QB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size);
+		case RendererAPI::API::Vulkan:  return CreateRef<VulkanVertexBuffer>(size);
 		}
 
 		QB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -26,6 +27,7 @@ namespace Qbit {
 		{
 		case RendererAPI::API::None:    QB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size);
+		case RendererAPI::API::Vulkan:  return CreateRef<VulkanVertexBuffer>(vertices, size);
 		}
 
 		QB_CORE_ASSERT(false, "Unknown RendererAPI!");

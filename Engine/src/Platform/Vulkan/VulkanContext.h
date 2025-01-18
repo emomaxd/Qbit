@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Qbit/Renderer/GraphicsContext.h"
+#include "Qbit/Renderer/VertexArray.h"
+#include "Qbit/Renderer/Shader.h"
 
 #ifdef QB_PLATFORM_WINDOWS
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -40,6 +42,9 @@ namespace Qbit {
     private:
         void OnWindowResize(int width, int height);
 
+    public:
+        void CreateGraphicsPipeline(Ref<Shader> shader, Ref<VertexArray> vertexArray);
+
     private: /* Setup */
         void CreateInstance();
         void SetupDebugMessenger();
@@ -49,10 +54,9 @@ namespace Qbit {
         void CreateSwapChain();
         void CreateImageViews();
         void CreateRenderPass();
-        void CreateGraphicsPipeline();
         void CreateFramebuffers();
         void CreateCommandPool();
-        void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+        void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Ref<VertexArray> vertexArray);
         void CreateSemaphores();
     
     private: /* Setup helpers */
@@ -68,8 +72,8 @@ namespace Qbit {
 
         VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
-    private:
-        void DrawFrame(); // Tester function for early vulkan testing
+    public:
+        void DrawFrame(Ref<VertexArray> vertexArray); // Tester function for early vulkan testing
         
 
     private:

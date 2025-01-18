@@ -36,8 +36,12 @@ namespace Qbit {
 		// Create a memory region in amount size with NULL data.
 		*/
 
-		VulkanContext& context = (VulkanContext&)Application::Get().GetWindow().GetGraphicsContext();
-		m_Device = context.GetDevice();
+		
+		{
+			VulkanContext& context = (VulkanContext&)Application::Get().GetWindow().GetGraphicsContext();
+			m_Device = context.GetDevice();
+		}
+
 
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -83,9 +87,11 @@ namespace Qbit {
 
 	VulkanVertexBuffer::VulkanVertexBuffer(float* vertices, uint32_t size)
 	{
+		{
+			VulkanContext& context = (VulkanContext&)Application::Get().GetWindow().GetGraphicsContext();
+			m_Device = context.GetDevice();
+		}
 
-		VulkanContext& context = (VulkanContext&)Application::Get().GetWindow().GetGraphicsContext();
-		m_Device = context.GetDevice();
 
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

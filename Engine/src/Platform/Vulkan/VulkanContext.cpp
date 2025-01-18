@@ -12,6 +12,8 @@
 #include <vector>
 
 #include <set>
+#include "VulkanVertexArray.h"
+#include "VulkanBuffer.h"
 
 namespace Qbit {
 
@@ -183,7 +185,7 @@ namespace Qbit {
 
         CreateRenderPass();
 
-        CreateGraphicsPipeline();
+        //CreateGraphicsPipeline(); /* Lazy initialize this */
 
         CreateFramebuffers();
 
@@ -192,15 +194,15 @@ namespace Qbit {
         CreateSemaphores();
 
         /* Do not go to scene - ecs structure try to render basically in here */
-        while (!glfwWindowShouldClose(m_WindowHandle))
-        {
-            glfwPollEvents();
-            DrawFrame();
-        }
+        //while (!glfwWindowShouldClose(m_WindowHandle))
+        //{
+        //    glfwPollEvents();
+        //    DrawFrame();
+        //}
 
         QB_CORE_INFO("Vulkan context initialized successfully.");
 
-        QB_CORE_ASSERT(false);
+        //QB_CORE_ASSERT(false);
 
     }
 
@@ -543,28 +545,15 @@ namespace Qbit {
         }
     }
 
-    void VulkanContext::CreateGraphicsPipeline()
+    void VulkanContext::CreateGraphicsPipeline(Ref<Shader> shader, Ref<VertexArray> vertexArray)
     {
-        // Initial modules
-        auto vertShaderCode = Util::ReadFile("assets/shaders/VulkanTest.glsl.cached_vulkan.vert");
-        auto fragShaderCode = Util::ReadFile("assets/shaders/VulkanTest.glsl.cached_vulkan.frag");
 
-        VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
-        VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
+        Ref<VulkanShader> vulkanShader = std::dynamic_pointer_cast<VulkanShader>(shader);
+        Ref<VulkanVertexArray> vulkanVertexArray = std::dynamic_pointer_cast<VulkanVertexArray>(vertexArray);
 
-        VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-        vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-        vertShaderStageInfo.module = vertShaderModule;
-        vertShaderStageInfo.pName = "main";
+        QB_CORE_ASSERT(vulkanShader);
 
-        VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-        fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragShaderStageInfo.module = fragShaderModule;
-        fragShaderStageInfo.pName = "main";
-
-        VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+        auto shaderStages = vulkanShader->GetShaderStages();
 
         // Dynamic state
         VkPipelineDynamicStateCreateInfo dynamicState{};
@@ -573,12 +562,16 @@ namespace Qbit {
         dynamicState.pDynamicStates = m_DynamicStates.data();
 
         // Vertex layout
+
+        auto& bindingDescriptions = vulkanVertexArray->GetBindingDescriptions();
+        auto& attributeDescriptions = vulkanVertexArray->GetAttributeDescriptions();
+
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+        vertexInputInfo.vertexBindingDescriptionCount = bindingDescriptions.size();    
+        vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+        vertexInputInfo.vertexAttributeDescriptionCount = attributeDescriptions.size();
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
         // Input assembly
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
@@ -662,7 +655,7 @@ namespace Qbit {
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineInfo.stageCount = 2;
-        pipelineInfo.pStages = shaderStages;
+        pipelineInfo.pStages = shaderStages.data();
         pipelineInfo.pVertexInputState = &vertexInputInfo;
         pipelineInfo.pInputAssemblyState = &inputAssembly;
         pipelineInfo.pViewportState = &viewportState;
@@ -681,8 +674,8 @@ namespace Qbit {
             QB_CORE_ASSERT(false);
         }
 
-        vkDestroyShaderModule(m_Device, fragShaderModule, nullptr);
-        vkDestroyShaderModule(m_Device, vertShaderModule, nullptr);
+        //vkDestroyShaderModule(m_Device, fragShaderModule, nullptr);
+        //vkDestroyShaderModule(m_Device, vertShaderModule, nullptr);
 
     }
 
@@ -746,7 +739,7 @@ namespace Qbit {
         }
     }
 
-    void VulkanContext::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
+    void VulkanContext::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, Ref<VertexArray> vertexArray)
     {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -786,6 +779,19 @@ namespace Qbit {
         scissor.extent = m_SwapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
+        auto& vertexBuffers = vertexArray->GetVertexBuffers();
+        Ref<VulkanVertexBuffer> vertexBuffer = std::dynamic_pointer_cast<VulkanVertexBuffer>(vertexBuffers[0]);
+        auto& buffer = vertexBuffer->GetBuffer();  // This is a Vulkan buffer (VkBuffer)
+
+        // Create an array of VkBuffer to pass into the bind command
+        VkBuffer buffers[] = { buffer };
+        VkDeviceSize offsets[] = { 0 };
+
+        // Now bind the vertex buffer properly
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+
+
+
         vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 
         vkCmdEndRenderPass(commandBuffer);
@@ -823,7 +829,7 @@ namespace Qbit {
         }
     }
 
-    void VulkanContext::DrawFrame()
+    void VulkanContext::DrawFrame(Ref<VertexArray> vertexArray)
     {
         vkWaitForFences(m_Device, 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT64_MAX);
 
@@ -846,7 +852,7 @@ namespace Qbit {
 
         vkResetCommandBuffer(m_CommandBuffers[m_CurrentFrame], 0);
 
-        RecordCommandBuffer(m_CommandBuffers[m_CurrentFrame], imageIndex);
+        RecordCommandBuffer(m_CommandBuffers[m_CurrentFrame], imageIndex, vertexArray);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

@@ -20,6 +20,8 @@ namespace Qbit {
 
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
 		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
+
+		const VkBuffer& GetBuffer() { return m_VertexBuffer; }
 	private:
 		VkDevice m_Device;
 		VkBuffer m_VertexBuffer;
