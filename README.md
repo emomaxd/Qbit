@@ -1,6 +1,8 @@
 # Qbit [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/emomaxd/Qbit/blob/master/LICENSE)
 
-<img align="center" src="images/qbit-logo.png" alt="Qbit" width="200" height="200">
+<p align="center">
+  <img src="images/qbit-logo.png" alt="Qbit" width="200" height="200">
+</p>
 
 Qbit is a **cross-platform**, **open-source** game engine designed to create high performance 2D and 3D games. It supports the full game development pipeline—rendering, physics, input handling, asset management and distributing the game executable.
 
