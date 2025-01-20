@@ -1,24 +1,23 @@
 # Qbit [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/emomaxd/Qbit/blob/master/LICENSE)
 
-![Qbit](Embeds/qbit-logo.png?raw=true "Qbit")
+<img src="images/qbit-logo.png" alt="Qbit" width="200" height="200">
 
-Qbit is a lightweight game engine. It's built with a mission to achieve high performance, modularity, readability, and memory safety. Qbit aims to provide a clear and structured codebase for understanding game engine development concepts.
+Qbit is a **cross-platform**, **open-source** game engine designed to create high performance 2D and 3D games. It supports the full game development pipeline—rendering, physics, input handling, asset management and distributing the game executable.
 
-## Dependencies
+## Documentation
+Documenting Qbit is one of our main focuses, as we recognize there’s still a lot to be done. Contributions in this area are welcome!
 
-**VulkanSDK**: To build Qbit from source you need VulkanSDK installed.
+- [About Qbit](docs/manual/AboutQbit.md)
 
-## Build Instructions
+## Development
+- [Build Instructions](BUILDING.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
 
-### Windows:
 
-1. Run `Setup.bat` to build 3rd party libraries.
-2. Run `CreateSolutionBuild.bat` to generate the Visual Studio Solution in build directory.
-3. After running the script:
-    - Open `Qbit.sln`
-    - Run the project.
+<p align="center">
+  <img src="images/QbitEditorTexture.png" alt="Editor" width="300" style="margin-right: 10px;">
+  <img src="images/QbitPhysics2D.png" alt="Physics" width="300">
+</p>
 
-## Follow the progress : [Trello](https://trello.com/b/8og3yTb4/engine)
-
-![Editor](Embeds/QbitEditorTexture.png)
-![Physics](Embeds/QbitPhysics2D.png)
+## LICENSE
+Qbit as a whole is open-source software and licensed under the Apache 2.0 license.

@@ -84,17 +84,12 @@ if(WIN32)
     target_compile_definitions(Editor PRIVATE QB_PLATFORM_WINDOWS GLFW_INCLUDE_NONE)
 
     target_link_directories(Editor PRIVATE 
-        ${MSDF_ATLAS_GEN_DIR}
-        $<$<CONFIG:Debug>:${GLFW_DIR}/build/src/Debug>
-        $<$<CONFIG:Release>:${GLFW_DIR}/build/src/Release>
-        $<$<CONFIG:Debug>:${ASSIMP_DIR}/build/lib/Debug>
-        $<$<CONFIG:Release>:${ASSIMP_DIR}/build/lib/Release>
-        $<$<CONFIG:Debug>:${ASSIMP_DIR}/build/contrib/zlib/Debug>
-        $<$<CONFIG:Release>:${ASSIMP_DIR}/build/contrib/zlib/Release>
         $<$<CONFIG:Debug>:${GLEW_DIR}/Windows/lib/Release/x64>
         $<$<CONFIG:Release>:${GLEW_DIR}/Windows/lib/Release/x64>
         $<$<CONFIG:Release>:${MONO_DIR}/lib/Release>
         $<$<CONFIG:Debug>:${MONO_DIR}/lib/Debug>
+
+        ${CMAKE_CURRENT_BINARY_DIR}/../Engine/vendor/msdf-atlas-gen/msdfgen/freetype
         ${VULKAN_LIB_DIR}
     )
 
@@ -106,9 +101,10 @@ if(WIN32)
         Winmm 
         Version 
         Bcrypt 
-        Engine 
+        
+        Engine
 
-        vulkan-1
+
         
         # SPIRV-Tools Debug and Release libraries
         $<$<CONFIG:Debug>:SPIRV-Toolsd>
@@ -136,12 +132,7 @@ if(WIN32)
 
         
         glew32s
-        $<$<CONFIG:Debug>:glfw3>
-        $<$<CONFIG:Release>:glfw3>
-        $<$<CONFIG:Debug>:assimp-vc143-mtd>
-        $<$<CONFIG:Release>:assimp-vc143-mt>
-        $<$<CONFIG:Debug>:zlibstaticd>
-        $<$<CONFIG:Release>:zlibstatic>
+        
         $<$<CONFIG:Debug>:libmono-static-sgen>
         $<$<CONFIG:Release>:libmono-static-sgen>
     )

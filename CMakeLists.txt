@@ -19,7 +19,9 @@ add_subdirectory(Engine)
 add_subdirectory(Editor)
 add_subdirectory(Qbit-ScriptCore)
 
-# Set the default startup project for Visual Studio
+add_subdirectory(Engine/vendor/glfw)
+add_subdirectory(Engine/vendor/assimp)
+
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Editor)
 
 # Optional: Platform-specific configurations
