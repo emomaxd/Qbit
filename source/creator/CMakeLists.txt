@@ -23,9 +23,8 @@ target_include_directories(qbit PUBLIC
 )
 
 target_link_directories(qbit PUBLIC
-    ${CMAKE_SOURCE_DIR}/lib
-    ${CMAKE_CURRENT_BINARY_DIR}/../../lib/Debug
-    ${CMAKE_CURRENT_BINARY_DIR}/../../lib/Release
+    ${CMAKE_SOURCE_DIR}/lib    
+    ${CMAKE_CURRENT_BINARY_DIR}/../../lib
 )
 
 target_link_libraries(qbit PUBLIC

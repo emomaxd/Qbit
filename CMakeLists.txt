@@ -95,8 +95,7 @@ endif()
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
-#install(TARGETS Qbit DESTINATION bin)
-#install(DIRECTORY include/ DESTINATION include)
+
 
 #------------------------------------------------------------------------------
 # Setup include and lib dirs
@@ -131,7 +130,9 @@ add_subdirectory(source)
 add_subdirectory(extern)
 
 
-
+install(TARGETS qbit DESTINATION ${CMAKE_BINARY_DIR}/bin)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/source/creator/assets DESTINATION ${CMAKE_BINARY_DIR}/bin)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/source/creator/mono DESTINATION ${CMAKE_BINARY_DIR}/bin)
 
 # ============================
 # End of CMake Configuration

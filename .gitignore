@@ -17,7 +17,6 @@ build/
 # CMake build files
 **/CMakeFiles
 **/CMakeCache.txt
-*.cmake
 
 # Editor-specific files (Windows, Linux, macOS)
 Editor/assets/cache
