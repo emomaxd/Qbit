@@ -1,0 +1,30 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 100
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterEnum: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+PointerAlignment: Left
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInAngles: false
+SpacesInSquareBrackets: false
+SpacesInCStyleCast: false
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignOperands: false
+AlignAfterOpenBracket: Align
+AllowShortFunctionsOnASingleLine: None
+SortIncludes: true
+IncludeBlocks: Regroup
+NamespaceIndentation: All

@@ -19,11 +19,11 @@ Qbit uses the CMake build system.
 ### Prerequisites
 
 - CMake
+- Python (3.x)
 - Git
-- VulkanSDK
 - Visual Studio (Tested on VS2022)
 
-Qbit doesn't allow in-source builds, so it is recommended to create a folder - usually build\ - and follow the instructions. The instructions have that command also, don't worry about it.
+Qbit doesn't allow in-source builds, so it is recommended to create a folder - usually build\ - and follow the instructions.
 
 It is important to use **cmd.exe** and not powershell or any other shell, the instructions may not work otherwise.
 
@@ -33,28 +33,32 @@ Following build instructions use relative paths and assume you to you are in the
 
 Clone the repository.
 ```shell
-git clone --recursive https://github.com/emomaxd/Qbit.git
+git clone https://github.com/emomaxd/qbit.git
 ```
-This instruction creates a folder called "Qbit".
+This instruction creates a folder called "qbit".
 
 
-Download the libraries. (Use it when Qbit cloned without **recursive** option)
+Download libraries.
 ```shell
-git submodule update --init --recursive
+python build_scripts/util/configure.py
 ```
+This script is gonna download the libraries according to the platform.
 
 ### Compile Qbit
 
-Move into the scripts/ directory and run the script.
+Create build directory
 ```shell
-cd Qbit/scripts
-CreateSolution.bat
+mkdir build && cd build
 ```
 
-Start developing by opening the **Qbit.sln**.
+Configure with CMake
 ```shell
-cd ../build
-Qbit.sln
+cmake ..
+```
+
+Compile using CMake, Then in the following command just substitute [CONFIG] with one of the following options: Release, Debug, RelWithDebInfo
+```shell
+cmake --build . --target INSTALL --config [CONFIG]
 ```
 
 

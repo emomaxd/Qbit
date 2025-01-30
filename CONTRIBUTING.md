@@ -2,10 +2,10 @@
 We are excited to have you contribute to our project! Please follow the steps below to help make the process as smooth as possible.
 
 ## How to Contribute
-You can find areas where you can contribute by checking out the [Issues](https://github.com/emomaxd/Qbit/issues) and [Projects](https://github.com/emomaxd/Qbit/projects) pages.
+You can find areas where you can contribute by checking out the [Issues](https://github.com/emomaxd/qbit/issues) and [Projects](https://github.com/emomaxd/qbit/projects) pages.
 
 ### Reporting Bugs
-If you find a bug, please open an [issue](https://github.com/emomaxd/Qbit/issues) on GitHub. Be sure to include:
+If you find a bug, please open an [issue](https://github.com/emomaxd/qbit/issues) on GitHub. Be sure to include:
 - A description of the bug
 - Steps to reproduce the bug
 - Any relevant error messages or logs
@@ -13,18 +13,18 @@ If you find a bug, please open an [issue](https://github.com/emomaxd/Qbit/issues
 ### Feature Requests
 If you'd like to suggest a new feature, open an issue and describe the feature in detail. Please explain why you think it would be useful to the project.
 
-### Workflow: To contribute, follow these steps:
-
+### Contribution Workflow:
 - Fork the repository.
 - Create a new branch for your changes.
 - Implement your changes.
 - Open a pull request with a clear description of your changes.
 
 ## Code Style
-Please follow the code style of the existing project. Consistency is key, and it helps everyone understand and maintain the code. It is expected that names (variables, functions and classes) be clear and descriptive, reducing the need for comments (most of the time).
+Please follow the code style of the existing project. Consistency is key, and it helps everyone understand and maintain the code. It is expected that names (variables, functions and classes) to be clear and descriptive, reducing the need for comments (most of the time).
 
 - Add comments where necessary to explain complex code.
 - Make sure to test your changes before submitting.
+- Use the .clang-format file in the root to fix the format of your new implementation.
 
 ## Control your commits
 Try to make simple PRs that handle one specific topic. Just like for reporting issues, it's better to open 3 different PRs that each address a different issue than one big PR with three commits. This makes it easier to review, approve, and merge the changes independently.
