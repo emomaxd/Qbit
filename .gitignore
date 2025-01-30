@@ -1,54 +1,105 @@
+# ============================
 # OUTPUT FILES
+# ============================
+
+# Windows executables and object files
 *.exe
 *.o
 *.out
+*.pdb
+*.ilk
 
+# Directories created during build
 build/
+*/RelWithDebInfo/
+*/MinSizeRel/
 
-Editor/assets/cache
-
-# 
-Editor/*.dll
-Editor/*.pdb
-#
-
-# CMAKE BUILD FILES
+# CMake build files
 **/CMakeFiles
 **/CMakeCache.txt
-*.cmake
 
-# Qbit Profiling Output
+# Editor-specific files (Windows, Linux, macOS)
+Editor/assets/cache
+Editor/*.dll
+Editor/*.pdb
+
+# Qbit Profiling Output (e.g., JSON reports)
 Sandbox/*.json
 Editor/*.json
 
-# LINUX SPECIFIED BUILD FILES
+# ============================
+# PLATFORM SPECIFIC BUILD FILES
+# ============================
+
+# Linux build files
 **/Makefile
 
-# VISUAL STUDIO FILES
+# Windows Visual Studio Files
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
 *.sln
 *.csproj
 
-# VISUAL STUDIO DIRECTORIES
+# Windows Visual Studio directories
 **/.vs/
 **/obj/
 **/x64/
 **/*.dir/
-**/Debug/
-**/Release/ 
 
-# LOGS
+# Logs
 *.log
 *.recipe
 *.tlog
 
-# VSCODE
-/.vscode
+# ============================
+# VSCODE (IDE-specific files)
+# ============================
+.vscode/
 
-# DEVELOPING PURPOSES
+# ============================
+# DEVELOPING PURPOSES / TEMP FILES
+# ============================
+
+# Temporary DLLs for scripting purposes
 SandboxProject.dll
 Editor/Resources/**/*.dll
 
-# NOTE: Editor/SandboxProject/Assets/Scripts/Binaries does include Qbit-ScriptCore.dll for temporarily, the plan is to copy that dll while creating a new project.
+# Temporary Files for projects
+Editor/SandboxProject/Assets/Scripts/Binaries/Qbit-ScriptCore.dll
+
+# ============================
+# Miscellaneous (global exclusions)
+# ============================
+
+# IDE-specific files
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Node.js dependencies (if applicable)
+node_modules/
+
+# Python virtual environments (if applicable)
+.env/
+.venv/
+
+# macOS system files
+.DS_Store
+
+# Linux system files
+*~
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+
+# ============================
+# Temporary Files and Directories
+# ============================
+
+# Cache directories
+**/.cache/
+**/.temp/
+
+# End of cross-platform .gitignore
