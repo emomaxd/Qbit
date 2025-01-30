@@ -623,8 +623,8 @@ namespace Qbit {
 
 		// Copy Qbit-ScriptCore into Library/
 		{
-			const std::string coreDllName = "Qbit-ScriptCore.dll";
-			fs::path coreDllPath = fs::current_path() / "Resources" / "Scripts" / coreDllName;
+			const std::string coreDllName = "qcs.dll";
+			fs::path coreDllPath = fs::current_path() / "resources" / "scripts" / coreDllName;
 			fs::path copyTo = projectDir / config.LibraryDirectory / coreDllName;
 			fs::copy_file(coreDllPath, copyTo);
 		}
